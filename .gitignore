@@ -1,6 +1,13 @@
 # Dependencies
 node_modules/
-**/.claude/
+# Claude local state
+.claude/*
+!.claude/skills/
+!.claude/skills/**
+
+# Optional local Claude files
+.claude/settings.local.json
+.claude/cache/
 
 # Build outputs
 dist/
