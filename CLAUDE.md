@@ -44,3 +44,31 @@ metadata:
   * Attach `x-correlation-id` to RabbitMQ message headers when publishing jobs.
   * Notification Worker extracts `x-correlation-id` to inject into Worker Pino logs for end-to-end request tracing.
 * **Readiness:** Expose `/healthz` (liveness) and `/readyz` (readiness checking Supabase DB & RabbitMQ availability).
+
+## 5. Project Directory Structure
+```text
+/
+├── docker-compose.yml
+├── CLAUDE.md
+├── shared/                     # Shared Zod schemas & TypeScript types
+├── client/                     # Vite + React Frontend
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ui/             # Reusable base UI primitives (Button, Modal, Input)
+│   │   │   └── features/       # Domain-specific components (Schedule, Tasks)
+│   │   ├── hooks/              # Custom hooks (useScheduleDnd, useAuth, etc.)
+│   │   ├── services/           # API client & TanStack Query definitions
+│   │   ├── i18n/               # Translation files (he.json, en.json)
+│   │   ├── types/              # Frontend types
+│   │   └── utils/              # Helper functions (cn, formatters)
+├── server/                     # Express Backend
+│   ├── src/
+│   │   ├── controllers/        # Route handlers
+│   │   ├── services/           # Business logic & RabbitMQ producers
+│   │   ├── routes/             # Express routes & middlewares
+│   │   ├── db/                 # Drizzle schemas & migrations
+│   │   └── config/             # Environment validation (env.ts)
+└── worker/                     # Notification & Background Worker
+    ├── src/
+        ├── consumers/          # RabbitMQ event consumers
+        └── integrations/       # Google Calendar API, Email/Push services
