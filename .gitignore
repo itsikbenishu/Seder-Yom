@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+**/.claude/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# Environment and local files
+.env
+.env.*
+*.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

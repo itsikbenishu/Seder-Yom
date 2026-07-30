@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' };</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>@keyframes syToast { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+.sy-scroll{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.sy-scroll::-webkit-scrollbar{width:8px;height:8px}
+.sy-scroll::-webkit-scrollbar-track{background:transparent}
+.sy-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+.sy-scroll::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+.dark .sy-scroll{scrollbar-color:#334155 transparent}
+.dark .sy-scroll::-webkit-scrollbar-thumb{background:#334155}
+.dark .sy-scroll::-webkit-scrollbar-thumb:hover{background:#475569}</style>
+</helmet>
+<div class="{{ rootWrap }}" dir="{{ dir }}" style="width:100%;height:100vh">
+  <div class="w-full h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden relative" style="font-family:Inter,ui-sans-serif,system-ui,sans-serif">
+
+    <!-- chrome -->
+    <div class="flex items-center gap-3 px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 flex-none">
+      <span class="text-[15px] font-semibold tracking-tight">{{ t.appName }}</span>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">{{ subLabel }}</span>
+      <div class="ms-auto flex items-center gap-2">
+        <div class="{{ segWrap }}">
+          <button class="{{ clsDesktop }}" onClick="{{ setDesktop }}">Desktop</button>
+          <button class="{{ clsMobile }}" onClick="{{ setMobile }}">Mobile</button>
+        </div>
+        <div class="{{ segWrap }}">
+          <button class="{{ clsHe }}" onClick="{{ setHe }}">עברית</button>
+          <button class="{{ clsEn }}" onClick="{{ setEn }}">EN</button>
+        </div>
+        <div class="{{ segWrap }}">
+          <button class="{{ clsLight }}" onClick="{{ setLight }}" title="Light"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg></button>
+          <button class="{{ clsDark }}" onClick="{{ setDark }}" title="Dark"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- viewport -->
+    <div class="{{ stageClass }}">
+      <div class="{{ frameClass }}">
+
+        <!-- ===== LOGIN ===== -->
+        <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+          <div class="h-full flex flex-col items-center justify-center gap-6 p-8 text-center">
+            <div class="h-12 w-12 rounded-xl flex items-center justify-center text-white {{ ac.solid }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+            <div><h2 class="text-2xl font-semibold m-0">{{ t.appName }}</h2><p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ t.tagline }}</p></div>
+            <div class="w-[320px] max-w-full flex flex-col gap-3 text-start">
+              <div><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.email }}</label><input class="{{ inputCls }}" type="email" value="{{ email }}" onInput="{{ onEmail }}" maxlength="120" placeholder="user@gmail.com"></div>
+              <button class="{{ btnPrimary }} w-full" onClick="{{ toTwofa }}">{{ t.continue }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== 2FA ===== -->
+        <sc-if value="{{ isTwofa }}" hint-placeholder-val="{{ false }}">
+          <div class="h-full flex flex-col items-center justify-center gap-5 p-8 text-center">
+            <div class="h-12 w-12 rounded-xl flex items-center justify-center {{ ac.softText }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+            <div><h3 class="text-xl font-semibold m-0">{{ t.twofaTitle }}</h3><p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{{ t.codeSent }} <span class="font-semibold text-slate-700 dark:text-slate-200">{{ email }}</span></p></div>
+            <div class="w-[320px] max-w-full flex flex-col gap-3">
+              <input class="{{ inputCls }} text-center text-xl tracking-[0.5em]" value="{{ code }}" onInput="{{ onCode }}" placeholder="——————" maxlength="6">
+              <button class="{{ btnPrimary }} w-full" onClick="{{ verify }}">{{ t.verify }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== WEEK ===== -->
+        <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ true }}">
+          <div class="flex flex-col h-full">
+            <div class="flex items-baseline gap-3 px-6 pt-5 pb-3">
+              <div class="flex-1">
+                <div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold">{{ t.week }} · {{ t.weekRange }}</div>
+                <h2 class="text-2xl font-semibold mt-0.5">{{ t.weekTitle }}</h2>
+              </div>
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ go.settings }}" title="{{ t.settings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.7l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.3 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 17 4.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ go.archive }}" title="{{ t.archive }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg></button>
+            </div>
+            <div class="{{ weekGridClass }}">
+              <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+                <div class="{{ d.cardClass }}">
+                  <div class="flex items-center gap-2 cursor-pointer" onClick="{{ d.onOpen }}">
+                    <div class="flex-1 font-semibold text-[15px]">{{ d.dow }} <span class="text-xs font-normal text-slate-400 dark:text-slate-500">{{ d.dateNum }}</span></div>
+                    <sc-if value="{{ d.isToday }}" hint-placeholder-val="{{ false }}"><span class="{{ tagAccent }}">{{ t.today }}</span></sc-if>
+                    <sc-if value="{{ d.muted }}" hint-placeholder-val="{{ false }}"><span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300" title="{{ t.alertsMuted }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-9.3-5M6 8c0 7-3 9-3 9h13M13.7 21a2 2 0 0 1-3.4 0M2 2l20 20"/></svg>{{ t.muted }}</span></sc-if>
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 min-h-[16px] flex items-center gap-1.5 cursor-pointer" onClick="{{ d.onOpen }}">
+                    <sc-if value="{{ d.hasNext }}" hint-placeholder-val="{{ true }}"><span class="h-1.5 w-1.5 rounded-full flex-none {{ ac.dot }}"></span>{{ d.nextText }}</sc-if>
+                  </div>
+                  <div class="flex gap-1 mt-0.5">
+                    <button class="{{ btnGhost }} text-[11px]" onClick="{{ d.onMute }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>{{ d.muteLabel }}</button>
+                    <button class="{{ btnGhost }} text-[11px]" onClick="{{ d.onArchive }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/></svg></button>
+                    <button class="{{ btnGhost }} text-[11px] ms-auto" onClick="{{ d.onAddAllDay }}" title="{{ t.allDay }}">+</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== DAY ===== -->
+        <sc-if value="{{ isDay }}" hint-placeholder-val="{{ false }}">
+          <div class="flex flex-col h-full">
+            <div class="flex items-center gap-2.5 px-5 pt-4 pb-2.5 border-b border-slate-200 dark:border-slate-800">
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backWeek }}" title="{{ t.backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+              <button class="{{ btnGhost }} {{ iconBtn }}" onClick="{{ prevDay }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <div class="text-center flex-1 min-w-[150px]"><div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold">{{ curDay.dow }}</div><h3 class="text-xl font-semibold m-0">{{ curDay.full }}</h3></div>
+              <button class="{{ btnGhost }} {{ iconBtn }}" onClick="{{ nextDay }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ fwdIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <div class="relative">
+                <button class="{{ curDay.menuBtnClass }}" onClick="{{ toggleDayMenu }}" title="{{ curDay.menuTitle }}"><sc-if value="{{ curDay.muted }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="text-amber-500 dark:text-amber-400"><path d="M18 8a6 6 0 0 0-9.3-5M6 8c0 7-3 9-3 9h13M13.7 21a2 2 0 0 1-3.4 0M2 2l20 20"/></svg></sc-if><sc-if value="{{ curDay.notMuted }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="2.3"/><circle cx="12" cy="12" r="2.3"/><circle cx="19" cy="12" r="2.3"/></svg></sc-if></button>
+                <sc-if value="{{ dayMenuOpen }}" hint-placeholder-val="{{ false }}">
+                  <div class="fixed inset-0 z-30" onClick="{{ closeDayMenu }}"></div>
+                  <div class="absolute top-full mt-1.5 end-0 z-40 min-w-[200px] flex flex-col p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl" onClick="{{ stop }}">
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onMuteMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>{{ curDay.muteLabel }}</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onOpenArchive }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg>{{ t.openArchive }}</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onArchiveMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/></svg>{{ t.archiveDay }}</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition" onClick="{{ curDay.onClearAllMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6M10 11v6M14 11v6"/></svg>{{ t.clearDay }}</button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+
+            <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+              <sc-for list="{{ curDay.allDay }}" as="a" hint-placeholder-count="0">
+                <div class="{{ a.rowClass }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none"><path d="M4 7l16 0M4 12l16 0M4 17l10 0"/></svg><span class="flex-1">{{ a.title }}</span><sc-if value="{{ a.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if></div>
+              </sc-for>
+
+              <div class="text-[11px] text-slate-400 dark:text-slate-500 my-2.5 flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9l4 4 4-8 4 12 2-4"/></svg>{{ t.dragHint }}</div>
+
+              <div class="flex flex-col gap-2.5" onDragOver="{{ onDragOver }}">
+                <sc-for list="{{ curDay.events }}" as="ev" hint-placeholder-count="4">
+                  <div draggable="{{ ev.draggable }}" onDragStart="{{ ev.onDragStart }}" onDragOver="{{ onDragOver }}" onDrop="{{ ev.onDrop }}" class="{{ ev.rowClass }}">
+                    <div class="flex-none w-[58px] {{ ev.timeAlign }}"><div class="font-semibold text-[15px] tabular-nums">{{ ev.start }}</div><div class="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{{ ev.end }}</div></div>
+                    <div class="w-px self-stretch bg-slate-200 dark:bg-slate-700 flex-none"></div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <sc-if value="{{ ev.isNext }}" hint-placeholder-val="{{ false }}"><span class="{{ tagAccent }}">{{ t.nextUp }}</span></sc-if>
+                        <span class="font-semibold text-[16px] leading-snug break-words [overflow-wrap:anywhere] {{ ev.titleClampCls }}">{{ ev.title }}</span>
+                      </div>
+                      <sc-if value="{{ ev.hasText }}" hint-placeholder-val="{{ false }}">
+                        <div>
+                          <sc-if value="{{ ev.hasDesc }}" hint-placeholder-val="{{ false }}"><p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-0 break-words [overflow-wrap:anywhere] {{ ev.clampCls }}">{{ ev.desc }}</p></sc-if>
+                          <sc-if value="{{ ev.hasNote }}" hint-placeholder-val="{{ false }}"><p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-0 flex items-start gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none mt-0.5 opacity-70"><path d="M4 4h16v12H8l-4 4z"/></svg><span class="min-w-0 break-words [overflow-wrap:anywhere] {{ ev.clampCls }}">{{ ev.note }}</span></p></sc-if>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ ev.isLong }}" hint-placeholder-val="{{ false }}"><button class="text-[11px] font-medium mt-1 {{ ac.text }} hover:underline" onClick="{{ ev.toggleText }}">{{ ev.toggleLabel }}</button></sc-if>
+                      <div class="flex flex-wrap gap-1.5 mt-2">
+                        <sc-if value="{{ ev.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if>
+                        <sc-if value="{{ ev.reminder }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>{{ ev.leadLabel }}</span></sc-if>
+                        <sc-if value="{{ ev.repeats }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 2l3 3-3 3M20 5H9a4 4 0 0 0-4 4M7 22l-3-3 3-3M4 19h11a4 4 0 0 0 4-4"/></svg>{{ ev.freqLabel }}</span></sc-if>
+                        <sc-if value="{{ ev.hasFiles }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>{{ ev.fileCount }} {{ t.attachN }}</span></sc-if>
+                      </div>
+                    </div>
+                    <sc-if value="{{ ev.editable }}" hint-placeholder-val="{{ true }}">
+                      <div class="flex flex-col gap-1 flex-none">
+                        <button class="{{ btnGhost }} h-[30px] w-[30px] justify-center" onClick="{{ ev.onEdit }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                        <button class="{{ btnGhost }} h-[30px] w-[30px] justify-center" onClick="{{ ev.onDelete }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ ev.locked }}" hint-placeholder-val="{{ false }}"><span class="flex-none text-slate-400 dark:text-slate-500" title="{{ t.readOnly }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span></sc-if>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ curDay.empty }}" hint-placeholder-val="{{ false }}"><p class="text-center text-slate-400 dark:text-slate-500 py-8">{{ t.noEvents }}</p></sc-if>
+              </div>
+            </div>
+
+            <div class="px-5 py-3 border-t border-slate-200 dark:border-slate-800"><button class="{{ btnPrimary }} w-full" onClick="{{ addToCurDay }}">+ {{ t.addEvent }}</button></div>
+          </div>
+        </sc-if>
+
+        <!-- ===== ARCHIVE ===== -->
+        <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
+          <div class="flex flex-col h-full">
+            <div class="px-6 pt-4 pb-2.5 flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800">
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <h3 class="text-xl font-semibold m-0 flex-none">{{ t.archive }}</h3>
+              <div class="flex-1 relative">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="absolute top-1/2 -translate-y-1/2 start-3 opacity-50"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+                <input class="{{ inputCls }} ps-9" value="{{ search }}" onInput="{{ onSearch }}" placeholder="{{ t.search }}">
+              </div>
+            </div>
+            <div class="flex-1 min-h-0 overflow-auto px-6 py-3.5 flex flex-col gap-2">
+              <sc-for list="{{ archiveList }}" as="a" hint-placeholder-count="4">
+                <div class="{{ archiveRowClass }}" onClick="{{ a.onOpen }}">
+                  <div class="text-center flex-none w-[46px]"><div class="font-semibold text-[22px] tabular-nums leading-none">{{ a.day }}</div><div class="text-[10px] uppercase tracking-[0.06em] text-slate-500 dark:text-slate-300">{{ a.mon }}</div><div class="text-[10px] tabular-nums text-slate-500 dark:text-slate-400 mt-0.5">{{ a.yr }}</div></div>
+                  <div class="w-px self-stretch bg-slate-200 dark:bg-slate-700"></div>
+                  <div class="flex-1 min-w-0"><div class="font-semibold text-[15px]">{{ a.dow }}</div><div class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ a.summary }}</div></div>
+                  <span class="{{ tagOutline }} flex-none">{{ a.count }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ archiveEmpty }}" hint-placeholder-val="{{ false }}"><p class="text-center text-slate-400 dark:text-slate-500 py-8">{{ t.noArchive }}</p></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== SETTINGS ===== -->
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div class="flex flex-col h-full">
+            <div class="px-6 pt-4 pb-2.5 flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800">
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <h3 class="text-xl font-semibold m-0">{{ t.settings }}</h3>
+            </div>
+            <div class="flex-1 min-h-0 overflow-auto px-6 py-5 flex flex-col gap-6 max-w-[540px]">
+              <div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-2">{{ t.language }}</h6>
+                <div class="{{ segWrap }}"><button class="{{ clsHe }}" onClick="{{ setHe }}">עברית</button><button class="{{ clsEn }}" onClick="{{ setEn }}">English</button></div>
+              </div>
+              <div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-2">{{ t.appearance }}</h6>
+                <div class="{{ segWrap }}"><button class="{{ clsLight }}" onClick="{{ setLight }}">{{ t.light }}</button><button class="{{ clsDark }}" onClick="{{ setDark }}">{{ t.dark }}</button></div>
+              </div>
+              <div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-2">{{ t.gcalSync }}</h6>
+                <div class="flex items-center gap-3.5 flex-wrap">
+                  <div class="{{ segWrap }}"><button class="{{ clsGOn }}" onClick="{{ setGcalOn }}">{{ t.on }}</button><button class="{{ clsGOff }}" onClick="{{ setGcalOff }}">{{ t.off }}</button></div>
+                  <button class="{{ btnSecondary }}" onClick="{{ noop }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4v6h6M20 20v-6h-6M20 9a8 8 0 0 0-14-3M4 15a8 8 0 0 0 14 3"/></svg>{{ t.reauth }}</button>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">{{ t.gcalNote }}</p>
+              </div>
+              <div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-2">{{ t.notif }}</h6>
+                <div class="{{ segWrap }}">
+                  <button class="{{ clsNotifBrowser }}" onClick="{{ setNotifBrowser }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>{{ t.browserN }}</button>
+                  <button class="{{ clsNotifMobile }}" onClick="{{ setNotifMobile }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>{{ t.mobileN }}</button>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">{{ t.notifNote }}</p>
+              </div>
+              <button class="{{ btnSecondary }} self-start" onClick="{{ signOut }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>{{ t.signOut }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== ARCHIVED DAY (read-only) ===== -->
+        <sc-if value="{{ isArchiveDay }}" hint-placeholder-val="{{ false }}">
+          <div class="flex flex-col h-full">
+            <div class="flex items-center gap-2.5 px-5 pt-4 pb-2.5 border-b border-slate-200 dark:border-slate-800">
+              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backArchive }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <div class="flex-1"><div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold">{{ archCur.dow }}</div><h3 class="text-xl font-semibold m-0">{{ archCur.full }}</h3></div>
+              <span class="{{ tagOutline }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.readOnly }}</span>
+            </div>
+            <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+              <sc-for list="{{ archCur.allDay }}" as="a" hint-placeholder-count="0">
+                <div class="{{ a.rowClass }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none"><path d="M4 7l16 0M4 12l16 0M4 17l10 0"/></svg><span class="flex-1">{{ a.title }}</span><sc-if value="{{ a.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if></div>
+              </sc-for>
+              <div class="flex flex-col gap-2.5">
+                <sc-for list="{{ archCur.events }}" as="ev" hint-placeholder-count="3">
+                  <div class="{{ ev.rowClass }}">
+                    <div class="flex-none w-[58px] {{ ev.timeAlign }}"><div class="font-semibold text-[15px] tabular-nums">{{ ev.start }}</div><div class="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{{ ev.end }}</div></div>
+                    <div class="w-px self-stretch bg-slate-200 dark:bg-slate-700 flex-none"></div>
+                    <div class="flex-1 min-w-0">
+                      <span class="font-semibold text-[16px] truncate block">{{ ev.title }}</span>
+                      <sc-if value="{{ ev.hasDesc }}" hint-placeholder-val="{{ false }}"><p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-0">{{ ev.desc }}</p></sc-if>
+                      <div class="flex flex-wrap gap-1.5 mt-2">
+                        <sc-if value="{{ ev.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if>
+                        <sc-if value="{{ ev.reminder }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>{{ ev.leadLabel }}</span></sc-if>
+                        <sc-if value="{{ ev.repeats }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 2l3 3-3 3M20 5H9a4 4 0 0 0-4 4M7 22l-3-3 3-3M4 19h11a4 4 0 0 0 4-4"/></svg>{{ ev.freqLabel }}</span></sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ archCur.empty }}" hint-placeholder-val="{{ false }}"><p class="text-center text-slate-400 dark:text-slate-500 py-8">{{ t.noEvents }}</p></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== EVENT DIALOG ===== -->
+        <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="absolute inset-0 z-40 grid place-items-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeDialog }}">
+            <div class="{{ dialogCls }}" onClick="{{ stop }}">
+              <div class="flex items-center justify-between mb-3 flex-none"><span class="text-lg font-semibold">{{ dialogTitle }}</span><button class="{{ btnGhost }} {{ iconBtn }}" onClick="{{ closeDialog }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+              <div class="flex-1 min-h-0 overflow-auto sy-scroll {{ formGridClass }}">
+                <div class="{{ spanCls }}"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.title }}</label><input class="{{ form.titleCls }}" value="{{ form.title }}" onInput="{{ ff.title }}" maxlength="80" placeholder="{{ t.title }}"><sc-if value="{{ form.titleError }}" hint-placeholder-val="{{ false }}"><p class="text-xs text-rose-500 dark:text-rose-400 mt-1 mb-0 flex items-center gap-1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>{{ t.titleErr }}</p></sc-if></div>
+                <sc-if value="{{ form.notAllDay }}" hint-placeholder-val="{{ true }}">
+                <div class="flex gap-2.5 {{ spanCls }} flex-wrap">
+                  <div class="flex-1 min-w-[110px]"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.startT }}</label><input class="{{ form.startCls }}" type="time" value="{{ form.start }}" onInput="{{ ff.start }}"></div>
+                  <div class="flex-1 min-w-[110px]"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.endT }}</label><input class="{{ form.endCls }}" type="time" value="{{ form.end }}" onInput="{{ ff.end }}"></div>
+                  <sc-if value="{{ form.timeError }}" hint-placeholder-val="{{ false }}"><p class="w-full text-xs text-rose-500 dark:text-rose-400 m-0 flex items-center gap-1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>{{ t.timeErr }}</p></sc-if>
+                </div>
+                </sc-if>
+                <div><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.freq }}</label>
+                  <div class="{{ segWrap }} flex-wrap"><button class="{{ clsFOnce }}" onClick="{{ ff.freqOnce }}">{{ t.once }}</button><button class="{{ clsFDaily }}" onClick="{{ ff.freqDaily }}">{{ t.daily }}</button><button class="{{ clsFWeekly }}" onClick="{{ ff.freqWeekly }}">{{ t.weekly }}</button></div>
+                </div>
+                <div><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.reminder }}</label>
+                  <div class="flex gap-2.5 flex-wrap items-center">
+                    <div class="{{ segWrap }}"><button class="{{ clsRemOn }}" onClick="{{ ff.remOn }}">{{ t.on }}</button><button class="{{ clsRemOff }}" onClick="{{ ff.remOff }}">{{ t.off }}</button></div>
+                    <sc-if value="{{ form.reminder }}" hint-placeholder-val="{{ false }}"><select class="{{ inputCls }} w-auto min-w-[130px]" value="{{ form.lead }}" onChange="{{ ff.lead }}"><option value="15m">{{ t.m15 }}</option><option value="30m">{{ t.m30 }}</option><option value="1h">{{ t.h1 }}</option><option value="1d">{{ t.d1 }}</option><option value="sameday">{{ t.sameday }}</option></select></sc-if>
+                    <sc-if value="{{ form.leadSameday }}" hint-placeholder-val="{{ false }}"><div class="flex items-center gap-2"><span class="text-xs text-slate-500 dark:text-slate-400">{{ t.leadAt }}</span><input type="time" class="{{ inputCls }} w-auto min-w-[110px]" value="{{ form.leadTime }}" onChange="{{ ff.leadTime }}"></div></sc-if>
+                  </div>
+                </div>
+                <div class="{{ spanCls }}"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.desc }}</label><input class="{{ inputCls }}" value="{{ form.desc }}" onInput="{{ ff.desc }}" maxlength="200"></div>
+                <div class="{{ spanCls }}"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.note }}</label><textarea class="{{ inputCls }} min-h-[60px] resize-y" value="{{ form.note }}" onInput="{{ ff.note }}" maxlength="500"></textarea></div>
+                <div class="{{ spanCls }}"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.attach }}</label>
+                  <div class="flex flex-col gap-2">
+                    <sc-if value="{{ form.hasFiles }}" hint-placeholder-val="{{ false }}">
+                      <div class="flex flex-wrap gap-1.5">
+                        <sc-for list="{{ form.files }}" as="fl" hint-placeholder-count="0">
+                          <span class="inline-flex items-center gap-1.5 max-w-full ps-2 pe-1 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-xs">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none text-slate-400 dark:text-slate-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            <span class="truncate max-w-[150px]" title="{{ fl.name }}">{{ fl.name }}</span>
+                            <span class="flex-none text-[10px] text-slate-400 dark:text-slate-500 tabular-nums">{{ fl.size }}</span>
+                            <button class="flex-none h-5 w-5 grid place-items-center rounded text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition" onClick="{{ fl.remove }}" title="{{ t.removeFile }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                          </span>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <sc-if value="{{ form.canAddFiles }}" hint-placeholder-val="{{ true }}">
+                        <label class="{{ btnSecondary }} cursor-pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>{{ t.addFiles }}<input type="file" class="hidden" multiple="{{ true }}" accept="image/png,image/jpeg,image/webp,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt" onChange="{{ ff.file }}"></label>
+                      </sc-if>
+                      <sc-if value="{{ form.hasFiles }}" hint-placeholder-val="{{ false }}"><span class="text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{{ form.fileCount }} / 5</span></sc-if>
+                      <sc-if value="{{ form.filesFull }}" hint-placeholder-val="{{ false }}"><span class="text-[11px] text-slate-400 dark:text-slate-500">{{ t.filesMax }}</span></sc-if>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 pt-3 mt-3 flex-none border-t border-slate-100 dark:border-slate-800">
+                <sc-if value="{{ form.canDelete }}" hint-placeholder-val="{{ false }}"><button class="{{ btnGhost }} me-auto text-slate-500 dark:text-slate-400" onClick="{{ deleteFromForm }}">{{ t.delete }}</button></sc-if>
+                <button class="{{ btnSecondary }}" onClick="{{ closeDialog }}">{{ t.cancel }}</button>
+                <button class="{{ btnPrimary }}" onClick="{{ saveEvent }}">{{ t.save }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== CONFIRM DIALOG ===== -->
+        <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="absolute inset-0 z-50 grid place-items-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeConfirm }}">
+            <div class="w-[380px] max-w-[92%] flex flex-col gap-3 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl" onClick="{{ stop }}">
+              <span class="text-lg font-semibold">{{ confirmData.title }}</span>
+              <p class="text-sm text-slate-500 dark:text-slate-400 m-0 leading-relaxed">{{ confirmData.body }}</p>
+              <div class="flex justify-end gap-2 mt-1">
+                <button class="{{ btnSecondary }}" onClick="{{ closeConfirm }}">{{ t.cancel }}</button>
+                <button class="{{ confirmBtnCls }}" onClick="{{ confirmOk }}">{{ confirmData.label }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== TOAST ===== -->
+        <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+          <div class="absolute bottom-5 inset-x-0 flex justify-center z-[60] pointer-events-none">
+            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm flex items-center gap-2 shadow-lg" style="animation:syToast .2s ease">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="{{ ac.text }}"><path d="M20 6L9 17l-5-5"/></svg>{{ toast }}
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;1200&quot;,&quot;height&quot;:&quot;820&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;indigo&quot;,&quot;violet&quot;,&quot;emerald&quot;,&quot;rose&quot;],&quot;default&quot;:&quot;violet&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;defaultMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;comfortable&quot;,&quot;compact&quot;],&quot;default&quot;:&quot;comfortable&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const E = (id,day,s,e,he,en,o={}) => ({id,day,start:s,end:e,titleHe:he,titleEn:en,allDay:!!o.allDay,gcal:!!o.gcal,freq:o.freq||'once',reminder:!!o.reminder,lead:o.lead||'30m',descHe:o.dh||'',descEn:o.de||'',note:o.note||'',files:o.files||[]});
+    this.state = {
+      screen:'week', lang:'he', device:'desktop', mode: props.defaultMode||'light', authed:true,
+      email:'noa@gmail.com', code:'',
+      selDay:3, muted:{}, search:'', gcal:true, notif:'browser', expanded:{}, archAdded:[],
+      dialogOpen:false, form:null, toast:'', confirm:null, dayMenu:false,
+      events:[
+        E(1,0,'09:00','09:30','פגישת צוות שבועית','Weekly team sync',{freq:'weekly',reminder:true,lead:'30m',dh:'סקירת משימות לשבוע',de:'Review the week\u2019s tasks'}),
+        E(2,0,'13:00','14:00','צהריים עם דנה','Lunch with Dana',{}),
+        E(3,1,'','','יום הולדת אמא','Mom\u2019s birthday',{allDay:true,gcal:true}),
+        E(4,1,'08:30','09:15','אימון בוקר','Morning workout',{freq:'daily',reminder:true,lead:'1h'}),
+        E(5,1,'17:00','18:30','קורס React','React course',{gcal:true,dh:'שיעור 7 — hooks',de:'Lesson 7 — hooks'}),
+        E(6,2,'10:00','11:00','שיחת לקוח','Client call',{reminder:true,lead:'1h',dh:'הצגת אבטיפוס',de:'Present the prototype'}),
+        E(7,2,'15:00','15:30','רופא שיניים','Dentist',{reminder:true,lead:'1d'}),
+        E(8,3,'','','יום עיון חברה','Company offsite',{allDay:true,gcal:true}),
+        E(9,3,'07:30','08:00','יוגה','Yoga',{freq:'daily'}),
+        E(10,3,'09:30','10:30','סטנדאפ ותכנון','Standup & planning',{reminder:true,lead:'30m',dh:'סבב סטטוס + יעדי היום',de:'Status round + daily goals'}),
+        E(11,3,'12:00','13:00','צהריים','Lunch break',{}),
+        E(12,3,'16:00','17:00','1:1 עם המנהל','1:1 with manager',{reminder:true,lead:'sameday'}),
+        E(13,4,'11:00','12:00','מצגת רבעונית','Quarterly review',{reminder:true,lead:'1d',dh:'תוצאות Q4',de:'Q4 results'}),
+        E(14,4,'19:00','21:00','ארוחת ערב משפחתית','Family dinner',{freq:'weekly'}),
+        E(15,5,'','','כניסת שבת','Shabbat begins',{allDay:true,gcal:true}),
+        E(16,5,'09:00','10:00','קניות לשבת','Weekend shopping',{}),
+      ],
+      nextId:100,
+    };
+    this.week = [
+      {dow_he:'ראשון',dow_en:'Sunday',date:11,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'שני',dow_en:'Monday',date:12,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'שלישי',dow_en:'Tuesday',date:13,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'רביעי',dow_en:'Wednesday',date:14,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'חמישי',dow_en:'Thursday',date:15,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'שישי',dow_en:'Friday',date:16,mon_he:'ינואר',mon_en:'Jan'},
+      {dow_he:'שבת',dow_en:'Saturday',date:17,mon_he:'ינואר',mon_en:'Jan'},
+    ];
+    this.today = 3;
+    this.NOW = 9*60; // demo "current time" = 09:00 on today (Wed)
+    const AE = (s,e,he,en,o={}) => ({s,e,he,en,gcal:!!o.gcal,reminder:!!o.reminder,lead:o.lead||'30m',freq:o.freq||'once',allDay:!!o.allDay,dh:o.dh||'',de:o.de||''});
+    this.arch = [
+      {dow_he:'ראשון',dow_en:'Sunday',day:4,yr:2026,mon_he:'ינואר',mon_en:'JAN',sumHe:'מנוחה, ארוחת בוקר ארוכה, סרט בערב',sumEn:'Rest day, long brunch, movie night',count:3,
+        events:[AE('','','צום עשרה בטבת','Fast of Tevet',{allDay:true,gcal:true}),AE('11:00','13:00','ארוחת בוקר מאוחרת','Late brunch'),AE('21:00','23:00','ערב סרטים','Movie night',{reminder:true,lead:'1h'})]},
+      {dow_he:'חמישי',dow_en:'Thursday',day:1,yr:2026,mon_he:'ינואר',mon_en:'JAN',sumHe:'סיכום שנה, פגישת הנהלה',sumEn:'Year wrap-up, leadership meeting',count:5,
+        events:[AE('','','ראש השנה האזרחית','New Year\u2019s Day',{allDay:true,gcal:true}),AE('09:00','10:00','סיכום שנה','Year wrap-up',{reminder:true,lead:'30m'}),AE('11:00','12:30','פגישת הנהלה','Leadership meeting',{gcal:true}),AE('14:00','15:00','תכנון Q1','Q1 planning'),AE('18:00','19:00','כושר','Gym',{freq:'daily'})]},
+      {dow_he:'שני',dow_en:'Monday',day:29,yr:2025,mon_he:'דצמבר',mon_en:'DEC',sumHe:'חזרה מחופשה, מיון מיילים',sumEn:'Back from vacation, inbox triage',count:4,
+        events:[AE('08:30','09:00','מיון מיילים','Inbox triage'),AE('10:00','11:00','סנכרון חזרה לעבודה','Back-to-work sync',{dh:'סטטוס פרויקטים',de:'Project status'}),AE('13:00','14:00','צהריים עם הצוות','Team lunch'),AE('16:00','17:00','שיחת 1:1','1:1',{reminder:true,lead:'15m'})]},
+      {dow_he:'רביעי',dow_en:'Wednesday',day:24,yr:2025,mon_he:'דצמבר',mon_en:'DEC',sumHe:'ערב חג, ארוחה משפחתית',sumEn:'Holiday eve, family meal',count:2,
+        events:[AE('','','ערב חג','Holiday eve',{allDay:true,gcal:true}),AE('19:00','22:00','ארוחה משפחתית','Family dinner',{reminder:true,lead:'1d'})]},
+    ];
+    this.AC = {
+      indigo:{solid:'bg-indigo-600 hover:bg-indigo-500',text:'text-indigo-600 dark:text-indigo-400',dot:'bg-indigo-500',soft:'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-300 dark:border-indigo-500/40',softText:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400',tag:'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'},
+      violet:{solid:'bg-violet-600 hover:bg-violet-500',text:'text-violet-600 dark:text-violet-400',dot:'bg-violet-500',soft:'bg-violet-50 dark:bg-violet-500/10 border-violet-300 dark:border-violet-500/40',softText:'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400',tag:'bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300'},
+      emerald:{solid:'bg-emerald-600 hover:bg-emerald-500',text:'text-emerald-600 dark:text-emerald-400',dot:'bg-emerald-500',soft:'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/40',softText:'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',tag:'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'},
+      rose:{solid:'bg-rose-600 hover:bg-rose-500',text:'text-rose-600 dark:text-rose-400',dot:'bg-rose-500',soft:'bg-rose-50 dark:bg-rose-500/10 border-rose-300 dark:border-rose-500/40',softText:'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400',tag:'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'},
+    };
+    this.SEGW = 'inline-flex gap-0.5 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800';
+    this.SEGA = 'px-3 py-1.5 rounded-md text-sm font-medium bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition inline-flex items-center gap-1.5';
+    this.SEGI = 'px-3 py-1.5 rounded-md text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition inline-flex items-center gap-1.5';
+    this.dragId = null;
+  }
+
+  sg(a){ return a ? this.SEGA : this.SEGI; }
+  set(k,v){ this.setState({[k]:v}); }
+  flash(msg){ this.setState({toast:msg}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),1900); }
+  toMin(t){ if(!t) return 9999; const [h,m]=t.split(':').map(Number); return h*60+m; }
+  dayEventsFor(d){ return this.state.events.filter(e=>e.day===d); }
+
+  T(){
+    const he = this.state.lang==='he';
+    return {
+      appName: he?'סֵדֶר יוֹם':'SederYom', tagline: he?'התכנון היומי שלך':'Your daily plan, in order',
+      week:he?'שבוע':'Week', archive:he?'ארכיון':'Archive', settings:he?'הגדרות':'Settings',
+      weekTitle: he?'השבוע שלך':'Your week', weekRange: he?'11–17 בינואר':'Jan 11–17',
+      today:he?'היום':'Today', nextUp:he?'הקרוב':'Next up', allDay:he?'יום שלם':'All-day', noEvents:he?'אין אירועים':'No events',
+      addEvent:he?'הוספת אירוע':'Add event', muteOn:he?'השתקת תזכורות':'Mute alerts', muted:he?'מושתק':'Muted', unmute:he?'ביטול השתקה':'Unmute',
+      archiveDay:he?'ארכוב יום':'Archive day', backWeek:he?'חזרה לשבוע':'Back to week',
+      openArchive:he?'פתיחת הארכיון':'Open archive',
+      search:he?'חיפוש בארכיון…':'Search archive…', readOnly:he?'קריאה בלבד':'Read only', fromGoogle:'Google',
+      email:he?'דוא״ל':'Email', continue:he?'המשך':'Continue', twofaTitle:he?'אימות דו‑שלבי':'Two-factor verification', codeSent:he?'קוד נשלח אל':'Code sent to', verify:he?'אימות':'Verify',
+      title:he?'כותרת':'Title', startT:he?'התחלה':'Start', endT:he?'סיום':'End', freq:he?'תדירות':'Repeat', once:he?'חד‑פעמי':'Once', daily:he?'יומי':'Daily', weekly:he?'שבועי':'Weekly',
+      reminder:he?'תזכורת':'Reminder', on:he?'פעיל':'On', off:he?'כבוי':'Off', m15:he?'רבע שעה לפני':'15 min before', m30:he?'חצי שעה לפני':'30 min before', h1:he?'שעה לפני':'1 hour before', d1:he?'יום לפני':'1 day before', sameday:he?'שעה מוגדרת':'Specific time', leadAt:he?'התראה בשעה':'Alert at', allDayEvent:he?'אירוע יום שלם':'All-day event',
+      desc:he?'תיאור':'Description', note:he?'הערה':'Note', attach:he?'קבצים (תמונה / PDF / Office)':'Files (image / PDF / Office)', chooseFile:he?'בחירת קובץ':'Choose file', save:he?'שמירה':'Save', delete:he?'מחיקה':'Delete', cancel:he?'ביטול':'Cancel',
+      editEvent:he?'עריכת אירוע':'Edit event', newEvent:he?'אירוע חדש':'New event',
+      addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום — עד 5 קבצים / 25MB':'Maximum reached — up to 5 files / 25MB',
+      showMore:he?'הצג עוד':'Show more', showLess:he?'הצג פחות':'Show less',
+      attachN:he?'קבצים':'files',
+      timeErr:he?'שעת הסיום חייבת להיות אחרי שעת ההתחלה':'End time must be after start time',
+      titleErr:he?'יש להזין כותרת לאירוע':'Please enter an event title',
+      confirm:he?'אישור':'Confirm', confirmArchiveTitle:he?'לארכב את היום?':'Archive this day?',
+      confirmArchiveBody:he?'האירועים שלך מהיום יימחקו; אירועי Google יישמרו בארכיון לקריאה בלבד.':'Your own events from this day will be removed; Google events are kept in the archive as read-only.',
+      confirmDeleteTitle:he?'למחוק את האירוע?':'Delete event?',
+      confirmDeleteBody:he?'לא ניתן לשחזר את האירוע לאחר המחיקה.':'This event can\u2019t be restored after deletion.',
+      confirmSignOutTitle:he?'להתנתק?':'Sign out?',
+      confirmSignOutBody:he?'תצטרכו להתחבר שוב כדי להיכנס לחשבון.':'You\u2019ll need to sign in again to access your account.',
+      clearDay:he?'מחיקת כל אירועי היום':'Delete all events',
+      confirmClearTitle:he?'למחוק את כל אירועי היום?':'Delete all events for this day?',
+      confirmClearBody:he?'כל האירועים שיצרתם ביום זה יימחקו; אירועי Google יישארו.':'All events you created on this day will be deleted; Google events remain.',
+      cleared:he?'אירועי היום נמחקו':'Day\u2019s events deleted', nothingToClear:he?'אין אירועים למחיקה':'No events to delete',
+      more:he?'עוד':'More', unmuteDay:he?'ביטול השתקת תזכורות':'Unmute alerts',
+      alertsMuted:he?'התראות מושתקות':'Alerts muted', alertsOn:he?'התראות פעילות':'Alerts on',
+      language:he?'שפה':'Language', appearance:he?'מראה':'Appearance', light:he?'בהיר':'Light', dark:he?'כהה':'Dark',
+      gcalSync:he?'סנכרון Google Calendar':'Google Calendar sync', reauth:he?'אימות מחדש':'Re-authenticate', gcalNote: he?'אירועים מ‑Google מסומנים ומוצגים לקריאה בלבד — לא ניתן לערוך אותם כאן.':'Events from Google are marked and shown read-only — they can\u2019t be edited here.',
+      notif:he?'התראות':'Notifications', browserN:he?'דפדפן':'Browser', mobileN:he?'נייד':'Mobile',
+      notifNote:he?'ההתראות נשלחות כ‑Push (Firebase). בחרו היכן לקבל אותן — התראות לא יופיעו בתוך האפליקציה עצמה.':'Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear inside the app itself.',
+      saved:he?'האירוע נשמר':'Event saved', deleted:he?'האירוע נמחק':'Event deleted', signOut:he?'התנתקות':'Sign out',
+      dragHint:he?'גררו אירוע כדי לשנות את השעה':'Drag an event to change its time', noArchive:he?'לא נמצאו ימים בארכיון':'No archived days found',
+    };
+  }
+
+  renderVals(){
+    const s=this.state, t=this.T(), he=s.lang==='he';
+    const isDark = s.mode==='dark', mobile = s.device==='mobile';
+    const ac = this.AC[this.props.accent||'indigo'] || this.AC.indigo;
+    const compact = (this.props.density||'comfortable')==='compact';
+    const rad = compact?'rounded-lg':'rounded-xl';
+    const pad = compact?'p-2.5':'p-3.5';
+    const gap = compact?'gap-2':'gap-2.5';
+    const title = k => he ? k+'He' : k+'En';
+    const leadText = l => ({'15m':t.m15,'30m':t.m30,'1h':t.h1,'1d':t.d1,'sameday':t.sameday})[l];
+    const freqText = f => ({daily:t.daily,weekly:t.weekly})[f];
+
+    const surface = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800';
+    const btnPrimary = 'inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition disabled:opacity-50 '+ac.solid;
+    const btnSecondary = 'inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
+    const btnGhost = 'inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
+    const iconBtn = 'h-9 w-9 px-0 justify-center';
+    const inputCls = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:focus:border-slate-500 placeholder:text-slate-400';
+    const tagBase = 'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium';
+    const tagAccent = tagBase+' '+ac.tag;
+    const tagNeutral = tagBase+' bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300';
+    const tagOutline = tagBase+' border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400';
+
+    const frameClass = mobile
+      ? 'w-[390px] max-w-full my-4 self-start rounded-[26px] border border-slate-300 dark:border-slate-700 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 h-[760px] flex flex-col'
+      : 'w-full flex flex-col min-h-full';
+    const stageClass = 'flex-1 min-h-0 overflow-auto flex justify-center '+(mobile?'bg-slate-100 dark:bg-slate-900':'');
+    const weekGridClass = mobile?'grid grid-cols-1 gap-2.5 px-4 pb-5 overflow-auto':'grid gap-3 px-6 pb-6 overflow-auto grid-cols-4';
+    const backIconStyle = he ? 'transform:scaleX(-1)' : '';
+    const fwdIconStyle = he ? '' : 'transform:scaleX(-1)';
+
+    const weekDays = this.week.map((w,i)=>{
+      const evs=this.dayEventsFor(i);
+      const timed=evs.filter(e=>!e.allDay).sort((a,b)=>this.toMin(a.start)-this.toMin(b.start));
+      const isToday=i===this.today, muted=!!s.muted[i];
+      const next = isToday ? timed.find(e=>this.toMin(e.start)>=this.NOW) : null;
+      return {
+        dow: he?w.dow_he:w.dow_en, dateNum:w.date, isToday, muted,
+        hasNext:!!next, nextText: next? next.start+' · '+next[title('title')]:'',
+        muteLabel: muted?t.unmute:t.muteOn,
+        cardClass: 'flex flex-col '+gap+' '+pad+' '+rad+' border transition '+(isToday?ac.soft:surface)+(muted?' opacity-70':''),
+        onOpen:()=>this.setState({selDay:i,screen:'day'}),
+        onMute:()=>this.setState(st=>({muted:{...st.muted,[i]:!st.muted[i]}})),
+        onArchive:()=>this.archiveDay(i),
+        onAddAllDay:()=>this.openForm(i,true,null,true),
+      };
+    });
+
+    const di=s.selDay, w=this.week[di];
+    const dEvs=this.dayEventsFor(di);
+    const timed=dEvs.filter(e=>!e.allDay).sort((a,b)=>this.toMin(a.start)-this.toMin(b.start));
+    const nextId=timed[0]?timed[0].id:null;
+    const curDay={
+      dow: he?w.dow_he:w.dow_en,
+      full:(he?w.dow_he:w.dow_en)+', '+w.date+' '+(he?w.mon_he:w.mon_en),
+      empty:dEvs.length===0,
+      muted:!!s.muted[di], notMuted:!s.muted[di],
+      menuBtnClass: btnSecondary+' '+iconBtn,
+      menuTitle: s.muted[di]?this.T().alertsMuted:this.T().more,
+      onMute:()=>this.setState(st=>({muted:{...st.muted,[di]:!st.muted[di]}})),
+      muteLabel: s.muted[di]?this.T().unmuteDay:this.T().muteOn,
+      onMuteMenu:()=>{ const t=this.T(); this.setState(st=>{ const on=!st.muted[di]; return {muted:{...st.muted,[di]:on},dayMenu:false,toast: on?(he?'התראות היום הושתקו':'Day muted'):(he?'ההשתקה בוטלה':'Unmuted')}; }); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),1900); },
+      onArchiveMenu:()=>{ this.setState({dayMenu:false}); this.archiveDay(di); },
+      onOpenArchive:()=>this.setState({dayMenu:false,screen:'archive'}),
+      onClearAllMenu:()=>{ this.setState({dayMenu:false}); this.clearDayEvents(di); },
+      onArchive:()=>this.archiveDay(di),
+      onClearAll:()=>{ this.clearDayEvents(di); },
+      allDay:dEvs.filter(e=>e.allDay).map(a=>({title:a[title('title')],gcal:a.gcal,
+        rowClass:'flex items-center gap-2 '+pad+' '+rad+' border border-dashed mb-2 text-sm '+(a.gcal?ac.softText+' border-current/40':'border-slate-300 dark:border-slate-700')})),
+      events:timed.map(e=>{
+        const gc=e.gcal, isNext=e.id===nextId;
+        return {
+          id:e.id, start:e.start, end:e.end, title:e[title('title')],
+          desc:e[title('desc')], hasDesc:!!e[title('desc')],
+          note:e.note, hasNote:!!e.note,
+          expanded:!!s.expanded[e.id], hasText:!!(e[title('desc')]||e.note), isLong:(((e[title('desc')]||'').length + (e.note||'').length) > 80),
+          titleClampCls: '',
+          clampCls: (s.expanded[e.id]||((e[title('desc')]||'').length+(e.note||'').length<=80))?'':'line-clamp-2',
+          textWrapCls: '',
+          toggleLabel: s.expanded[e.id]?t.showLess:t.showMore,
+          toggleText:()=>this.setState(st=>({expanded:{...st.expanded,[e.id]:!st.expanded[e.id]}})),
+          hasFiles:!!(e.files&&e.files.length), fileCount:(e.files||[]).length,
+          gcal:gc, reminder:e.reminder, leadLabel:leadText(e.lead),
+          repeats:e.freq!=='once', freqLabel:freqText(e.freq),
+          isNext, editable:!gc, locked:gc, draggable:!gc,
+          timeAlign: he?'text-right':'text-left',
+          rowClass:'flex '+gap+' items-start '+pad+' '+rad+' border transition '+(isNext?ac.soft:(gc?'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800':surface))+(gc?'':' cursor-grab'),
+          onEdit:()=>this.openForm(di,false,e.id),
+          onDelete:()=>this.askConfirm({title:t.confirmDeleteTitle, body:t.confirmDeleteBody, label:t.delete, danger:true, onOk:()=>{ this.setState(st=>({events:st.events.filter(x=>x.id!==e.id),confirm:null})); this.flash(t.deleted); }}),
+          onDragStart:(ev)=>{ this.dragId=e.id; try{ev.dataTransfer.effectAllowed='move';}catch(_){} },
+          onDrop:(ev)=>{ ev.preventDefault(); this.swapTimes(this.dragId,e.id); },
+        };
+      }),
+    };
+
+    const q=s.search.trim().toLowerCase();
+    const archiveList=this.state.archAdded.concat(this.arch).filter(a=>!q||(a.dow_he+a.dow_en+a[he?'sumHe':'sumEn']).toLowerCase().includes(q)).map(a=>({
+      day:a.day, mon:he?a.mon_he:a.mon_en, dow:he?a.dow_he:a.dow_en, yr:a.yr,
+      summary:he?a.sumHe:a.sumEn, count:a.count+(he?' אירועים':' events'),
+      onOpen:()=>this.setState({archView:a,screen:'archiveDay'}),
+    }));
+
+    const av=s.archView;
+    const readRow = gc => 'flex '+gap+' items-start '+pad+' '+rad+' border '+(gc?'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800':surface);
+    const archCur = av ? {
+      dow: he?av.dow_he:av.dow_en,
+      full:(he?av.dow_he:av.dow_en)+', '+av.day+' '+(he?av.mon_he:av.mon_en)+' '+av.yr,
+      allDay:(av.events||[]).filter(e=>e.allDay).map(e=>({title:he?e.he:e.en,gcal:e.gcal,
+        rowClass:'flex items-center gap-2 '+pad+' '+rad+' border border-dashed mb-2 text-sm '+(e.gcal?ac.softText+' border-current/40':'border-slate-300 dark:border-slate-700')})),
+      events:(av.events||[]).filter(e=>!e.allDay).sort((a,b)=>this.toMin(a.s)-this.toMin(b.s)).map(e=>({
+        start:e.s,end:e.e,title:he?e.he:e.en,desc:he?e.dh:e.de,hasDesc:!!(he?e.dh:e.de),
+        gcal:e.gcal,reminder:e.reminder,leadLabel:leadText(e.lead),repeats:e.freq&&e.freq!=='once',freqLabel:freqText(e.freq),
+        timeAlign: he?'text-right':'text-left', rowClass:readRow(e.gcal),
+      })),
+      empty:(av.events||[]).length===0,
+    } : {dow:'',full:'',allDay:[],events:[],empty:true};
+
+    const f=s.form;
+    const ff=f?{
+      title:e=>this.upd('title',e.target.value.slice(0,80)), start:e=>this.updTime('start',e.target.value), end:e=>this.updTime('end',e.target.value),
+      desc:e=>this.upd('desc',e.target.value.slice(0,200)), note:e=>this.upd('note',e.target.value.slice(0,500)), lead:e=>this.upd('lead',e.target.value),
+      leadTime:e=>this.upd('leadTime',e.target.value),
+      freqOnce:()=>this.upd('freq','once'), freqDaily:()=>this.upd('freq','daily'), freqWeekly:()=>this.upd('freq','weekly'),
+      remOn:()=>this.upd('reminder',true), remOff:()=>this.upd('reminder',false),
+      file:e=>{ const he=this.state.lang==='he'; const incoming=[...(e.target.files||[])]; e.target.value=''; if(!incoming.length) return;
+        const MAXN=5, MAXSIZE=10*1024*1024, MAXTOTAL=25*1024*1024;
+        const ok=fl=>/^(image\/(png|jpe?g|webp)|application\/pdf)$/.test(fl.type)||/\.(png|jpe?g|webp|pdf|docx?|xlsx?|pptx?|csv|txt)$/i.test(fl.name);
+        let files=[...(this.state.form.files||[])]; let total=files.reduce((a,x)=>a+x.size,0); let rejected=false, full=false;
+        for(const fl of incoming){ if(!ok(fl)||fl.size>MAXSIZE){ rejected=true; continue; } if(files.some(x=>x.name===fl.name&&x.size===fl.size)) continue; if(files.length>=MAXN||total+fl.size>MAXTOTAL){ full=true; break; } files.push({name:fl.name.slice(0,120),size:fl.size}); total+=fl.size; }
+        this.setState(st=>({form:{...st.form,files}}));
+        if(full) this.flash(he?('ניתן לצרף עד '+MAXN+' קבצים או 25MB'):('Up to '+MAXN+' files or 25MB total'));
+        else if(rejected) this.flash(he?'חלק מהקבצים נדחו (סוג או גודל)':'Some files were rejected (type or size)');
+      },
+      removeFile:i=>this.setState(st=>({form:{...st.form,files:(st.form.files||[]).filter((_,idx)=>idx!==i)}})),
+    }:{};
+    const formView=f?{
+      title:f.title,start:f.start,end:f.end,desc:f.desc,note:f.note,lead:f.lead,leadTime:f.leadTime,reminder:f.reminder,
+      allDay:!!f.allDay, notAllDay:!f.allDay, leadSameday: f.reminder&&f.lead==='sameday',
+      timeError:!!f.timeError,
+      titleError:!!f.titleError,
+      titleCls: inputCls+(f.titleError?' border-rose-400 dark:border-rose-500':''),
+      startCls: inputCls+(f.timeError?' border-rose-400 dark:border-rose-500':''),
+      endCls: inputCls+(f.timeError?' border-rose-400 dark:border-rose-500':''),
+      canDelete:!f.isNew,
+      files:(f.files||[]).map((x,i)=>({name:x.name, size:this.fmtSize(x.size), remove:()=>this.setState(st=>({form:{...st.form,files:(st.form.files||[]).filter((_,j)=>j!==i)}}))})),
+      hasFiles:(f.files||[]).length>0, fileCount:(f.files||[]).length, filesFull:(f.files||[]).length>=5, canAddFiles:(f.files||[]).length<5,
+    }:{};
+
+    const dialogCls = (mobile?'w-[440px] max-w-[94%]':'w-[680px] max-w-[94%]')+' max-h-[90%] flex flex-col p-5 '+(compact?'rounded-xl':'rounded-2xl')+' bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl';
+    const formGridClass = mobile?'flex flex-col gap-3':'grid grid-cols-2 gap-x-4 gap-y-3 items-start';
+    const spanCls = mobile?'':'col-span-2';
+
+    return {
+      rootWrap: isDark?'dark':'',
+      subLabel:(he?'עברית':'EN')+' · '+(mobile?'Mobile':'Desktop')+' · '+(isDark?(he?'כהה':'Dark'):(he?'בהיר':'Light')),
+      dir: he?'rtl':'ltr', t, ac,
+      btnPrimary, btnSecondary, btnGhost, iconBtn, inputCls, tagAccent, tagNeutral, tagOutline,
+      segWrap:this.SEGW,
+      clsDesktop:this.sg(!mobile), clsMobile:this.sg(mobile), clsHe:this.sg(he), clsEn:this.sg(!he),
+      clsLight:this.sg(!isDark), clsDark:this.sg(isDark),
+      setDesktop:()=>this.set('device','desktop'), setMobile:()=>this.set('device','mobile'),
+      setHe:()=>this.set('lang','he'), setEn:()=>this.set('lang','en'),
+      setLight:()=>this.set('mode','light'), setDark:()=>this.set('mode','dark'),
+      frameClass, stageClass, weekGridClass, backIconStyle, fwdIconStyle,
+      isLogin:s.screen==='login', isTwofa:s.screen==='twofa', isWeek:s.screen==='week',
+      isDay:s.screen==='day', isArchive:s.screen==='archive', isSettings:s.screen==='settings', isArchiveDay:s.screen==='archiveDay',
+      weekDays, curDay, archCur, backArchive:()=>this.set('screen','archive'),
+      email:s.email, code:s.code, onEmail:e=>this.set('email',e.target.value.slice(0,120)), onCode:e=>this.set('code',e.target.value.replace(/\D/g,'').slice(0,6)),
+      toTwofa:()=>{ const he=this.state.lang==='he'; if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((this.state.email||'').trim())){ this.flash(he?'כתובת דוא"ל לא תקינה':'Invalid email address'); return; } this.set('screen','twofa'); }, verify:()=>this.setState({authed:true,screen:'week'}),
+      go:{ settings:()=>this.set('screen','settings'), archive:()=>this.set('screen','archive') },
+      backWeek:()=>this.set('screen','week'),
+      prevDay:()=>this.set('selDay',(di+6)%7), nextDay:()=>this.set('selDay',(di+1)%7),
+      addToCurDay:()=>this.openForm(di,true),
+      search:s.search, onSearch:e=>this.set('search',e.target.value),
+      archiveList, archiveEmpty:archiveList.length===0,
+      archiveRowClass:'flex flex-row items-center gap-3.5 '+pad+' '+rad+' border '+surface+' cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition',
+      clsGOn:this.sg(s.gcal), clsGOff:this.sg(!s.gcal), setGcalOn:()=>this.set('gcal',true), setGcalOff:()=>this.set('gcal',false),
+      clsNotifBrowser:this.sg(s.notif==='browser'), clsNotifMobile:this.sg(s.notif==='mobile'),
+      setNotifBrowser:()=>this.set('notif','browser'), setNotifMobile:()=>this.set('notif','mobile'),
+      signOut:()=>{ const t=this.T(); this.askConfirm({title:t.confirmSignOutTitle, body:t.confirmSignOutBody, label:t.signOut, danger:true, onOk:()=>this.setState({authed:false,screen:'login',code:'',confirm:null})}); },
+      noop:()=>this.flash(he?'מתחבר מחדש ל‑Google…':'Reconnecting to Google…'),
+      dialogOpen:s.dialogOpen, dialogTitle: f&&f.isNew?(f.allDay?t.allDayEvent:t.newEvent):t.editEvent,
+      dialogCls, formGridClass, spanCls, form:formView, ff,
+      clsFOnce:this.sg(f&&f.freq==='once'), clsFDaily:this.sg(f&&f.freq==='daily'), clsFWeekly:this.sg(f&&f.freq==='weekly'),
+      clsRemOn:this.sg(f&&f.reminder), clsRemOff:this.sg(f&&!f.reminder),
+      closeDialog:()=>this.setState({dialogOpen:false,form:null}),
+      stop:e=>e.stopPropagation(),
+      saveEvent:()=>this.saveForm(), deleteFromForm:()=>this.deleteForm(),
+      confirmOpen:!!s.confirm, confirmData:s.confirm||{},
+      confirmOk:()=>{ const c=this.state.confirm; if(c&&c.onOk) c.onOk(); },
+      closeConfirm:()=>this.closeConfirm(),
+      dayMenuOpen:s.dayMenu, toggleDayMenu:()=>this.setState(st=>({dayMenu:!st.dayMenu})), closeDayMenu:()=>this.set('dayMenu',false),
+      confirmBtnCls: (s.confirm&&s.confirm.danger)
+        ? 'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-rose-600 hover:bg-rose-500 text-white transition'
+        : btnPrimary,
+      onDragOver:e=>e.preventDefault(),
+      toast:s.toast,
+    };
+  }
+
+  openForm(dayIdx,isNew,id,allDay){
+    let form;
+    if(isNew){ form={id:null,day:dayIdx,isNew:true,allDay:!!allDay,title:'',start:allDay?'':'10:00',end:allDay?'':'11:00',freq:'once',reminder:true,lead:'30m',leadTime:'08:00',desc:'',note:'',files:[]}; }
+    else { const e=this.state.events.find(x=>x.id===id); const he=this.state.lang==='he';
+      form={id:e.id,day:e.day,isNew:false,allDay:!!e.allDay,title:e[he?'titleHe':'titleEn'],start:e.start,end:e.end,freq:e.freq,reminder:e.reminder,lead:e.lead,leadTime:e.leadTime||'08:00',desc:e[he?'descHe':'descEn'],note:e.note,files:(e.files||[]).slice()}; }
+    this.setState({dialogOpen:true,form});
+  }
+  askConfirm(cfg){ this.setState({confirm:cfg}); }
+  closeConfirm(){ this.setState({confirm:null}); }
+  clearDayEvents(di){
+    const t=this.T();
+    const has=this.state.events.some(e=>e.day===di&&!e.gcal);
+    if(!has){ this.flash(t.nothingToClear); return; }
+    this.askConfirm({title:t.confirmClearTitle, body:t.confirmClearBody, label:t.clearDay, danger:true, onOk:()=>{ this.setState(st=>({events:st.events.filter(e=>e.day!==di||e.gcal),confirm:null})); this.flash(t.cleared); }});
+  }
+  archiveDay(dayIdx){
+    const t=this.T(), he=this.state.lang==='he';
+    if(!this.state.events.some(e=>e.day===dayIdx)){ this.flash(he?'אין אירועים לארכוב ביום זה':'No events to archive on this day'); return; }
+    this.askConfirm({title:t.confirmArchiveTitle, body:t.confirmArchiveBody, label:t.confirm, danger:false, onOk:()=>this.doArchiveDay(dayIdx)});
+  }
+  doArchiveDay(dayIdx){
+    const he=this.state.lang==='he', w=this.week[dayIdx];
+    const dayEvs=this.state.events.filter(e=>e.day===dayIdx && e.gcal);
+    const aEvents=dayEvs.map(e=>({s:e.start,e:e.end,he:e.titleHe,en:e.titleEn,gcal:true,reminder:e.reminder,lead:e.lead,freq:e.freq,allDay:e.allDay,dh:e.descHe,de:e.descEn}));
+    const sumHe=dayEvs.map(e=>e.titleHe).slice(0,3).join(', ')||'ללא אירועים';
+    const sumEn=dayEvs.map(e=>e.titleEn).slice(0,3).join(', ')||'No events';
+    const entry={dow_he:w.dow_he,dow_en:w.dow_en,day:w.date,yr:2026,mon_he:w.mon_he,mon_en:w.mon_en,sumHe,sumEn,count:aEvents.length,events:aEvents};
+    this.setState(st=>({events:st.events.filter(e=>e.day!==dayIdx||e.gcal),archAdded:[entry,...st.archAdded],confirm:null,screen:'archive'}));
+    this.flash(he?'היום נשמר בארכיון':'Day archived');
+  }
+  upd(k,v){ this.setState(st=>({form:{...st.form,[k]:v, titleError: k==='title'?false:st.form.titleError}})); }
+  fmtSize(b){ if(b==null) return ''; if(b<1024) return b+' B'; if(b<1024*1024) return Math.round(b/1024)+' KB'; return (b/1024/1024).toFixed(1)+' MB'; }
+  updTime(k,v){ this.setState(st=>({form:{...st.form,[k]:v,timeError:false}})); }
+  saveForm(){
+    const f=this.state.form, t=this.T(), he=this.state.lang==='he';
+    if(!f.title || !f.title.trim()){
+      this.setState(st=>({form:{...st.form,titleError:true}}));
+      return;
+    }
+    if(!f.allDay && f.start && f.end && this.toMin(f.end)<=this.toMin(f.start)){
+      this.setState(st=>({form:{...st.form,timeError:true}}));
+      return;
+    }
+    this.setState(st=>{
+      let events=[...st.events];
+      if(f.isNew){ events.push({id:st.nextId,day:f.day,start:f.allDay?'':f.start,end:f.allDay?'':f.end,titleHe:f.title,titleEn:f.title,allDay:!!f.allDay,gcal:false,freq:f.freq,reminder:f.reminder,lead:f.lead,leadTime:f.leadTime,descHe:f.desc,descEn:f.desc,note:f.note,files:f.files||[]});
+        return {events,nextId:st.nextId+1,dialogOpen:false,form:null}; }
+      events=events.map(e=> e.id===f.id?{...e,start:f.allDay?'':f.start,end:f.allDay?'':f.end,allDay:!!f.allDay,[he?'titleHe':'titleEn']:f.title,freq:f.freq,reminder:f.reminder,lead:f.lead,leadTime:f.leadTime,[he?'descHe':'descEn']:f.desc,note:f.note,files:f.files||[]}:e);
+      return {events,dialogOpen:false,form:null};
+    });
+    this.flash(t.saved);
+  }
+  deleteForm(){ const t=this.T(); this.askConfirm({title:t.confirmDeleteTitle, body:t.confirmDeleteBody, label:t.delete, danger:true, onOk:()=>this.doDeleteForm()}); }
+  doDeleteForm(){ const id=this.state.form.id,t=this.T(); this.setState(st=>({events:st.events.filter(e=>e.id!==id),dialogOpen:false,form:null,confirm:null})); this.flash(t.deleted); }
+  swapTimes(a,b){
+    if(a==null||a===b) return;
+    this.setState(st=>{
+      const ea=st.events.find(x=>x.id===a), eb=st.events.find(x=>x.id===b);
+      if(!ea||!eb||ea.gcal||eb.gcal) return {};
+      return {events:st.events.map(e=> e.id===a?{...e,start:eb.start,end:eb.end}:(e.id===b?{...e,start:ea.start,end:ea.end}:e))};
+    });
+    this.dragId=null;
+    this.flash(this.state.lang==='he'?'השעה עודכנה':'Time updated');
+  }
+}
+</script>
+</body>
+</html>
