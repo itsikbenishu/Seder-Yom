@@ -1,0 +1,15 @@
+import { z } from "zod";
+import { dayOfWeekSchema } from "./common.schema";
+import { eventSchema } from "./event.schema";
+
+export const archivedDaySchema = z.object({
+  dayOfWeek: dayOfWeekSchema,
+  month: z.number().int().min(0).max(11),
+  day: z.number().int().min(1).max(31),
+  yr: z.number().int().min(2000),
+  sum: z.string(),
+  count: z.number().int().nonnegative(),
+  events: z.array(eventSchema),
+});
+
+export type ArchivedDay = z.infer<typeof archivedDaySchema>;

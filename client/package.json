@@ -22,7 +22,7 @@
     "react-hook-form": "^7.83.0",
     "react-i18next": "^17.0.11",
     "tailwind-merge": "^3.6.0",
-    "zod": "^3.25.76",
+    "zod": "^4.4.3",
     "@project/shared": "*"
   },
   "devDependencies": {
