@@ -19,7 +19,8 @@
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
     "postgres": "^3.4.9",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@project/shared": "*"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
