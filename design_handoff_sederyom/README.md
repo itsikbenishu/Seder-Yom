@@ -76,9 +76,13 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
   `text-align` follows language), then title (`font-semibold text-[16px]`, always wraps fully —
   `break-words [overflow-wrap:anywhere]`, never clamped), optional "Next up" accent tag, description and
   note (clamped to 2 lines with a "show more"/"show less" toggle **only** when combined length > 80 chars),
-  file chips, and metadata (Google-synced badge, reminder lead label). Google-synced events
-  (`gcal: true`) are read-only: muted surface (`bg-slate-50 dark:bg-slate-800/40`), not draggable, no edit/delete.
-  Local events are editable, deletable, and drag-to-reschedule.
+  file chips, and metadata (Google-synced badge, reminder lead label). File chips are clickable links
+  (`<a download>` to an object URL) that open/download the attachment and show its name. Google-synced
+  events (`gcal: true`) are read-only: muted surface (`bg-slate-50 dark:bg-slate-800/40`), not draggable,
+  no edit/delete. Local events are editable, deletable, and drag-to-reschedule.
+- **All-day events** render separately, above the timed list, as **minimal single-line rows**: calendar
+  icon + title (truncated, never wraps) + optional Google badge + an ⓘ info button. All other detail is
+  hidden until the ⓘ button opens the **detail popup** (see Overlays). This keeps the day compact.
 - **Footer**: full-width primary "+ Add event" button.
 - **Empty day**: shows a muted empty state.
 
@@ -105,7 +109,7 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
   - **Language**: עברית / English.
   - **Appearance**: Light / Dark.
   - **Google Calendar sync**: On / Off segmented control + a "reconnect" secondary button + a note.
-  - **Notifications**: **Browser / Mobile** segmented control (push destination). Note text:
+  - **Notifications**: **Browser / Mobile** segmented control (push destination — one, not both). Note text:
     "Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear
     inside the app itself." Default: `browser`. (There is deliberately **no** email/SMS channel and **no**
     in-app notification.)
@@ -119,14 +123,27 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
 - Card has a flex header (title + ghost close button), a **scrollable body** (`overflow-auto`, custom
   themed thin scrollbar `.sy-scroll`), and a **sticky footer** so the save/cancel buttons stay visible.
 - Fields: Title (span full width), All-day toggle, Start/End time (with `start < end` validation — invalid
-  field turns red), Frequency segmented (once/daily/weekly/…), Reminder On/Off + lead-time select
-  (`30m`, `1h`, `1d`, same-day-at-hour picker…), Description, Note (textarea), Attachments.
+  field turns red), Frequency segmented, Reminder On/Off + lead control, Description, Note (textarea),
+  Attachments.
+- **All-day vs timed differ**: for a **timed** event the frequency offers once/daily/weekly and the
+  reminder is a lead-time select (`15m`/`30m`/`1h`/`1d`/same-day-at-hour). For an **all-day** event the
+  frequency offers only **daily/weekly** (no "once") and the reminder is a **fixed clock-time picker**
+  only (`<input type="time">`, no lead-time offset). Opening the form for an all-day event defaults its
+  frequency to daily.
 - **Field caps**: title ≤ 80 chars, description ≤ 200, note ≤ 500 (enforced via `slice()` **and** HTML
   `maxlength`).
 - **Attachments**: up to **5 files**, **10 MB per file**, **25 MB total**. Allowed types: images
   (PNG/JPG/WebP), PDF, Office (DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT). Duplicate (same name+size) blocked;
   rejected files (bad type/size) show an error. Files display as compact wrapping chips with a count badge;
   no internal scroll within the file list.
+
+### Detail popup (all-day event)
+Opened from an all-day row's ⓘ button. Centered modal card (`440px`, `max-h-86%`, scrollable body with
+the themed `.sy-scroll`). Header: time/all-day kicker + title. Body: tag row (Google badge, reminder
+lead, repeat frequency), Description section, Note section, and an **Attachments** list where each file
+is a full-width clickable row (icon + name + human size) that opens/downloads it. Footer (local events
+only): Delete (ghost, start-aligned) + Edit (secondary) — both close the popup; Edit opens the event form.
+Google events show no footer.
 
 ### Confirm dialog (generic)
 Reused for archive, delete-event, clear-all-events, and sign-out. Title + body explaining the consequence

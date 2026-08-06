@@ -129,9 +129,16 @@
             </div>
 
             <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+              <div class="flex flex-col gap-2 mb-2.5">
               <sc-for list="{{ curDay.allDay }}" as="a" hint-placeholder-count="0">
-                <div class="{{ a.rowClass }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none"><path d="M4 7l16 0M4 12l16 0M4 17l10 0"/></svg><span class="flex-1">{{ a.title }}</span><sc-if value="{{ a.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if></div>
+                <div class="{{ a.rowClass }}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none opacity-70"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>
+                  <span class="flex-1 min-w-0 font-medium text-sm truncate">{{ a.title }}</span>
+                  <sc-if value="{{ a.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }} flex-none"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if>
+                  <button class="{{ btnGhost }} h-[28px] w-[28px] justify-center flex-none" onClick="{{ a.onDetail }}" title="{{ t.details }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
+                </div>
               </sc-for>
+              </div>
 
               <div class="text-[11px] text-slate-400 dark:text-slate-500 my-2.5 flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 9l4 4 4-8 4 12 2-4"/></svg>{{ t.dragHint }}</div>
 
@@ -156,7 +163,7 @@
                         <sc-if value="{{ ev.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if>
                         <sc-if value="{{ ev.reminder }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>{{ ev.leadLabel }}</span></sc-if>
                         <sc-if value="{{ ev.repeats }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 2l3 3-3 3M20 5H9a4 4 0 0 0-4 4M7 22l-3-3 3-3M4 19h11a4 4 0 0 0 4-4"/></svg>{{ ev.freqLabel }}</span></sc-if>
-                        <sc-if value="{{ ev.hasFiles }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>{{ ev.fileCount }} {{ t.attachN }}</span></sc-if>
+                        <sc-if value="{{ ev.hasFiles }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ ev.files }}" as="fl" hint-placeholder-count="0"><a href="{{ fl.url }}" target="_blank" rel="noopener" download="{{ fl.name }}" class="{{ tagNeutral }} max-w-[180px] hover:underline cursor-pointer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="flex-none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span class="truncate">{{ fl.name }}</span></a></sc-for></sc-if>
                       </div>
                     </div>
                     <sc-if value="{{ ev.editable }}" hint-placeholder-val="{{ true }}">
@@ -284,13 +291,14 @@
                 </div>
                 </sc-if>
                 <div><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.freq }}</label>
-                  <div class="{{ segWrap }} flex-wrap"><button class="{{ clsFOnce }}" onClick="{{ ff.freqOnce }}">{{ t.once }}</button><button class="{{ clsFDaily }}" onClick="{{ ff.freqDaily }}">{{ t.daily }}</button><button class="{{ clsFWeekly }}" onClick="{{ ff.freqWeekly }}">{{ t.weekly }}</button></div>
+                  <div class="{{ segWrap }} flex-wrap"><sc-if value="{{ form.notAllDay }}" hint-placeholder-val="{{ true }}"><button class="{{ clsFOnce }}" onClick="{{ ff.freqOnce }}">{{ t.once }}</button></sc-if><button class="{{ clsFDaily }}" onClick="{{ ff.freqDaily }}">{{ t.daily }}</button><button class="{{ clsFWeekly }}" onClick="{{ ff.freqWeekly }}">{{ t.weekly }}</button></div>
                 </div>
                 <div><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.reminder }}</label>
                   <div class="flex gap-2.5 flex-wrap items-center">
                     <div class="{{ segWrap }}"><button class="{{ clsRemOn }}" onClick="{{ ff.remOn }}">{{ t.on }}</button><button class="{{ clsRemOff }}" onClick="{{ ff.remOff }}">{{ t.off }}</button></div>
-                    <sc-if value="{{ form.reminder }}" hint-placeholder-val="{{ false }}"><select class="{{ inputCls }} w-auto min-w-[130px]" value="{{ form.lead }}" onChange="{{ ff.lead }}"><option value="15m">{{ t.m15 }}</option><option value="30m">{{ t.m30 }}</option><option value="1h">{{ t.h1 }}</option><option value="1d">{{ t.d1 }}</option><option value="sameday">{{ t.sameday }}</option></select></sc-if>
+                    <sc-if value="{{ form.remLead }}" hint-placeholder-val="{{ false }}"><select class="{{ inputCls }} w-auto min-w-[130px]" value="{{ form.lead }}" onChange="{{ ff.lead }}"><option value="15m">{{ t.m15 }}</option><option value="30m">{{ t.m30 }}</option><option value="1h">{{ t.h1 }}</option><option value="1d">{{ t.d1 }}</option><option value="sameday">{{ t.sameday }}</option></select></sc-if>
                     <sc-if value="{{ form.leadSameday }}" hint-placeholder-val="{{ false }}"><div class="flex items-center gap-2"><span class="text-xs text-slate-500 dark:text-slate-400">{{ t.leadAt }}</span><input type="time" class="{{ inputCls }} w-auto min-w-[110px]" value="{{ form.leadTime }}" onChange="{{ ff.leadTime }}"></div></sc-if>
+                    <sc-if value="{{ form.remTime }}" hint-placeholder-val="{{ false }}"><div class="flex items-center gap-2"><span class="text-xs text-slate-500 dark:text-slate-400">{{ t.leadAt }}</span><input type="time" class="{{ inputCls }} w-auto min-w-[110px]" value="{{ form.leadTime }}" onChange="{{ ff.leadTime }}"></div></sc-if>
                   </div>
                 </div>
                 <div class="{{ spanCls }}"><label class="block text-xs mb-1.5 text-slate-500 dark:text-slate-400">{{ t.desc }}</label><input class="{{ inputCls }}" value="{{ form.desc }}" onInput="{{ ff.desc }}" maxlength="200"></div>
@@ -324,6 +332,38 @@
                 <button class="{{ btnSecondary }}" onClick="{{ closeDialog }}">{{ t.cancel }}</button>
                 <button class="{{ btnPrimary }}" onClick="{{ saveEvent }}">{{ t.save }}</button>
               </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== DETAIL POPUP ===== -->
+        <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="absolute inset-0 z-40 grid place-items-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeDetail }}">
+            <div class="w-[440px] max-w-[94%] max-h-[86%] flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl" onClick="{{ stop }}">
+              <div class="flex items-start justify-between gap-3 mb-3 flex-none">
+                <div class="min-w-0"><div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold mb-1">{{ detail.time }}</div><span class="text-lg font-semibold break-words [overflow-wrap:anywhere]">{{ detail.title }}</span></div>
+                <button class="{{ btnGhost }} {{ iconBtn }}" onClick="{{ closeDetail }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+              </div>
+              <div class="flex-1 min-h-0 overflow-auto sy-scroll flex flex-col gap-3">
+                <div class="flex flex-wrap gap-1.5">
+                  <sc-if value="{{ detail.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if>
+                  <sc-if value="{{ detail.reminder }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg>{{ detail.leadLabel }}</span></sc-if>
+                  <sc-if value="{{ detail.repeats }}" hint-placeholder-val="{{ false }}"><span class="{{ tagNeutral }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 2l3 3-3 3M20 5H9a4 4 0 0 0-4 4M7 22l-3-3 3-3M4 19h11a4 4 0 0 0 4-4"/></svg>{{ detail.freqLabel }}</span></sc-if>
+                </div>
+                <sc-if value="{{ detail.hasDesc }}" hint-placeholder-val="{{ false }}"><div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-1">{{ t.desc }}</h6><p class="text-sm text-slate-700 dark:text-slate-200 m-0 break-words [overflow-wrap:anywhere]">{{ detail.desc }}</p></div></sc-if>
+                <sc-if value="{{ detail.hasNote }}" hint-placeholder-val="{{ false }}"><div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-1">{{ t.note }}</h6><p class="text-sm text-slate-700 dark:text-slate-200 m-0 break-words [overflow-wrap:anywhere]">{{ detail.note }}</p></div></sc-if>
+                <sc-if value="{{ detail.hasFiles }}" hint-placeholder-val="{{ false }}"><div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-1.5">{{ t.attach }}</h6><div class="flex flex-col gap-1.5">
+                  <sc-for list="{{ detail.files }}" as="fl" hint-placeholder-count="0">
+                    <a href="{{ fl.url }}" target="_blank" rel="noopener" download="{{ fl.name }}" class="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-sm hover:border-slate-300 dark:hover:border-slate-600 transition"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none text-slate-400 dark:text-slate-500"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span class="flex-1 min-w-0 truncate">{{ fl.name }}</span><span class="flex-none text-[11px] text-slate-400 dark:text-slate-500 tabular-nums">{{ fl.size }}</span></a>
+                  </sc-for>
+                </div></div></sc-if>
+              </div>
+              <sc-if value="{{ detail.editable }}" hint-placeholder-val="{{ false }}">
+                <div class="flex justify-end gap-2 pt-3 mt-3 flex-none border-t border-slate-100 dark:border-slate-800">
+                  <button class="{{ btnGhost }} me-auto text-slate-500 dark:text-slate-400" onClick="{{ detail.onDelete }}">{{ t.delete }}</button>
+                  <button class="{{ btnSecondary }}" onClick="{{ detail.onEdit }}">{{ t.edit }}</button>
+                </div>
+              </sc-if>
             </div>
           </div>
         </sc-if>
@@ -365,7 +405,7 @@ class Component extends DCLogic {
       screen:'week', lang:'he', device:'desktop', mode: props.defaultMode||'light', authed:true,
       email:'noa@gmail.com', code:'',
       selDay:3, muted:{}, search:'', gcal:true, notif:'browser', expanded:{}, archAdded:[], archLimit:12,
-      dialogOpen:false, form:null, toast:'', confirm:null, dayMenu:false,
+      dialogOpen:false, form:null, toast:'', confirm:null, dayMenu:false, detail:null,
       events:[
         E(1,0,'09:00','09:30','פגישת צוות שבועית','Weekly team sync',{freq:'weekly',reminder:true,lead:'30m',dh:'סקירת משימות לשבוע',de:'Review the week\u2019s tasks'}),
         E(2,0,'13:00','14:00','צהריים עם דנה','Lunch with Dana',{}),
@@ -441,7 +481,7 @@ class Component extends DCLogic {
       title:he?'כותרת':'Title', startT:he?'התחלה':'Start', endT:he?'סיום':'End', freq:he?'תדירות':'Repeat', once:he?'חד‑פעמי':'Once', daily:he?'יומי':'Daily', weekly:he?'שבועי':'Weekly',
       reminder:he?'תזכורת':'Reminder', on:he?'פעיל':'On', off:he?'כבוי':'Off', m15:he?'רבע שעה לפני':'15 min before', m30:he?'חצי שעה לפני':'30 min before', h1:he?'שעה לפני':'1 hour before', d1:he?'יום לפני':'1 day before', sameday:he?'שעה מוגדרת':'Specific time', leadAt:he?'התראה בשעה':'Alert at', allDayEvent:he?'אירוע יום שלם':'All-day event',
       desc:he?'תיאור':'Description', note:he?'הערה':'Note', attach:he?'קבצים (תמונה / PDF / Office)':'Files (image / PDF / Office)', chooseFile:he?'בחירת קובץ':'Choose file', save:he?'שמירה':'Save', delete:he?'מחיקה':'Delete', cancel:he?'ביטול':'Cancel',
-      editEvent:he?'עריכת אירוע':'Edit event', newEvent:he?'אירוע חדש':'New event',
+      editEvent:he?'עריכת אירוע':'Edit event', newEvent:he?'אירוע חדש':'New event', edit:he?'עריכה':'Edit', details:he?'פרטים':'Details',
       addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום — עד 5 קבצים / 25MB':'Maximum reached — up to 5 files / 25MB',
       showMore:he?'הצג עוד':'Show more', showLess:he?'הצג פחות':'Show less',
       attachN:he?'קבצים':'files',
@@ -536,8 +576,11 @@ class Component extends DCLogic {
       onClearAllMenu:()=>{ this.setState({dayMenu:false}); this.clearDayEvents(di); },
       onArchive:()=>this.archiveDay(di),
       onClearAll:()=>{ this.clearDayEvents(di); },
-      allDay:dEvs.filter(e=>e.allDay).map(a=>({title:a[title('title')],gcal:a.gcal,
-        rowClass:'flex items-center gap-2 '+pad+' '+rad+' border border-dashed mb-2 text-sm '+(a.gcal?ac.softText+' border-current/40':'border-slate-300 dark:border-slate-700')})),
+      allDay:dEvs.filter(e=>e.allDay).map(e=>({
+        id:e.id, title:e[title('title')], gcal:e.gcal,
+        rowClass:'flex items-center gap-2 '+pad+' '+rad+' border border-dashed text-sm '+(e.gcal?'bg-slate-50 dark:bg-slate-800/40 border-slate-300 dark:border-slate-700':'border-slate-300 dark:border-slate-700 '+surface),
+        onDetail:()=>this.setState({detail:e.id}),
+      })),
       events:timed.map(e=>{
         const gc=e.gcal, isNext=e.id===nextId;
         return {
@@ -550,7 +593,7 @@ class Component extends DCLogic {
           textWrapCls: '',
           toggleLabel: s.expanded[e.id]?t.showLess:t.showMore,
           toggleText:()=>this.setState(st=>({expanded:{...st.expanded,[e.id]:!st.expanded[e.id]}})),
-          hasFiles:!!(e.files&&e.files.length), fileCount:(e.files||[]).length,
+          hasFiles:!!(e.files&&e.files.length), fileCount:(e.files||[]).length, files:(e.files||[]).map(x=>({name:x.name,size:this.fmtSize(x.size),url:x.url})),
           gcal:gc, reminder:e.reminder, leadLabel:leadText(e.lead),
           repeats:e.freq!=='once', freqLabel:freqText(e.freq),
           isNext, editable:!gc, locked:gc, draggable:!gc,
@@ -588,6 +631,19 @@ class Component extends DCLogic {
       empty:(av.events||[]).length===0,
     } : {dow:'',full:'',allDay:[],events:[],empty:true};
 
+    const dv = s.detail!=null ? this.state.events.find(x=>x.id===s.detail) : null;
+    const detailView = dv ? {
+      title: dv[title('title')], gcal:dv.gcal,
+      time: dv.allDay?t.allDay:(dv.start+' – '+dv.end),
+      desc: dv[title('desc')], hasDesc:!!dv[title('desc')], note: dv.note, hasNote:!!dv.note,
+      reminder:dv.reminder, leadLabel: dv.reminder?(dv.allDay?(t.leadAt+' '+(dv.leadTime||'08:00')):leadText(dv.lead)):'',
+      repeats: dv.freq==='daily'||dv.freq==='weekly'||(!dv.allDay&&dv.freq&&dv.freq!=='once'), freqLabel:freqText(dv.freq),
+      files:(dv.files||[]).map(x=>({name:x.name,size:this.fmtSize(x.size),url:x.url})), hasFiles:!!(dv.files&&dv.files.length),
+      editable:!dv.gcal,
+      onEdit:()=>{ const day=dv.day, id=dv.id; this.setState({detail:null}); this.openForm(day,false,id); },
+      onDelete:()=>this.askConfirm({title:t.confirmDeleteTitle,body:t.confirmDeleteBody,label:t.delete,danger:true,onOk:()=>{ this.setState(st=>({events:st.events.filter(x=>x.id!==dv.id),confirm:null,detail:null})); this.flash(t.deleted); }}),
+    } : null;
+
     const f=s.form;
     const ff=f?{
       title:e=>this.upd('title',e.target.value.slice(0,80)), start:e=>this.updTime('start',e.target.value), end:e=>this.updTime('end',e.target.value),
@@ -599,7 +655,7 @@ class Component extends DCLogic {
         const MAXN=5, MAXSIZE=10*1024*1024, MAXTOTAL=25*1024*1024;
         const ok=fl=>/^(image\/(png|jpe?g|webp)|application\/pdf)$/.test(fl.type)||/\.(png|jpe?g|webp|pdf|docx?|xlsx?|pptx?|csv|txt)$/i.test(fl.name);
         let files=[...(this.state.form.files||[])]; let total=files.reduce((a,x)=>a+x.size,0); let rejected=false, full=false;
-        for(const fl of incoming){ if(!ok(fl)||fl.size>MAXSIZE){ rejected=true; continue; } if(files.some(x=>x.name===fl.name&&x.size===fl.size)) continue; if(files.length>=MAXN||total+fl.size>MAXTOTAL){ full=true; break; } files.push({name:fl.name.slice(0,120),size:fl.size}); total+=fl.size; }
+        for(const fl of incoming){ if(!ok(fl)||fl.size>MAXSIZE){ rejected=true; continue; } if(files.some(x=>x.name===fl.name&&x.size===fl.size)) continue; if(files.length>=MAXN||total+fl.size>MAXTOTAL){ full=true; break; } files.push({name:fl.name.slice(0,120),size:fl.size,url:URL.createObjectURL(fl)}); total+=fl.size; }
         this.setState(st=>({form:{...st.form,files}}));
         if(full) this.flash(he?('ניתן לצרף עד '+MAXN+' קבצים או 25MB'):('Up to '+MAXN+' files or 25MB total'));
         else if(rejected) this.flash(he?'חלק מהקבצים נדחו (סוג או גודל)':'Some files were rejected (type or size)');
@@ -608,7 +664,8 @@ class Component extends DCLogic {
     }:{};
     const formView=f?{
       title:f.title,start:f.start,end:f.end,desc:f.desc,note:f.note,lead:f.lead,leadTime:f.leadTime,reminder:f.reminder,
-      allDay:!!f.allDay, notAllDay:!f.allDay, leadSameday: f.reminder&&f.lead==='sameday',
+      allDay:!!f.allDay, notAllDay:!f.allDay,
+      remLead: f.reminder&&!f.allDay, remTime: f.reminder&&!!f.allDay, leadSameday: f.reminder&&!f.allDay&&f.lead==='sameday',
       timeError:!!f.timeError,
       titleError:!!f.titleError,
       titleCls: inputCls+(f.titleError?' border-rose-400 dark:border-rose-500':''),
@@ -660,6 +717,7 @@ class Component extends DCLogic {
       closeDialog:()=>this.setState({dialogOpen:false,form:null}),
       stop:e=>e.stopPropagation(),
       saveEvent:()=>this.saveForm(), deleteFromForm:()=>this.deleteForm(),
+      detailOpen:s.detail!=null, detail:detailView, closeDetail:()=>this.set('detail',null),
       confirmOpen:!!s.confirm, confirmData:s.confirm||{},
       confirmOk:()=>{ const c=this.state.confirm; if(c&&c.onOk) c.onOk(); },
       closeConfirm:()=>this.closeConfirm(),
@@ -674,9 +732,9 @@ class Component extends DCLogic {
 
   openForm(dayIdx,isNew,id,allDay){
     let form;
-    if(isNew){ form={id:null,day:dayIdx,isNew:true,allDay:!!allDay,title:'',start:allDay?'':'10:00',end:allDay?'':'11:00',freq:'once',reminder:true,lead:'30m',leadTime:'08:00',desc:'',note:'',files:[]}; }
+    if(isNew){ form={id:null,day:dayIdx,isNew:true,allDay:!!allDay,title:'',start:allDay?'':'10:00',end:allDay?'':'11:00',freq:allDay?'daily':'once',reminder:true,lead:'30m',leadTime:'08:00',desc:'',note:'',files:[]}; }
     else { const e=this.state.events.find(x=>x.id===id); const he=this.state.lang==='he';
-      form={id:e.id,day:e.day,isNew:false,allDay:!!e.allDay,title:e[he?'titleHe':'titleEn'],start:e.start,end:e.end,freq:e.freq,reminder:e.reminder,lead:e.lead,leadTime:e.leadTime||'08:00',desc:e[he?'descHe':'descEn'],note:e.note,files:(e.files||[]).slice()}; }
+      form={id:e.id,day:e.day,isNew:false,allDay:!!e.allDay,title:e[he?'titleHe':'titleEn'],start:e.start,end:e.end,freq:(e.allDay&&(!e.freq||e.freq==='once'))?'daily':e.freq,reminder:e.reminder,lead:e.lead,leadTime:e.leadTime||'08:00',desc:e[he?'descHe':'descEn'],note:e.note,files:(e.files||[]).slice()}; }
     this.setState({dialogOpen:true,form});
   }
   askConfirm(cfg){ this.setState({confirm:cfg}); }

@@ -1,6 +1,6 @@
-# SederYom — Technical Spec (v1.0)
+# SederYom — Technical Spec
 
-> Consolidated from BRD v1.0 + FRD v1.0. This is the single source of truth for
+> Consolidated from the BRD + FRD. This is the single source of truth for
 > implementation. Business rationale lives in the original BRD/FRD; this file
 > contains only what's needed to build.
 
@@ -35,11 +35,20 @@ start, end: HH:mm
 allDay: bool
 freq: "once" | "daily" | "weekly"
 reminder: bool
-lead: "30m" | "1h" | "1d" | "time"
+lead: "15m" | "30m" | "1h" | "1d" | "time"
 leadTime: HH:mm            # used when lead === "time"
 files: File[]              # max 5, 10MB/file, 25MB total
 gcal: bool                 # true = read-only, from Google Calendar
 ```
+
+**Conditional rules — `freq`/`lead` depend on `allDay`** (enforce in the Zod
+schema with a discriminated union, not just the base enums above):
+- **Timed event** (`allDay: false`): `freq` ∈ `once | daily | weekly`. `lead`
+  ∈ `15m | 30m | 1h | 1d | time` (full offset menu).
+- **All-day event** (`allDay: true`): `freq` ∈ `daily | weekly` only — **no
+  `once`**; form defaults to `daily` when the user opens it for an all-day
+  event. `lead` is always effectively `time` — a fixed clock-time picker
+  (`leadTime`), with **no offset options** (15m/30m/1h/1d are not offered).
 
 ### ArchivedDay
 ```
@@ -86,8 +95,17 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
 6. **Archive Day** — read-only day view
 7. **Settings** — language, theme, Google sync, notification channel, sign out
 
-Overlays: Event form dialog (create/edit), generic confirm dialog (reused for
-archive/delete/clear/sign-out).
+Overlays:
+- **Event form dialog** (create/edit) — fields differ for timed vs. all-day
+  events; see §3 conditional rules.
+- **Detail popup (all-day event)** — opened via an ⓘ info button on an
+  all-day row (all-day rows show only icon + title in the day list itself).
+  Shows description/note/attachments in full. Footer has Delete + Edit for
+  local events only; Google-synced events show no footer.
+- **Confirm dialog (generic)** — reused for archive/delete/clear/sign-out.
+
+Attachments render as clickable download links (`<a download>`) wherever
+shown — day list file chips and the detail popup's attachment rows alike.
 
 ## 6. Archive — Lazy Loading
 - Backend page size: 50 days/request (`GET /archive?limit=50&offset=0&search=`)
