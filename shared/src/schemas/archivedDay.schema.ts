@@ -5,9 +5,9 @@ import { eventSchema } from "./event.schema";
 export const archivedDaySchema = z.object({
   dayOfWeek: dayOfWeekSchema,
   month: z.number().int().min(0).max(11),
-  day: z.number().int().min(1).max(31),
-  yr: z.number().int().min(2000),
-  sum: z.string(),
+  dayOfMonth: z.number().int().min(1).max(31),
+  year: z.number().int().min(2000),
+  summary: z.string(),
   count: z.number().int().nonnegative(),
   events: z.array(eventSchema),
 });
