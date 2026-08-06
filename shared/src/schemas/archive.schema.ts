@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { archivedDaySchema } from "./archivedDay.schema";
+import { archivedDaySchema } from "./archivedDay.schema.js";
 
 export const ARCHIVE_PAGE_SIZE = 50;
 

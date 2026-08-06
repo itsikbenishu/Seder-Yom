@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dayOfWeekSchema, eventFilesSchema, timeStringSchema } from "./common.schema";
+import { dayOfWeekSchema, eventFilesSchema, timeStringSchema } from "./common.schema.js";
 
 export const eventFrequencySchema = z.enum(["once", "daily", "weekly"]);
 export const allDayEventFrequencySchema = z.enum(["daily", "weekly"]);

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { dayOfWeekSchema } from "./common.schema";
-import { eventSchema } from "./event.schema";
+import { dayOfWeekSchema } from "./common.schema.js";
+import { eventSchema } from "./event.schema.js";
 
 export const archivedDaySchema = z.object({
   dayOfWeek: dayOfWeekSchema,
