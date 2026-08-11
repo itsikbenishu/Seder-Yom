@@ -2,14 +2,14 @@ import { Router } from "express";
 import { z } from "zod";
 import { createEventSchema, updateEventSchema } from "@project/shared";
 import { deleteEventById, getEvents, patchEvent, postEvent } from "../controllers/events.controller.js";
-import { authMiddleware } from "./middlewares/auth.middleware.js";
+import { requireAuth } from "./middlewares/requireAuth.middleware.js";
 import { validate } from "./middlewares/validate.middleware.js";
 
 const idParamsSchema = z.object({ id: z.uuid() });
 
 export const eventsRouter = Router();
 
-eventsRouter.use(authMiddleware);
+eventsRouter.use(requireAuth);
 
 eventsRouter.get("/", getEvents);
 eventsRouter.post("/", validate({ body: createEventSchema }), postEvent);
