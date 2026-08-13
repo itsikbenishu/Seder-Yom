@@ -1,7 +1,6 @@
-import { pgTable, uuid, smallint, varchar, time, boolean, jsonb, pgEnum, index, check, pgPolicy } from "drizzle-orm/pg-core";
+import { pgTable, uuid, smallint, varchar, time, boolean, pgEnum, index, check, pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { authUsers, authenticatedRole, authUid } from "drizzle-orm/supabase";
-import type { EventFile } from "@project/shared";
 
 export const eventFrequencyEnum = pgEnum("event_frequency", ["once", "daily", "weekly"]);
 export const reminderLeadEnum = pgEnum("reminder_lead", ["15m", "30m", "1h", "1d", "time"]);
@@ -21,7 +20,6 @@ export const events = pgTable("events", {
   reminder: boolean().notNull().default(false),
   reminderLead: reminderLeadEnum(),
   reminderLeadTime: time(),
-  files: jsonb().$type<EventFile[]>().notNull().default([]),
   googleCalendarSynced: boolean().notNull().default(false),
 }, (t) => [
   index("events_user_day_idx").on(t.userId, t.dayOfWeek),

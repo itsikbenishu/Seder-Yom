@@ -15,7 +15,6 @@ CREATE TABLE "events" (
 	"reminder" boolean DEFAULT false NOT NULL,
 	"reminder_lead" "reminder_lead",
 	"reminder_lead_time" time,
-	"files" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"google_calendar_synced" boolean DEFAULT false NOT NULL,
 	CONSTRAINT "events_day_of_week_range" CHECK ("events"."day_of_week" >= 0 AND "events"."day_of_week" <= 6),
 	CONSTRAINT "events_all_day_frequency" CHECK ("events"."all_day" = false OR "events"."frequency" <> 'once'),
@@ -23,6 +22,18 @@ CREATE TABLE "events" (
 );
 --> statement-breakpoint
 ALTER TABLE "events" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
+CREATE TABLE "event_files" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"event_id" uuid,
+	"storage_path" text NOT NULL,
+	"filename" text NOT NULL,
+	"size" integer NOT NULL,
+	"mime_type" text NOT NULL,
+	"uploaded_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "event_files" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 CREATE TABLE "archived_days" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -47,11 +58,17 @@ CREATE TABLE "notification_preferences" (
 --> statement-breakpoint
 ALTER TABLE "notification_preferences" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
 ALTER TABLE "events" ADD CONSTRAINT "events_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "event_files" ADD CONSTRAINT "event_files_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "event_files" ADD CONSTRAINT "event_files_event_id_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "archived_days" ADD CONSTRAINT "archived_days_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "notification_preferences" ADD CONSTRAINT "notification_preferences_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "events_user_day_idx" ON "events" USING btree ("user_id","day_of_week");--> statement-breakpoint
+CREATE INDEX "event_files_user_idx" ON "event_files" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "event_files_event_idx" ON "event_files" USING btree ("event_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "event_files_event_filename_size_unique" ON "event_files" USING btree ("event_id","filename","size");--> statement-breakpoint
 CREATE INDEX "archived_days_user_year_month_day_idx" ON "archived_days" USING btree ("user_id" DESC NULLS LAST,"year" DESC NULLS LAST,"month" DESC NULLS LAST,"day_of_month" DESC NULLS LAST);--> statement-breakpoint
 CREATE UNIQUE INDEX "archived_days_user_year_month_day_unique" ON "archived_days" USING btree ("user_id","year","month","day_of_month");--> statement-breakpoint
 CREATE POLICY "events_crud_own_rows" ON "events" AS PERMISSIVE FOR ALL TO "authenticated" USING ((select auth.uid()) = "events"."user_id") WITH CHECK ((select auth.uid()) = "events"."user_id");--> statement-breakpoint
+CREATE POLICY "event_files_crud_own_rows" ON "event_files" AS PERMISSIVE FOR ALL TO "authenticated" USING ((select auth.uid()) = "event_files"."user_id") WITH CHECK ((select auth.uid()) = "event_files"."user_id");--> statement-breakpoint
 CREATE POLICY "archived_days_crud_own_rows" ON "archived_days" AS PERMISSIVE FOR ALL TO "authenticated" USING ((select auth.uid()) = "archived_days"."user_id") WITH CHECK ((select auth.uid()) = "archived_days"."user_id");--> statement-breakpoint
 CREATE POLICY "notification_preferences_crud_own_row" ON "notification_preferences" AS PERMISSIVE FOR ALL TO "authenticated" USING ((select auth.uid()) = "notification_preferences"."user_id") WITH CHECK ((select auth.uid()) = "notification_preferences"."user_id");

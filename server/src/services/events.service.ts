@@ -33,7 +33,6 @@ function toWritableFields(row: EventRow) {
     reminder: row.reminder,
     reminderLead: row.reminderLead ?? undefined,
     reminderLeadTime: row.reminderLeadTime ? trimSeconds(row.reminderLeadTime) : undefined,
-    files: row.files,
   };
 }
 
