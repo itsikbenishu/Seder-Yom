@@ -10,6 +10,7 @@ import { errorHandlerMiddleware } from "./routes/middlewares/errorHandler.middle
 import { archiveRouter } from "./routes/archive.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { eventsRouter } from "./routes/events.routes.js";
+import { filesRouter } from "./routes/files.routes.js";
 
 // pino-http ships as CommonJS without an "exports" map; under real Node ESM (this
 // package has "type": "module"), `import pinoHttp from "pino-http"` resolves to the
@@ -36,5 +37,6 @@ app.use(
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventsRouter);
 app.use("/api/v1/archive", archiveRouter);
+app.use("/api/v1/files", filesRouter);
 
 app.use(errorHandlerMiddleware);

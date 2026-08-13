@@ -31,14 +31,16 @@ export const MAX_TOTAL_FILES_SIZE_BYTES = 25 * 1024 * 1024;
 
 export const eventFileSchema = z.object({
   id: z.uuid(),
-  name: z.string().min(1, "validation.file.name.required"),
+  eventId: z.uuid().nullable(),
+  storagePath: z.string().min(1),
+  filename: z.string().min(1, "validation.file.name.required"),
   size: z
     .number()
     .int()
     .positive()
     .max(MAX_FILE_SIZE_BYTES, "validation.file.size"),
-  type: z.enum(ALLOWED_FILE_MIME_TYPES, "validation.file.type"),
-  url: z.url(),
+  mimeType: z.enum(ALLOWED_FILE_MIME_TYPES, "validation.file.type"),
+  uploadedAt: z.iso.datetime(),
 });
 
 export type EventFile = z.infer<typeof eventFileSchema>;
@@ -57,7 +59,7 @@ export const eventFilesSchema = z
 
     const seen = new Set<string>();
     files.forEach((file, index) => {
-      const key = `${file.name}:${file.size}`;
+      const key = `${file.filename}:${file.size}`;
       if (seen.has(key)) {
         ctx.addIssue({
           code: "custom",

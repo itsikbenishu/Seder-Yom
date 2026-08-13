@@ -11,6 +11,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   SUPABASE_URL: z.url(),
   SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  SUPABASE_STORAGE_BUCKET: z.string().min(1).default("event-files"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   CORS_ORIGIN: z.string().min(1).default("http://localhost:5173"),
 });
