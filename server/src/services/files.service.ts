@@ -3,6 +3,7 @@ import { eventFileSchema, type EventFile } from "@project/shared";
 import { db } from "../db/client.js";
 import { eventFiles } from "../db/schema/index.js";
 import { env } from "../config/env.js";
+import { logger } from "../config/logger.js";
 import { supabaseStorageClient } from "../config/supabaseClient.js";
 import { AppError, ValidationError } from "../utils/AppError.js";
 
@@ -10,7 +11,7 @@ type EventFileRow = typeof eventFiles.$inferSelect;
 
 const uploadedFileMetaSchema = eventFileSchema.pick({ filename: true, size: true, mimeType: true });
 
-function toApiEventFile(row: EventFileRow): EventFile {
+export function toApiEventFile(row: EventFileRow): EventFile {
   return eventFileSchema.parse({
     id: row.id,
     eventId: row.eventId,
@@ -20,6 +21,17 @@ function toApiEventFile(row: EventFileRow): EventFile {
     mimeType: row.mimeType,
     uploadedAt: row.uploadedAt.toISOString(),
   });
+}
+
+export async function removeStorageObjects(storagePaths: string[]): Promise<void> {
+  if (storagePaths.length === 0) {
+    return;
+  }
+
+  const { error } = await supabaseStorageClient.storage.from(env.SUPABASE_STORAGE_BUCKET).remove(storagePaths);
+  if (error) {
+    logger.error({ storagePaths, error: error.message }, "Failed to remove storage objects");
+  }
 }
 
 export async function uploadEventFile(userId: string, file: Express.Multer.File): Promise<EventFile> {
@@ -50,7 +62,7 @@ export async function uploadEventFile(userId: string, file: Express.Multer.File)
 
     return toApiEventFile(row);
   } catch (error) {
-    await supabaseStorageClient.storage.from(env.SUPABASE_STORAGE_BUCKET).remove([storagePath]);
+    await removeStorageObjects([storagePath]);
     throw error;
   }
 }

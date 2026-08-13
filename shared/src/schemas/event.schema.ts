@@ -1,10 +1,12 @@
 import { z } from "zod";
-import { dayOfWeekSchema, eventFilesSchema, timeStringSchema } from "./common.schema.js";
+import { dayOfWeekSchema, eventFilesSchema, MAX_FILES_PER_EVENT, timeStringSchema } from "./common.schema.js";
 
 export const eventFrequencySchema = z.enum(["once", "daily", "weekly"]);
 export const allDayEventFrequencySchema = z.enum(["daily", "weekly"]);
 
 export const reminderLeadSchema = z.enum(["15m", "30m", "1h", "1d", "time"]);
+
+const fileIdsSchema = z.array(z.uuid()).max(MAX_FILES_PER_EVENT, "validation.file.count").default([]);
 
 const sharedEventFields = {
   dayOfWeek: dayOfWeekSchema,
@@ -15,7 +17,7 @@ const sharedEventFields = {
   end: timeStringSchema,
   reminder: z.boolean().default(false),
   reminderLeadTime: timeStringSchema.optional(),
-  files: eventFilesSchema.default([]),
+  fileIds: fileIdsSchema,
 };
 
 const timedEventShape = z.object({
@@ -77,8 +79,12 @@ export const updateEventSchema = z
   .superRefine(applyEventBusinessRules);
 
 export const eventSchema = z.discriminatedUnion("allDay", [
-  timedEventShape.extend({ id: z.uuid(), googleCalendarSynced: z.boolean().default(false) }),
-  allDayEventShape.extend({ id: z.uuid(), googleCalendarSynced: z.boolean().default(false) }),
+  timedEventShape
+    .omit({ fileIds: true })
+    .extend({ id: z.uuid(), googleCalendarSynced: z.boolean().default(false), files: eventFilesSchema.default([]) }),
+  allDayEventShape
+    .omit({ fileIds: true })
+    .extend({ id: z.uuid(), googleCalendarSynced: z.boolean().default(false), files: eventFilesSchema.default([]) }),
 ]);
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;

@@ -68,7 +68,7 @@ export async function archiveDay(userId: string, dayOfWeek: number): Promise<Arc
         .map((event) => event.title)
         .join(", ");
       const date = dateForDayOfWeek(dayOfWeek);
-      const eventsSnapshot = localEvents.map(toApiEvent);
+      const eventsSnapshot = await Promise.all(localEvents.map(toApiEvent));
 
       const [row] = await archiveTransaction
         .insert(archivedDays)
