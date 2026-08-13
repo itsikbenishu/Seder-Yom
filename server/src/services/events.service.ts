@@ -12,7 +12,7 @@ function trimSeconds(time: string): string {
   return time.slice(0, 5);
 }
 
-function toApiEvent(row: EventRow): Event {
+export function toApiEvent(row: EventRow): Event {
   return eventSchema.parse({
     ...toWritableFields(row),
     id: row.id,
@@ -23,10 +23,8 @@ function toApiEvent(row: EventRow): Event {
 function toWritableFields(row: EventRow) {
   return {
     dayOfWeek: row.dayOfWeek,
-    titleHe: row.titleHe,
-    titleEn: row.titleEn,
-    descHe: row.descHe ?? undefined,
-    descEn: row.descEn ?? undefined,
+    title: row.title,
+    description: row.description ?? undefined,
     note: row.note ?? undefined,
     start: trimSeconds(row.start),
     end: trimSeconds(row.end),
@@ -61,7 +59,7 @@ export async function createEvent(userId: string, input: CreateEventInput, corre
     await publishReminderJob({
       eventId: row.id,
       userId,
-      eventTitle: row.titleHe,
+      eventTitle: row.title,
       reminderTime,
       correlationId,
     });

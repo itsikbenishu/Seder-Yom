@@ -27,26 +27,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "title_he": {
-          "name": "title_he",
+        "title": {
+          "name": "title",
           "type": "varchar(80)",
           "primaryKey": false,
           "notNull": true
         },
-        "title_en": {
-          "name": "title_en",
-          "type": "varchar(80)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "desc_he": {
-          "name": "desc_he",
-          "type": "varchar(200)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "desc_en": {
-          "name": "desc_en",
+        "description": {
+          "name": "description",
           "type": "varchar(200)",
           "primaryKey": false,
           "notNull": false

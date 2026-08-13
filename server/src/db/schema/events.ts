@@ -10,10 +10,8 @@ export const events = pgTable("events", {
   id: uuid().primaryKey().defaultRandom(),
   userId: uuid().notNull().references(() => authUsers.id, { onDelete: "cascade" }),
   dayOfWeek: smallint().notNull(),
-  titleHe: varchar({ length: 80 }).notNull(),
-  titleEn: varchar({ length: 80 }).notNull(),
-  descHe: varchar({ length: 200 }),
-  descEn: varchar({ length: 200 }),
+  title: varchar({ length: 80 }).notNull(),
+  description: varchar({ length: 200 }),
   note: varchar({ length: 500 }),
   // stored as native `time`; round-trips as "HH:mm:ss" via postgres-js — repository layer must trim to HH:mm for the API/Zod contract
   start: time().notNull(),

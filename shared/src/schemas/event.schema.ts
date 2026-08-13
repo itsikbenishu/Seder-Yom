@@ -8,10 +8,8 @@ export const reminderLeadSchema = z.enum(["15m", "30m", "1h", "1d", "time"]);
 
 const sharedEventFields = {
   dayOfWeek: dayOfWeekSchema,
-  titleHe: z.string().min(1, "validation.title.required").max(80, "validation.title.maxLength"),
-  titleEn: z.string().min(1, "validation.title.required").max(80, "validation.title.maxLength"),
-  descHe: z.string().max(200, "validation.description.maxLength").optional(),
-  descEn: z.string().max(200, "validation.description.maxLength").optional(),
+  title: z.string().min(1, "validation.title.required").max(80, "validation.title.maxLength"),
+  description: z.string().max(200, "validation.description.maxLength").optional(),
   note: z.string().max(500, "validation.note.maxLength").optional(),
   start: timeStringSchema,
   end: timeStringSchema,

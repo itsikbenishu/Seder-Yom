@@ -5,6 +5,7 @@ import { ValidationError } from "../../utils/AppError.js";
 interface ValidationSchemas {
   body?: ZodType;
   params?: ZodType;
+  query?: ZodType;
 }
 
 export function validate(schemas: ValidationSchemas) {
@@ -22,6 +23,17 @@ export function validate(schemas: ValidationSchemas) {
       if (!result.success) {
         throw new ValidationError(result.error.issues[0]?.message ?? "validation.invalid");
       }
+      req.params = result.data as typeof req.params;
+    }
+
+    if (schemas.query) {
+      const result = schemas.query.safeParse(req.query);
+      if (!result.success) {
+        throw new ValidationError(result.error.issues[0]?.message ?? "validation.invalid");
+      }
+      // req.query is a getter-only accessor in Express 5 (no setter), so a plain
+      // assignment throws under ESM's strict mode — redefine the property instead.
+      Object.defineProperty(req, "query", { value: result.data, writable: true, configurable: true, enumerable: true });
     }
 
     next();

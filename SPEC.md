@@ -28,8 +28,8 @@ via Firebase (FCM), queued through RabbitMQ. Passwordless auth (email + 2FA OTP)
 ```
 id: UUID
 dayOfWeek: number (0-6)
-titleHe, titleEn: string (max 80)
-descHe, descEn: string (max 200)
+title: string (max 80)
+description: string (max 200)
 note: string (max 500)
 start, end: HH:mm
 allDay: bool
@@ -37,9 +37,43 @@ freq: "once" | "daily" | "weekly"
 reminder: bool
 lead: "15m" | "30m" | "1h" | "1d" | "time"
 leadTime: HH:mm            # used when lead === "time"
-files: File[]              # max 5, 10MB/file, 25MB total
+files: see EventFile below — not embedded; a normalized table, not a jsonb array
 gcal: bool                 # true = read-only, from Google Calendar
 ```
+
+### EventFile (table: `event_files`)
+```
+id: UUID
+eventId: UUID | null       # FK -> events.id, ON DELETE CASCADE. Null = uploaded
+                            # but not yet attached to a saved event (see upload flow below)
+storagePath: string        # object key in Supabase Storage
+filename: string
+size: number (bytes)
+mimeType: string
+uploadedAt: timestamp
+UNIQUE(eventId, filename, size)   # duplicate-prevention, enforced at the DB level
+```
+
+Files are stored in a normalized table (FK to `events`) rather than as
+`jsonb` on the event row. Unlike `ArchivedDay.events` (an immutable
+historical snapshot, where `jsonb` is the right fit — see §6, Archive), a live
+event's files have their own lifecycle: uploaded, attached, replaced,
+orphaned. A real table gives DB-enforced duplicate prevention, indexed
+per-user storage-usage queries, and a straightforward orphan cleanup query —
+none of which are efficient against a `jsonb` blob scanned per-event.
+
+**Upload flow:** the file is uploaded to Storage as soon as the user picks
+it in the form (`POST /files/upload`, `eventId: null`), not deferred to
+event-save time — this keeps the form responsive. The upload response
+returns a file `id`; `POST /events` / `PATCH /events/:id` accept a
+`fileIds: string[]` field to attach those already-uploaded rows to the
+event (sets `eventId`). If the form is abandoned before save, the row is
+simply left with `eventId: null` — see the cleanup job below.
+
+**On event delete:** `ON DELETE CASCADE` removes the `event_files` rows
+automatically, but does **not** touch the Storage objects — the delete
+service must fetch each file's `storagePath` before deleting the event and
+remove the Storage objects explicitly as part of the same operation.
 
 **Conditional rules — `freq`/`lead` depend on `allDay`** (enforce in the Zod
 schema with a discriminated union, not just the base enums above):
@@ -107,7 +141,8 @@ Overlays:
 Attachments render as clickable download links (`<a download>`) wherever
 shown — day list file chips and the detail popup's attachment rows alike.
 
-## 6. Archive — Lazy Loading
+## 6. Archive — Lazy Loading & Creating an Archived Day
+**Reading (lazy load):**
 - Backend page size: 50 days/request (`GET /archive?limit=50&offset=0&search=`)
 - Response: `{ days: ArchivedDay[], total_count: number, has_more: bool }`
 - Frontend caches loaded pages in React state — no refetch on scroll up/down
@@ -115,10 +150,40 @@ shown — day list file chips and the detail popup's attachment rows alike.
 - Index: `CREATE INDEX ON archived_days(user_id DESC, yr DESC, mon DESC, day DESC)`
 - Target query time: < 50ms
 
+**Creating an archived day** (triggered by the archive button on Week/Day):
+`POST /archive/:dayOfWeek` copies that day's events into a new `ArchivedDay`
+row (`sum`, `count`, and a full `events` snapshot), then deletes the original
+rows from the active `events` table — copy-then-delete, not a soft-delete
+flag. Both steps run inside a single DB transaction: if the delete fails, the
+archive insert rolls back too, so the day is never left half-archived.
+
+Keeping `events` limited to the current week (rather than flagging old rows
+in place) keeps the hot path — `GET /events`, hit on every home-screen load —
+fast regardless of how much archive history a user accumulates, and lets
+`archived_days` be indexed/partitioned independently for scale.
+
+Google-synced events (`gcal: true`) are not included in the snapshot — they
+remain live in Google Calendar and are re-fetched from there when an archived
+day is viewed, rather than being duplicated into the archive.
+
 > Note: design prototype uses a page size of 12 for its own demo pacing — build
 > against the API contract above (50), not the prototype's demo constant.
 
-## 7. API (`/api/v1`)
+## 7. Orphan File Storage Cleanup (worker job)
+A scheduled job (cron-style, not a RabbitMQ consumer — it's periodic
+maintenance, not event-driven) run daily by the worker service:
+```
+DELETE FROM event_files
+WHERE eventId IS NULL AND uploadedAt < NOW() - INTERVAL '24 hours'
+RETURNING storagePath
+```
+For each returned `storagePath`, delete the corresponding object from
+Supabase Storage. The 24h grace window avoids deleting a file the user is
+still actively filling out a form for. This keeps Storage usage bounded to
+files that are actually referenced by a saved event, rather than growing
+indefinitely from abandoned uploads.
+
+## 8. API (`/api/v1`)
 ```
 POST   /auth/login                    { email }
 POST   /auth/verify                   { email, code }
@@ -127,13 +192,15 @@ POST   /events                        create — enqueues reminder job if remind
 PATCH  /events/:id
 DELETE /events/:id
 GET    /archive?limit=50&offset=0&search=
+POST   /archive/:dayOfWeek            archive a day — copies events, then deletes originals (transactional)
 GET    /gcal/events                   read-only
+POST   /files/upload                  upload a file, returns id; eventId set later via fileIds on events
 POST   /notifications/preferences
 GET    /notifications/preferences
 ```
 All responses: `{ success: true, data }` or `{ success: false, error: { message, code } }`.
 
-## 8. Notification Worker (RabbitMQ)
+## 9. Notification Worker (RabbitMQ)
 1. Event created with `reminder=true` → API publishes job to `notification_reminders`
 2. Worker (separate Node.js service) consumes, checks `NOW >= reminderTime`
 3. On due: send push via FCM → mark `sent`, ack message
@@ -144,7 +211,7 @@ Job format:
 { eventId, userId, eventTitle, reminderTime, channels: ["browser"|"mobile"], status }
 ```
 
-## 9. Localization
+## 10. Localization
 - UI: he/en, driven by `lang` state
 - User-entered content: **not** localized (stored as-is)
 - All system/error strings: localized both languages, required
@@ -152,13 +219,13 @@ Job format:
   (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic
 - Directional icons (chevrons) must mirror in RTL
 
-## 10. Non-Functional
+## 11. Non-Functional
 - Page load < 2s
 - Rate limit: 100 req/min/user
 - JWT in httpOnly cookie, RLS on all Supabase tables, all inputs Zod-validated
 - Responsive: mobile <640px (1 col) / tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid)
 
-## 11. Design Reference
+## 12. Design Reference
 Full visual spec (tokens, per-screen layout, state shape, copy) lives in
 `design_handoff_sederyom/README.md`. Read **only** that file — the accompanying
 `.dc.html`/`support.js` in the same folder are a non-runnable prototype

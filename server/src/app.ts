@@ -7,6 +7,7 @@ import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 import { correlationIdMiddleware } from "./routes/middlewares/correlationId.middleware.js";
 import { errorHandlerMiddleware } from "./routes/middlewares/errorHandler.middleware.js";
+import { archiveRouter } from "./routes/archive.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { eventsRouter } from "./routes/events.routes.js";
 
@@ -34,5 +35,6 @@ app.use(
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventsRouter);
+app.use("/api/v1/archive", archiveRouter);
 
 app.use(errorHandlerMiddleware);

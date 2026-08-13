@@ -27,3 +27,9 @@ export class UnauthorizedError extends AppError {
     super(401, "UNAUTHENTICATED", message);
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(message = "Conflict", code = "CONFLICT") {
+    super(409, code, message);
+  }
+}
