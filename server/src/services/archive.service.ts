@@ -4,19 +4,9 @@ import { db } from "../db/client.js";
 import { archivedDays, events } from "../db/schema/index.js";
 import { ConflictError } from "../utils/AppError.js";
 import { toApiEvent } from "./events.service.js";
+import { dateForDayOfWeek } from "./weekDates.js";
 
 type ArchivedDayRow = typeof archivedDays.$inferSelect;
-
-// Events only carry a day-of-week, not an absolute date — this resolves
-// dayOfWeek to a concrete date in the current week, using JS's own Date.getDay()
-// convention (0 = Sunday .. 6 = Saturday). Duplicated from reminderTime.ts rather than
-// imported: it's a 5-line pure function, not worth a shared module for one extra caller.
-function dateForDayOfWeek(dayOfWeek: number): Date {
-  const now = new Date();
-  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  date.setDate(date.getDate() + (dayOfWeek - date.getDay()));
-  return date;
-}
 
 function toApiArchivedDay(row: ArchivedDayRow): ArchivedDay {
   return archivedDaySchema.parse({
