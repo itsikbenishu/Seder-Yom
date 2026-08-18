@@ -1,0 +1,137 @@
+import { eq } from "drizzle-orm";
+import { googleCalendarEventSchema, type GoogleCalendarEvent } from "@project/shared";
+import { db } from "../db/client.js";
+import { googleCalendarTokens } from "../db/schema/index.js";
+import { getGoogleOAuthClient } from "../config/googleOAuthClient.js";
+import { logger } from "../config/logger.js";
+import { AppError } from "../utils/AppError.js";
+import { currentWeekRange, dayOfWeekForDate, type WeekRange } from "./weekDates.js";
+
+const REFRESH_MARGIN_MS = 60_000;
+const CALENDAR_EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+
+// The raw wire shape Google's REST API returns — distinct from `GoogleCalendarEvent`
+// (the shared/normalized shape our own API returns), which `mapToGoogleCalendarEvent`
+// below maps this into.
+interface GoogleCalendarApiEvent {
+  id: string;
+  status?: string;
+  summary?: string;
+  description?: string;
+  start: { date?: string; dateTime?: string };
+  end: { date?: string; dateTime?: string };
+}
+
+// Refreshes the stored access token when it's missing/expiring soon. Returns undefined
+// when the user has never connected (not an error — callers should treat that as "no
+// gcal events" rather than surfacing a failure). Throws GOOGLE_CALENDAR_RECONNECT_REQUIRED
+// when a stored refresh token is no longer valid (revoked access, or Google's 7-day
+// expiry in OAuth consent-screen "Testing" mode) — the row is deleted so /gcal/status
+// immediately reflects "disconnected".
+async function getValidAccessToken(userId: string): Promise<string | undefined> {
+  const [row] = await db.select().from(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
+  if (!row) {
+    return undefined;
+  }
+
+  const expiresSoon = Date.now() + REFRESH_MARGIN_MS >= row.accessTokenExpiresAt.getTime();
+  if (!expiresSoon) {
+    return row.accessToken;
+  }
+
+  const client = getGoogleOAuthClient();
+  client.setCredentials({ refresh_token: row.refreshToken });
+
+  try {
+    const { credentials } = await client.refreshAccessToken();
+    if (!credentials.access_token || !credentials.expiry_date) {
+      throw new Error("Missing access_token/expiry_date in refresh response");
+    }
+
+    await db
+      .update(googleCalendarTokens)
+      .set({
+        accessToken: credentials.access_token,
+        refreshToken: credentials.refresh_token ?? row.refreshToken,
+        accessTokenExpiresAt: new Date(credentials.expiry_date),
+        updatedAt: new Date(),
+      })
+      .where(eq(googleCalendarTokens.userId, userId));
+
+    return credentials.access_token;
+  } catch (error) {
+    logger.warn({ userId, err: error }, "Google Calendar token refresh failed — disconnecting");
+    await db.delete(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
+    throw new AppError(409, "GOOGLE_CALENDAR_RECONNECT_REQUIRED", "Google Calendar connection expired — please reconnect");
+  }
+}
+
+async function fetchGoogleEvents(accessToken: string, range: WeekRange): Promise<GoogleCalendarApiEvent[]> {
+  const url = new URL(CALENDAR_EVENTS_URL);
+  url.searchParams.set("timeMin", range.start.toISOString());
+  url.searchParams.set("timeMax", range.end.toISOString());
+  url.searchParams.set("singleEvents", "true");
+  url.searchParams.set("orderBy", "startTime");
+
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+
+  if (!response.ok) {
+    throw new AppError(502, "GOOGLE_CALENDAR_API_ERROR", `Google Calendar API request failed (${response.status})`);
+  }
+
+  const body = (await response.json()) as { items?: GoogleCalendarApiEvent[] };
+  return body.items ?? [];
+}
+
+function timeStringFromDate(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+// Pure — no I/O — so it's directly testable with hand-built fixtures.
+export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleCalendarEvent {
+  if (event.start.date && !event.start.dateTime) {
+    const startDate = new Date(`${event.start.date}T00:00:00`);
+    return googleCalendarEventSchema.parse({
+      id: `gcal_${event.id}`,
+      dayOfWeek: dayOfWeekForDate(startDate),
+      title: event.summary ?? "",
+      description: event.description,
+      start: "00:00",
+      end: "23:59",
+      allDay: true,
+      gcal: true,
+    });
+  }
+
+  const { dateTime: startDateTime } = event.start;
+  const { dateTime: endDateTime } = event.end;
+  if (!startDateTime || !endDateTime) {
+    throw new AppError(502, "GOOGLE_CALENDAR_API_ERROR", "Google Calendar event is missing a start/end time");
+  }
+
+  const startDate = new Date(startDateTime);
+  const endDate = new Date(endDateTime);
+
+  return googleCalendarEventSchema.parse({
+    id: `gcal_${event.id}`,
+    dayOfWeek: dayOfWeekForDate(startDate),
+    title: event.summary ?? "",
+    description: event.description,
+    start: timeStringFromDate(startDate),
+    end: timeStringFromDate(endDate),
+    allDay: false,
+    gcal: true,
+  });
+}
+
+export async function listGoogleCalendarEvents(userId: string): Promise<GoogleCalendarEvent[]> {
+  const accessToken = await getValidAccessToken(userId);
+  if (!accessToken) {
+    return [];
+  }
+
+  const googleEvents = await fetchGoogleEvents(accessToken, currentWeekRange());
+  return googleEvents.filter((event) => event.status !== "cancelled").map(mapToGoogleCalendarEvent);
+}
