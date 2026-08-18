@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { reminderLeadSchema } from "@project/shared";
+import { dateForDayOfWeek } from "./weekDates.js";
 
 type ReminderLead = z.infer<typeof reminderLeadSchema>;
 
@@ -15,18 +16,6 @@ interface ReminderTimeInput {
   start: string;
   reminderLead: ReminderLead;
   reminderLeadTime?: string;
-}
-
-// Events only carry a day-of-week (SPEC.md §3), not an absolute date — the app only
-// ever holds the current week's live events (older days move to the archive). This
-// resolves dayOfWeek to a concrete date in the current week, using JS's own
-// Date.getDay() convention (0 = Sunday .. 6 = Saturday), which is what SPEC's
-// `dayOfWeek: number (0-6)` maps onto with no other convention specified.
-function dateForDayOfWeek(dayOfWeek: number): Date {
-  const now = new Date();
-  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  date.setDate(date.getDate() + (dayOfWeek - date.getDay()));
-  return date;
 }
 
 function withTime(date: Date, time: string): Date {
