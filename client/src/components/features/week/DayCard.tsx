@@ -28,7 +28,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
       className={cn(
         "rounded-xl border p-3.5 text-start transition-colors cursor-pointer",
         day.isToday
-          ? "bg-violet-50 dark:bg-violet-500/10 border-violet-300 dark:border-violet-500/40"
+          ? "bg-violet-100 dark:bg-violet-500/15 border-violet-300 dark:border-violet-500/40"
           : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
         day.isMuted && "opacity-70",
       )}
@@ -61,11 +61,11 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
           <p className="text-sm text-slate-500 dark:text-slate-400">{t("week.noEvents")}</p>
         )}
       </div>
-      <div className="mt-2.5 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
+      <div className="mt-2.5 flex items-center justify-between gap-1">
+        <div className="flex min-w-0 items-center gap-1">
           <Button
             variant="ghost"
-            className="whitespace-nowrap"
+            className="min-w-0 whitespace-nowrap px-2"
             onClick={stopPropagationThen(() => onMuteDay(day.dayOfWeek))}
           >
             {day.isMuted ? "🔕" : "🔔"} {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}

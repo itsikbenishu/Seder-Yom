@@ -19,7 +19,7 @@ export function WeekScreen() {
   const weekViewData = buildWeekViewData(events ?? [], new Date());
 
   return (
-    <div className="mx-auto max-w-5xl p-4">
+    <div className="p-4">
       <header className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-violet-600 dark:text-violet-400">
