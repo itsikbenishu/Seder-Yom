@@ -1,5 +1,13 @@
 {
   "common": {
     "close": "Close"
+  },
+  "week": {
+    "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "today": "Today",
+    "muted": "Muted",
+    "noEvents": "No events",
+    "muteDayAria": "Mute day",
+    "unmuteDayAria": "Unmute day"
   }
 }
