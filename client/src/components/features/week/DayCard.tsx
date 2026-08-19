@@ -82,6 +82,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
         <Button
           variant="ghost"
           size="icon"
+          className="w-auto px-2.5"
           onClick={stopPropagationThen(() => onAddEvent(day.dayOfWeek))}
           aria-label={t("week.addEventAria")}
         >
