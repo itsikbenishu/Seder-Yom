@@ -35,6 +35,8 @@ start, end: HH:mm
 allDay: bool
 freq: "once" | "daily" | "weekly"
 reminder: bool
+mutedUntilArchive: bool    # default false; suppresses push for this event.
+                           # Applies to timed events only — see below.
 lead: "15m" | "30m" | "1h" | "1d" | "time"
 leadTime: HH:mm            # used when lead === "time"
 files: see EventFile below — not embedded; a normalized table, not a jsonb array
@@ -84,6 +86,42 @@ schema with a discriminated union, not just the base enums above):
   event. `lead` is always effectively `time` — a fixed clock-time picker
   (`leadTime`), with **no offset options** (15m/30m/1h/1d are not offered).
 
+**Muting.** Two independent actions, both act on timed (non-all-day) events
+only — all-day events have no mute control:
+- **Mute a day** (Week view, per-day button; also available from Day view) —
+  bulk-sets `mutedUntilArchive: true` on every currently-existing timed event
+  for that `dayOfWeek`. `PATCH /events/mute-day/:dayOfWeek` (see §8) does this
+  in one query, not a client-side loop over individual `PATCH` calls.
+- **Mute a single event** (Day view, per-event control) — sets
+  `mutedUntilArchive: true` on that one event via the existing
+  `PATCH /events/:id`.
+
+The flag needs no separate "unmute on archive" step: archiving a day deletes
+its event rows (§6), so any event created afterward for that `dayOfWeek`
+starts fresh at the field's default (`false`).
+
+The notification worker (§9) must check `mutedUntilArchive === false` before
+sending a push — an event can be muted after its reminder job was already
+enqueued, so the check happens at send time, not just at enqueue time.
+
+**"Day muted" is a derived UI state, not a stored field.** The Week view's
+per-day mute indicator/button state is computed, not read from a column: a
+day shows as muted only when **every** currently-existing timed event for
+that `dayOfWeek` has `mutedUntilArchive === true`. There is no day-level
+mute flag in the schema — a separate `muted_days` table was considered and
+rejected, precisely because it would have needed its own answer to what
+happens to a newly-added event on an already-muted day; deriving the state
+from existing events avoids that question entirely.
+
+This has a direct, intended consequence: if a day is fully muted and the
+user then adds a new (unmuted) event to it, that day **stops** showing as
+muted — even though every previously-existing event on it keeps its own
+`mutedUntilArchive: true`. The bulk "mute day" action, if pressed again
+afterward, re-applies to all currently-existing timed events and brings the
+day back to fully muted. Compute this client-side from the already-fetched
+week events (`allMuted = timedEvents.every(e => e.mutedUntilArchive)`) —
+no extra endpoint is needed to read it.
+
 ### ArchivedDay
 ```
 dayOfWeek: number (0-6)
@@ -123,8 +161,10 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
 ## 5. Screens (see design README for full layout detail)
 1. **Login** — email entry
 2. **2FA** — 6-digit code entry
-3. **Week** (home) — 7-day grid, today highlighted, nearest event per day
-4. **Day** — full event list, drag-to-reschedule, ⋯ menu (mute/archive/clear/open archive)
+3. **Week** (home) — 7-day grid, today highlighted, nearest event per day,
+   per-day mute-all button (mutes all timed events for that day)
+4. **Day** — full event list, drag-to-reschedule, per-event mute toggle on
+   each timed event, ⋯ menu (mute-day/archive/clear/open archive)
 5. **Archive** — searchable list, lazy-loaded (12/page in design, 50/page per API — see §7 note)
 6. **Archive Day** — read-only day view
 7. **Settings** — language, theme, Google sync, notification channel, sign out
@@ -190,6 +230,7 @@ POST   /auth/verify                   { email, code }
 GET    /events                        current week, RLS-scoped
 POST   /events                        create — enqueues reminder job if reminder=true
 PATCH  /events/:id
+PATCH  /events/mute-day/:dayOfWeek    bulk-mute all timed events for that day (one query)
 DELETE /events/:id
 GET    /archive?limit=50&offset=0&search=
 POST   /archive/:dayOfWeek            archive a day — copies events, then deletes originals (transactional)
@@ -202,8 +243,10 @@ All responses: `{ success: true, data }` or `{ success: false, error: { message,
 
 ## 9. Notification Worker (RabbitMQ)
 1. Event created with `reminder=true` → API publishes job to `notification_reminders`
-2. Worker (separate Node.js service) consumes, checks `NOW >= reminderTime`
-3. On due: send push via FCM → mark `sent`, ack message
+2. Worker (separate Node.js service) consumes, re-fetches the event and checks
+   `NOW >= reminderTime` **and** `mutedUntilArchive === false` and the event
+   still exists — mute/delete after enqueue must still suppress the send
+3. On due (and not muted): send push via FCM → mark `sent`, ack message
 4. On failure: retry w/ exponential backoff (max 3) → then `failed` + DLQ
 
 Job format:
