@@ -8,6 +8,9 @@
     "muted": "Muted",
     "noEvents": "No events",
     "muteDayAria": "Mute day",
-    "unmuteDayAria": "Unmute day"
+    "unmuteDayAria": "Unmute day",
+    "kicker": "This week",
+    "settingsAria": "Settings",
+    "archiveAria": "Archive"
   }
 }

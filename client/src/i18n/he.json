@@ -8,6 +8,9 @@
     "muted": "מושתק",
     "noEvents": "אין אירועים",
     "muteDayAria": "השתק יום",
-    "unmuteDayAria": "בטל השתקת יום"
+    "unmuteDayAria": "בטל השתקת יום",
+    "kicker": "השבוע",
+    "settingsAria": "הגדרות",
+    "archiveAria": "ארכיון"
   }
 }

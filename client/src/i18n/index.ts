@@ -13,4 +13,12 @@ void i18next.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
+function syncDocumentDirection(language: string): void {
+  document.documentElement.lang = language;
+  document.documentElement.dir = i18next.dir(language);
+}
+
+syncDocumentDirection(i18next.language);
+i18next.on("languageChanged", syncDocumentDirection);
+
 export default i18next;
