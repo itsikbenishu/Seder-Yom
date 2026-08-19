@@ -1,0 +1,2 @@
+ALTER TABLE "events" ADD COLUMN "muted_until_archive" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "events" ADD CONSTRAINT "events_all_day_muted" CHECK ("events"."all_day" = false OR "events"."muted_until_archive" = false);

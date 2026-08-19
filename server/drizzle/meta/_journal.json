@@ -15,6 +15,13 @@
       "when": 1786627630375,
       "tag": "0001_cheerful_ser_duncan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787134735153,
+      "tag": "0002_brown_beast",
+      "breakpoints": true
     }
   ]
 }

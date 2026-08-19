@@ -123,6 +123,7 @@ function toWritableFields(row: EventRow) {
     reminder: row.reminder,
     reminderLead: row.reminderLead ?? undefined,
     reminderLeadTime: row.reminderLeadTime ? trimSeconds(row.reminderLeadTime) : undefined,
+    mutedUntilArchive: row.mutedUntilArchive,
   };
 }
 
@@ -207,4 +208,11 @@ export async function deleteEvent(userId: string, id: string): Promise<void> {
   }
 
   await removeStorageObjects(filesToRemove.map((file) => file.storagePath));
+}
+
+export async function muteDayEvents(userId: string, dayOfWeek: number): Promise<void> {
+  await db
+    .update(events)
+    .set({ mutedUntilArchive: true })
+    .where(and(eq(events.userId, userId), eq(events.dayOfWeek, dayOfWeek), eq(events.allDay, false)));
 }
