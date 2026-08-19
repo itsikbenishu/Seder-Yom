@@ -58,7 +58,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
             {day.nearestEvent.start} · {day.nearestEvent.title}
           </p>
         ) : (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t("week.noEvents")}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400"></p>
         )}
       </div>
       <div className="mt-2.5 flex items-center justify-between gap-1">

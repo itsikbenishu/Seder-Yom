@@ -161,8 +161,10 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
 ## 5. Screens (see design README for full layout detail)
 1. **Login** — email entry
 2. **2FA** — 6-digit code entry
-3. **Week** (home) — 7-day grid, today highlighted, nearest event per day,
-   per-day mute-all button (mutes all timed events for that day)
+3. **Week** (home) — week grid of the 7 day-cards (4 cols desktop/tablet,
+   wraps to 2 rows; 1 col mobile — see design README, not a literal 7-wide
+   row), today highlighted, nearest event per day, per-day mute-all button
+   (mutes all timed events for that day)
 4. **Day** — full event list, drag-to-reschedule, per-event mute toggle on
    each timed event, ⋯ menu (mute-day/archive/clear/open archive)
 5. **Archive** — searchable list, lazy-loaded (12/page in design, 50/page per API — see §7 note)
@@ -266,7 +268,7 @@ Job format:
 - Page load < 2s
 - Rate limit: 100 req/min/user
 - JWT in httpOnly cookie, RLS on all Supabase tables, all inputs Zod-validated
-- Responsive: mobile <640px (1 col) / tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid)
+- Responsive: mobile <640px (1 col) / ≥640px (4-col week grid, wraps to 2 rows for the 7 day-cards — per design README, matches the week grid described in §5)
 
 ## 12. Design Reference
 Full visual spec (tokens, per-screen layout, state shape, copy) lives in
