@@ -42,6 +42,8 @@ export function WeekScreen() {
         days={weekViewData.days}
         onSelectDay={() => {}}
         onMuteDay={(dayOfWeek) => muteDayMutation.mutate(dayOfWeek)}
+        onAddEvent={() => {}}
+        onArchiveDay={() => {}}
       />
     </div>
   );

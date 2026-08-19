@@ -30,10 +30,14 @@ export interface WeekGridProps {
   days: WeekDay[];
   onSelectDay: (dayOfWeek: number) => void;
   onMuteDay: (dayOfWeek: number) => void;
+  onAddEvent: (dayOfWeek: number) => void;
+  onArchiveDay: (dayOfWeek: number) => void;
 }
 
 export interface DayCardProps {
   day: WeekDay;
   onSelect: (dayOfWeek: number) => void;
   onMuteDay: (dayOfWeek: number) => void;
+  onAddEvent: (dayOfWeek: number) => void;
+  onArchiveDay: (dayOfWeek: number) => void;
 }

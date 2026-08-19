@@ -4,14 +4,16 @@ import { Button } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { DayCardProps } from "../../../types/week";
 
-export function DayCard({ day, onSelect, onMuteDay }: DayCardProps) {
+export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: DayCardProps) {
   const { t } = useTranslation();
   const dayNames = t("week.dayNames", { returnObjects: true }) as string[];
 
-  const handleMuteClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onMuteDay(day.dayOfWeek);
-  };
+  function stopPropagationThen(handler: () => void) {
+    return (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      handler();
+    };
+  }
 
   return (
     <div
@@ -47,24 +49,43 @@ export function DayCard({ day, onSelect, onMuteDay }: DayCardProps) {
               {t("week.muted")}
             </span>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleMuteClick}
-            aria-label={t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
-          >
-            {day.isMuted ? "🔕" : "🔔"}
-          </Button>
         </div>
       </div>
       <div className="mt-2.5">
         {day.nearestEvent ? (
-          <p className="text-sm text-slate-700 dark:text-slate-200">
+          <p className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-200">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden="true" />
             {day.nearestEvent.start} · {day.nearestEvent.title}
           </p>
         ) : (
           <p className="text-sm text-slate-500 dark:text-slate-400">{t("week.noEvents")}</p>
         )}
+      </div>
+      <div className="mt-2.5 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={stopPropagationThen(() => onAddEvent(day.dayOfWeek))}
+          aria-label={t("week.addEventAria")}
+        >
+          +
+        </Button>
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={stopPropagationThen(() => onArchiveDay(day.dayOfWeek))}
+            aria-label={t("week.archiveDayAria")}
+          >
+            🗄️
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={stopPropagationThen(() => onMuteDay(day.dayOfWeek))}
+          >
+            {day.isMuted ? "🔕" : "🔔"} {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
+          </Button>
+        </div>
       </div>
     </div>
   );

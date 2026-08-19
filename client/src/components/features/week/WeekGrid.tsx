@@ -1,11 +1,18 @@
 import { DayCard } from "./DayCard";
 import type { WeekGridProps } from "../../../types/week";
 
-export function WeekGrid({ days, onSelectDay, onMuteDay }: WeekGridProps) {
+export function WeekGrid({ days, onSelectDay, onMuteDay, onAddEvent, onArchiveDay }: WeekGridProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
       {days.map((day) => (
-        <DayCard key={day.dayOfWeek} day={day} onSelect={onSelectDay} onMuteDay={onMuteDay} />
+        <DayCard
+          key={day.dayOfWeek}
+          day={day}
+          onSelect={onSelectDay}
+          onMuteDay={onMuteDay}
+          onAddEvent={onAddEvent}
+          onArchiveDay={onArchiveDay}
+        />
       ))}
     </div>
   );

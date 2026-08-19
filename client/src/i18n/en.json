@@ -7,10 +7,12 @@
     "today": "Today",
     "muted": "Muted",
     "noEvents": "No events",
-    "muteDayAria": "Mute day",
-    "unmuteDayAria": "Unmute day",
+    "muteDayAria": "Mute reminders",
+    "unmuteDayAria": "Unmute reminders",
     "kicker": "This week",
     "settingsAria": "Settings",
-    "archiveAria": "Archive"
+    "archiveAria": "Archive",
+    "addEventAria": "Add event",
+    "archiveDayAria": "Archive day"
   }
 }

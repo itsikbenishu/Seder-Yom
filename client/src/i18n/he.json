@@ -7,10 +7,12 @@
     "today": "היום",
     "muted": "מושתק",
     "noEvents": "אין אירועים",
-    "muteDayAria": "השתק יום",
-    "unmuteDayAria": "בטל השתקת יום",
+    "muteDayAria": "השתקת תזכורות",
+    "unmuteDayAria": "בטל השתקת תזכורות",
     "kicker": "השבוע",
     "settingsAria": "הגדרות",
-    "archiveAria": "ארכיון"
+    "archiveAria": "ארכיון",
+    "addEventAria": "הוסף אירוע",
+    "archiveDayAria": "העבר יום לארכיון"
   }
 }
