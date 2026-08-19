@@ -17,6 +17,7 @@ const sharedEventFields = {
   end: timeStringSchema,
   reminder: z.boolean().default(false),
   reminderLeadTime: timeStringSchema.optional(),
+  mutedUntilArchive: z.boolean().default(false),
   fileIds: fileIdsSchema,
 };
 
