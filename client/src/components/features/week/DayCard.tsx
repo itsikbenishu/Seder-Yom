@@ -62,15 +62,14 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
         )}
       </div>
       <div className="mt-2.5 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={stopPropagationThen(() => onAddEvent(day.dayOfWeek))}
-          aria-label={t("week.addEventAria")}
-        >
-          +
-        </Button>
         <div className="flex items-center gap-1.5">
+          <Button
+            variant="ghost"
+            className="whitespace-nowrap"
+            onClick={stopPropagationThen(() => onMuteDay(day.dayOfWeek))}
+          >
+            {day.isMuted ? "🔕" : "🔔"} {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -79,13 +78,15 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
           >
             🗄️
           </Button>
-          <Button
-            variant="ghost"
-            onClick={stopPropagationThen(() => onMuteDay(day.dayOfWeek))}
-          >
-            {day.isMuted ? "🔕" : "🔔"} {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
-          </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={stopPropagationThen(() => onAddEvent(day.dayOfWeek))}
+          aria-label={t("week.addEventAria")}
+        >
+          +
+        </Button>
       </div>
     </div>
   );
