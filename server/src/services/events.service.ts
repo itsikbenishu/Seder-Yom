@@ -216,3 +216,43 @@ export async function muteDayEvents(userId: string, dayOfWeek: number): Promise<
     .set({ mutedUntilArchive: true })
     .where(and(eq(events.userId, userId), eq(events.dayOfWeek, dayOfWeek), eq(events.allDay, false)));
 }
+
+export async function unmuteDayEvents(userId: string, dayOfWeek: number): Promise<void> {
+  await db
+    .update(events)
+    .set({ mutedUntilArchive: false })
+    .where(and(eq(events.userId, userId), eq(events.dayOfWeek, dayOfWeek), eq(events.allDay, false)));
+}
+
+// Google-synced events are excluded, same as archiveDay (SPEC.md §6/§7) — they stay live in
+// Google Calendar and are never deletable from this app, so "clear day" leaves them untouched.
+export async function clearDayEvents(userId: string, dayOfWeek: number): Promise<void> {
+  const localEventsPredicate = and(
+    eq(events.userId, userId),
+    eq(events.dayOfWeek, dayOfWeek),
+    eq(events.googleCalendarSynced, false),
+  );
+
+  const storagePaths = await db.transaction(async (tx) => {
+    const targetEvents = await tx.select({ id: events.id }).from(events).where(localEventsPredicate);
+    const eventIds = targetEvents.map((event) => event.id);
+
+    if (eventIds.length === 0) {
+      return [];
+    }
+
+    const files = await tx
+      .select({ storagePath: eventFiles.storagePath })
+      .from(eventFiles)
+      .where(and(inArray(eventFiles.eventId, eventIds), eq(eventFiles.userId, userId)));
+
+    await tx.delete(eventFiles).where(inArray(eventFiles.eventId, eventIds));
+    await tx.delete(events).where(inArray(events.id, eventIds));
+
+    return files.map((file) => file.storagePath);
+  });
+
+  // Storage isn't part of the Postgres transaction, so this batch cleanup only runs after
+  // the delete has committed (SPEC.md §7) — one call for the whole day, not one per file.
+  await removeStorageObjects(storagePaths);
+}
