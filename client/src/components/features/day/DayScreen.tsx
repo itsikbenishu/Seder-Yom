@@ -98,7 +98,7 @@ export function DayScreen({
   const isEmpty = data.timedEvents.length === 0 && data.allDayEvents.length === 0;
 
   return (
-    <div>
+    <div className="flex h-svh flex-col">
       <DayHeader
         dayOfWeek={dayOfWeek}
         date={data.date}
@@ -109,7 +109,7 @@ export function DayScreen({
         onMenuAction={handleMenuAction}
       />
 
-      <div className="flex flex-col gap-2 p-4">
+      <div className="sy-scroll flex flex-1 flex-col gap-2 overflow-y-auto p-4">
         {isEmpty && <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">{t("week.noEvents")}</p>}
 
         {data.allDayEvents.map((event) => (

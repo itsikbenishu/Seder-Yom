@@ -24,11 +24,11 @@
       "menuAria": "More options"
     },
     "menu": {
-      "mute": "Mute day",
-      "unmute": "Unmute day",
+      "mute": "Mute reminders",
+      "unmute": "Unmute reminders",
       "archiveDay": "Archive day",
-      "clearDay": "Clear all events",
-      "openArchive": "Open archive"
+      "clearDay": "Delete all of today's events",
+      "openArchive": "Open the archive"
     },
     "event": {
       "nextUp": "Next up",
