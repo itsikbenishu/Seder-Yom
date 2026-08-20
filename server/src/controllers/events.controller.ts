@@ -1,6 +1,14 @@
 import type { Request, Response } from "express";
 import type { CreateEventInput, UpdateEventInput } from "@project/shared";
-import { createEvent, deleteEvent, listEvents, muteDayEvents as muteDayEventsService, updateEvent } from "../services/events.service.js";
+import {
+  clearDayEvents as clearDayEventsService,
+  createEvent,
+  deleteEvent,
+  listEvents,
+  muteDayEvents as muteDayEventsService,
+  unmuteDayEvents as unmuteDayEventsService,
+  updateEvent,
+} from "../services/events.service.js";
 import { sendSuccess } from "../utils/apiResponse.js";
 
 export async function getEvents(req: Request, res: Response): Promise<void> {
@@ -27,5 +35,15 @@ export async function deleteEventById(req: Request<{ id: string }>, res: Respons
 
 export async function muteDayEvents(req: Request<{ dayOfWeek: string }>, res: Response): Promise<void> {
   await muteDayEventsService(req.userId, Number(req.params.dayOfWeek));
+  sendSuccess(res, null);
+}
+
+export async function clearDayEvents(req: Request<{ dayOfWeek: string }>, res: Response): Promise<void> {
+  await clearDayEventsService(req.userId, Number(req.params.dayOfWeek));
+  sendSuccess(res, null);
+}
+
+export async function unmuteDayEvents(req: Request<{ dayOfWeek: string }>, res: Response): Promise<void> {
+  await unmuteDayEventsService(req.userId, Number(req.params.dayOfWeek));
   sendSuccess(res, null);
 }
