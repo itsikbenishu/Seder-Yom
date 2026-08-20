@@ -90,8 +90,12 @@ schema with a discriminated union, not just the base enums above):
 only — all-day events have no mute control:
 - **Mute a day** (Week view, per-day button; also available from Day view) —
   bulk-sets `mutedUntilArchive: true` on every currently-existing timed event
-  for that `dayOfWeek`. `PATCH /events/mute-day/:dayOfWeek` (see §8) does this
+  for that `dayOfWeek`. `PATCH /events/mute-day/:dayOfWeek` (see §9) does this
   in one query, not a client-side loop over individual `PATCH` calls.
+  `PATCH /events/unmute-day/:dayOfWeek` does the symmetric bulk-set to
+  `false` — same shape, one `UPDATE ... WHERE dayOfWeek = ? AND userId = ?`
+  query. Neither touches `event_files`/Storage — there's nothing to clean up
+  for a status flip, unlike archiving or clearing a day.
 - **Mute a single event** (Day view, per-event control) — sets
   `mutedUntilArchive: true` on that one event via the existing
   `PATCH /events/:id`.
@@ -100,7 +104,7 @@ The flag needs no separate "unmute on archive" step: archiving a day deletes
 its event rows (§6), so any event created afterward for that `dayOfWeek`
 starts fresh at the field's default (`false`).
 
-The notification worker (§9) must check `mutedUntilArchive === false` before
+The notification worker (§10) must check `mutedUntilArchive === false` before
 sending a push — an event can be muted after its reminder job was already
 enqueued, so the check happens at send time, not just at enqueue time.
 
@@ -161,13 +165,11 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
 ## 5. Screens (see design README for full layout detail)
 1. **Login** — email entry
 2. **2FA** — 6-digit code entry
-3. **Week** (home) — week grid of the 7 day-cards (4 cols desktop/tablet,
-   wraps to 2 rows; 1 col mobile — see design README, not a literal 7-wide
-   row), today highlighted, nearest event per day, per-day mute-all button
-   (mutes all timed events for that day)
+3. **Week** (home) — 7-day grid, today highlighted, nearest event per day,
+   per-day mute-all button (mutes all timed events for that day)
 4. **Day** — full event list, drag-to-reschedule, per-event mute toggle on
    each timed event, ⋯ menu (mute-day/archive/clear/open archive)
-5. **Archive** — searchable list, lazy-loaded (12/page in design, 50/page per API — see §7 note)
+5. **Archive** — searchable list, lazy-loaded (12/page in design, 50/page per API — see §9 note)
 6. **Archive Day** — read-only day view
 7. **Settings** — language, theme, Google sync, notification channel, sign out
 
@@ -211,7 +213,25 @@ day is viewed, rather than being duplicated into the archive.
 > Note: design prototype uses a page size of 12 for its own demo pacing — build
 > against the API contract above (50), not the prototype's demo constant.
 
-## 7. Orphan File Storage Cleanup (worker job)
+## 7. Clearing a Day (bulk delete)
+`DELETE /events/day/:dayOfWeek` — this is the "Clear" action in the Day
+view's ⋯ menu (§5). Deletes every event for that `dayOfWeek` permanently
+(unlike archiving — nothing is kept). Same transactional shape as archiving
+a day (§6), applied to deletion instead of copy-then-delete:
+
+1. **One indexed DB query** fetches all events (and their `event_files` rows'
+   `storagePath`s) for that `dayOfWeek`, scoped to `user_id`
+2. **Single transaction**: delete the `event_files` rows, then the `events`
+   rows — all-or-nothing; if either delete fails, the whole operation rolls
+   back, so a day is never left partially cleared
+3. **Batched Storage cleanup**: the collected `storagePath`s are deleted from
+   Supabase Storage as one batch call (not one request per file) — this
+   happens after the DB transaction commits, since Storage isn't part of the
+   Postgres transaction
+4. **One network request from the client** — the whole clear action is a
+   single `DELETE`, not a loop of per-event deletes
+
+## 8. Orphan File Storage Cleanup (worker job)
 A scheduled job (cron-style, not a RabbitMQ consumer — it's periodic
 maintenance, not event-driven) run daily by the worker service:
 ```
@@ -225,7 +245,7 @@ still actively filling out a form for. This keeps Storage usage bounded to
 files that are actually referenced by a saved event, rather than growing
 indefinitely from abandoned uploads.
 
-## 8. API (`/api/v1`)
+## 9. API (`/api/v1`)
 ```
 POST   /auth/login                    { email }
 POST   /auth/verify                   { email, code }
@@ -233,7 +253,9 @@ GET    /events                        current week, RLS-scoped
 POST   /events                        create — enqueues reminder job if reminder=true
 PATCH  /events/:id
 PATCH  /events/mute-day/:dayOfWeek    bulk-mute all timed events for that day (one query)
+PATCH  /events/unmute-day/:dayOfWeek  bulk-unmute — symmetric, one query, no Storage involved
 DELETE /events/:id
+DELETE /events/day/:dayOfWeek         clear a day — deletes all its events + files (transactional, batched, see §7)
 GET    /archive?limit=50&offset=0&search=
 POST   /archive/:dayOfWeek            archive a day — copies events, then deletes originals (transactional)
 GET    /gcal/events                   read-only
@@ -243,7 +265,7 @@ GET    /notifications/preferences
 ```
 All responses: `{ success: true, data }` or `{ success: false, error: { message, code } }`.
 
-## 9. Notification Worker (RabbitMQ)
+## 10. Notification Worker (RabbitMQ)
 1. Event created with `reminder=true` → API publishes job to `notification_reminders`
 2. Worker (separate Node.js service) consumes, re-fetches the event and checks
    `NOW >= reminderTime` **and** `mutedUntilArchive === false` and the event
@@ -256,7 +278,7 @@ Job format:
 { eventId, userId, eventTitle, reminderTime, channels: ["browser"|"mobile"], status }
 ```
 
-## 10. Localization
+## 11. Localization
 - UI: he/en, driven by `lang` state
 - User-entered content: **not** localized (stored as-is)
 - All system/error strings: localized both languages, required
@@ -264,13 +286,13 @@ Job format:
   (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic
 - Directional icons (chevrons) must mirror in RTL
 
-## 11. Non-Functional
+## 12. Non-Functional
 - Page load < 2s
 - Rate limit: 100 req/min/user
 - JWT in httpOnly cookie, RLS on all Supabase tables, all inputs Zod-validated
-- Responsive: mobile <640px (1 col) / ≥640px (4-col week grid, wraps to 2 rows for the 7 day-cards — per design README, matches the week grid described in §5)
+- Responsive: mobile <640px (1 col) / tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid)
 
-## 12. Design Reference
+## 13. Design Reference
 Full visual spec (tokens, per-screen layout, state shape, copy) lives in
 `design_handoff_sederyom/README.md`. Read **only** that file — the accompanying
 `.dc.html`/`support.js` in the same folder are a non-runnable prototype
