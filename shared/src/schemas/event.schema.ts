@@ -91,3 +91,6 @@ export const eventSchema = z.discriminatedUnion("allDay", [
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 export type Event = z.infer<typeof eventSchema>;
+export type EventFrequency = z.infer<typeof eventFrequencySchema>;
+export type AllDayEventFrequency = z.infer<typeof allDayEventFrequencySchema>;
+export type ReminderLead = z.infer<typeof reminderLeadSchema>;
