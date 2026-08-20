@@ -1,6 +1,7 @@
 {
   "common": {
-    "close": "סגור"
+    "close": "סגור",
+    "cancel": "ביטול"
   },
   "week": {
     "dayNames": ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
@@ -14,5 +15,55 @@
     "archiveAria": "ארכיון",
     "addEventAria": "הוסף אירוע",
     "archiveDayAria": "העבר יום לארכיון"
+  },
+  "day": {
+    "header": {
+      "backAria": "חזרה לשבוע",
+      "prevDayAria": "היום הקודם",
+      "nextDayAria": "היום הבא",
+      "menuAria": "עוד אפשרויות"
+    },
+    "menu": {
+      "mute": "השתק יום",
+      "unmute": "בטל השתקה",
+      "archiveDay": "העבר לארכיון",
+      "clearDay": "נקה את כל האירועים",
+      "openArchive": "פתח ארכיון"
+    },
+    "event": {
+      "nextUp": "הבא בתור",
+      "showMore": "הצג עוד",
+      "showLess": "הצג פחות",
+      "muteAria": "השתק תזכורת",
+      "unmuteAria": "בטל השתקת תזכורת",
+      "editAria": "ערוך אירוע",
+      "deleteAria": "מחק אירוע",
+      "googleSynced": "מסונכרן מ-Google"
+    },
+    "allDay": {
+      "detailKicker": "אירוע יום שלם",
+      "infoAria": "פרטי האירוע",
+      "description": "תיאור",
+      "note": "הערה",
+      "attachments": "קבצים מצורפים",
+      "delete": "מחיקה",
+      "edit": "עריכה",
+      "googleSynced": "מסונכרן מגוגל",
+      "repeatDaily": "חוזר מדי יום",
+      "repeatWeekly": "חוזר מדי שבוע",
+      "reminderAt": "תזכורת בשעה {{time}}"
+    },
+    "confirm": {
+      "archiveDayTitle": "העברה לארכיון",
+      "archiveDayBody": "כל אירועי היום יועברו לארכיון ויוסרו מהיומן הפעיל. פעולה זו אינה הפיכה.",
+      "archiveDayConfirm": "העבר לארכיון",
+      "clearDayTitle": "ניקוי היום",
+      "clearDayBody": "כל האירועים ביום זה יימחקו לצמיתות. פעולה זו אינה הפיכה.",
+      "clearDayConfirm": "נקה הכל",
+      "deleteEventTitle": "מחיקת אירוע",
+      "deleteEventBody": "האירוע יימחק לצמיתות. פעולה זו אינה הפיכה.",
+      "deleteEventConfirm": "מחק"
+    },
+    "addEvent": "+ הוסף אירוע"
   }
 }

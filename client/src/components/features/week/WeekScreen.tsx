@@ -11,7 +11,11 @@ function formatWeekRange(start: Date, end: Date, language: string): string {
   return `${formatter.format(start)} – ${formatter.format(end)}`;
 }
 
-export function WeekScreen() {
+export interface WeekScreenProps {
+  onSelectDay: (dayOfWeek: number) => void;
+}
+
+export function WeekScreen({ onSelectDay }: WeekScreenProps) {
   const { t, i18n } = useTranslation();
   const { data: events } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
@@ -40,7 +44,7 @@ export function WeekScreen() {
       </header>
       <WeekGrid
         days={weekViewData.days}
-        onSelectDay={() => {}}
+        onSelectDay={onSelectDay}
         onMuteDay={(dayOfWeek) => muteDayMutation.mutate(dayOfWeek)}
         onAddEvent={() => {}}
         onArchiveDay={() => {}}

@@ -1,6 +1,7 @@
 {
   "common": {
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel"
   },
   "week": {
     "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -14,5 +15,55 @@
     "archiveAria": "Archive",
     "addEventAria": "Add event",
     "archiveDayAria": "Archive day"
+  },
+  "day": {
+    "header": {
+      "backAria": "Back to week",
+      "prevDayAria": "Previous day",
+      "nextDayAria": "Next day",
+      "menuAria": "More options"
+    },
+    "menu": {
+      "mute": "Mute day",
+      "unmute": "Unmute day",
+      "archiveDay": "Archive day",
+      "clearDay": "Clear all events",
+      "openArchive": "Open archive"
+    },
+    "event": {
+      "nextUp": "Next up",
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "muteAria": "Mute reminder",
+      "unmuteAria": "Unmute reminder",
+      "editAria": "Edit event",
+      "deleteAria": "Delete event",
+      "googleSynced": "Google-synced"
+    },
+    "allDay": {
+      "detailKicker": "All-day event",
+      "infoAria": "Event details",
+      "description": "Description",
+      "note": "Note",
+      "attachments": "Attachments",
+      "delete": "Delete",
+      "edit": "Edit",
+      "googleSynced": "Google-synced",
+      "repeatDaily": "Repeats daily",
+      "repeatWeekly": "Repeats weekly",
+      "reminderAt": "Reminder at {{time}}"
+    },
+    "confirm": {
+      "archiveDayTitle": "Archive day",
+      "archiveDayBody": "All of today's events will be moved to the archive and removed from the active calendar. This can't be undone.",
+      "archiveDayConfirm": "Archive day",
+      "clearDayTitle": "Clear day",
+      "clearDayBody": "All events on this day will be permanently deleted. This can't be undone.",
+      "clearDayConfirm": "Clear all",
+      "deleteEventTitle": "Delete event",
+      "deleteEventBody": "This event will be permanently deleted. This can't be undone.",
+      "deleteEventConfirm": "Delete"
+    },
+    "addEvent": "+ Add event"
   }
 }
