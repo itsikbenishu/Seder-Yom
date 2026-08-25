@@ -70,17 +70,14 @@ export interface EventListProps {
 }
 
 /**
- * Top-level Day screen. Navigation (back/prev/next/archive) and add/edit-event
- * launch are owned by the parent (App-level screen switcher) — DayScreen itself
- * derives DayViewData from the shared week-events cache via buildDayViewData.
+ * Top-level Day screen. Navigation (back/prev/next/archive) is owned by the parent
+ * (App-level screen switcher) — DayScreen itself derives DayViewData from the shared
+ * week-events cache via buildDayViewData, and owns the event form dialog locally
+ * (same pattern as its ConfirmDialog/AllDayEventDetail overlays).
  */
 export interface DayScreenProps {
   dayOfWeek: number;
   onBackToWeek: () => void;
   onNavigateDay: (dayOfWeek: number) => void;
   onOpenArchive: () => void;
-  /** Opens the (not-yet-built, per CLAUDE.md build order) event form dialog in create mode. */
-  onAddEvent: (dayOfWeek: number) => void;
-  /** Opens the event form dialog in edit mode for an existing event. */
-  onEditEvent: (eventId: string) => void;
 }

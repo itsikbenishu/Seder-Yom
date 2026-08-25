@@ -15,8 +15,7 @@ import { publishReminderJob } from "./reminderQueue.service.js";
 import { removeStorageObjects, toApiEventFile } from "./files.service.js";
 
 type EventRow = typeof events.$inferSelect;
-// The type of the callback argument `db.transaction` hands out — lets attachFiles/syncEventFiles
-// run either against the plain `db` client or inside an in-progress transaction.
+// Lets attachFiles/syncEventFiles run against either the plain db client or an in-progress transaction.
 type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type DbExecutor = typeof db | DbTransaction;
 
@@ -34,15 +33,9 @@ export async function toApiEvent(row: EventRow): Promise<Event> {
   });
 }
 
-// Attaches already-uploaded (POST /files/upload) rows to this event. Only files owned by
-// this user that are unattached or already belong to this same event are eligible — this
-// keeps the attach idempotent across repeated PATCHes and prevents hijacking another
-// event's files. A count mismatch means a fileId was invalid, foreign, or already used
-// elsewhere. Total size and duplicate name+size are validated up front, before the write,
-// so a violation is reported as the SPEC's validation.* message instead of surfacing later
-// as an unhandled ZodError (size, checked at response-build time) or a raw postgres unique
-// violation (duplicate name+size, enforced by event_files_event_filename_size_unique) —
-// either of which would 500 after the attach had already been persisted.
+// Only files owned by this user, unattached or already on this event, are eligible — keeps
+// PATCHes idempotent and blocks hijacking another event's files. Size/duplicate are checked
+// up front so violations report as validation.* messages, not a later 500.
 async function attachFiles(dbExecutor: DbExecutor, userId: string, eventId: string, fileIds: string[]): Promise<void> {
   if (fileIds.length === 0) {
     return;
@@ -90,11 +83,8 @@ async function attachFiles(dbExecutor: DbExecutor, userId: string, eventId: stri
   }
 }
 
-// Reconciles an existing event's attachments with the full `fileIds` set from a PATCH:
-// attaches newly-referenced uploads, then detaches (eventId -> null) any file that was
-// attached before but dropped out of the list. This is the "replaced" stage of the file
-// lifecycle (SPEC.md EventFile) — detached files are left orphaned for the daily cleanup
-// job rather than deleted immediately, same as an abandoned pre-save upload.
+// Reconciles attachments with a PATCH's fileIds: attaches new ones, detaches dropped ones
+// (left for the daily orphan-cleanup job, not deleted immediately).
 async function syncEventFiles(dbExecutor: DbExecutor, userId: string, eventId: string, fileIds: string[]): Promise<void> {
   await attachFiles(dbExecutor, userId, eventId, fileIds);
 
@@ -224,8 +214,7 @@ export async function unmuteDayEvents(userId: string, dayOfWeek: number): Promis
     .where(and(eq(events.userId, userId), eq(events.dayOfWeek, dayOfWeek), eq(events.allDay, false)));
 }
 
-// Google-synced events are excluded, same as archiveDay (SPEC.md §6/§7) — they stay live in
-// Google Calendar and are never deletable from this app, so "clear day" leaves them untouched.
+// Excludes Google-synced events (never deletable from this app), same as archiveDay.
 export async function clearDayEvents(userId: string, dayOfWeek: number): Promise<void> {
   const localEventsPredicate = and(
     eq(events.userId, userId),
@@ -252,7 +241,6 @@ export async function clearDayEvents(userId: string, dayOfWeek: number): Promise
     return files.map((file) => file.storagePath);
   });
 
-  // Storage isn't part of the Postgres transaction, so this batch cleanup only runs after
-  // the delete has committed (SPEC.md §7) — one call for the whole day, not one per file.
+  // Runs after the DB transaction commits — Storage isn't part of it — as one batched call.
   await removeStorageObjects(storagePaths);
 }

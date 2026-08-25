@@ -4,7 +4,7 @@ import { dayOfWeekSchema, eventFilesSchema, MAX_FILES_PER_EVENT, timeStringSchem
 export const eventFrequencySchema = z.enum(["once", "daily", "weekly"]);
 export const allDayEventFrequencySchema = z.enum(["daily", "weekly"]);
 
-export const reminderLeadSchema = z.enum(["15m", "30m", "1h", "1d", "time"]);
+export const reminderModeSchema = z.enum(["15m", "30m", "1h", "1d", "time"]);
 
 const fileIdsSchema = z.array(z.uuid()).max(MAX_FILES_PER_EVENT, "validation.file.count").default([]);
 
@@ -16,7 +16,7 @@ const sharedEventFields = {
   start: timeStringSchema,
   end: timeStringSchema,
   reminder: z.boolean().default(false),
-  reminderLeadTime: timeStringSchema.optional(),
+  reminderTime: timeStringSchema.optional(),
   mutedUntilArchive: z.boolean().default(false),
   fileIds: fileIdsSchema,
 };
@@ -25,17 +25,15 @@ const timedEventShape = z.object({
   ...sharedEventFields,
   allDay: z.literal(false),
   frequency: eventFrequencySchema,
-  reminderLead: reminderLeadSchema.optional(),
+  reminderMode: reminderModeSchema.optional(),
 });
 
 const allDayEventShape = z.object({
   ...sharedEventFields,
   allDay: z.literal(true),
   frequency: allDayEventFrequencySchema,
-  // all-day reminders are always a fixed clock-time — no offset menu, so this is
-  // never user-selected; defaults to "time" when omitted so the shared DB column
-  // stays meaningfully populated for both event kinds.
-  reminderLead: z.literal("time").default("time"),
+  // all-day reminders are always a fixed clock-time, never user-selected.
+  reminderMode: z.literal("time").default("time"),
 });
 
 type EventBusinessRuleInput = {
@@ -43,19 +41,19 @@ type EventBusinessRuleInput = {
   start?: string;
   end?: string;
   reminder?: boolean;
-  reminderLead?: string;
-  reminderLeadTime?: string;
+  reminderMode?: string;
+  reminderTime?: string;
 };
 
 function applyEventBusinessRules(data: EventBusinessRuleInput, ctx: z.RefinementCtx) {
   if (!data.allDay && data.start !== undefined && data.end !== undefined && data.start >= data.end) {
     ctx.addIssue({ code: "custom", message: "validation.time.endBeforeStart", path: ["end"] });
   }
-  if (data.reminder && !data.reminderLead) {
-    ctx.addIssue({ code: "custom", message: "validation.reminder.leadRequired", path: ["reminderLead"] });
+  if (data.reminder && !data.reminderMode) {
+    ctx.addIssue({ code: "custom", message: "validation.reminder.modeRequired", path: ["reminderMode"] });
   }
-  if (data.reminderLead === "time" && !data.reminderLeadTime) {
-    ctx.addIssue({ code: "custom", message: "validation.reminder.leadTimeRequired", path: ["reminderLeadTime"] });
+  if (data.reminderMode === "time" && !data.reminderTime) {
+    ctx.addIssue({ code: "custom", message: "validation.reminder.timeRequired", path: ["reminderTime"] });
   }
 }
 
@@ -65,16 +63,14 @@ export const eventWriteSchema = z
 
 export const createEventSchema = eventWriteSchema;
 
-// PATCH /events/:id — field-level validation only. The allDay <-> frequency/reminderLead
-// cross-rule can't be checked from a partial payload (the existing row's `allDay` may not
-// be part of the patch at all). The service layer must merge the validated patch onto the
-// current row and re-validate the merged object with `eventWriteSchema` before persisting.
+// PATCH: field-level only — a partial payload can't enforce the allDay/frequency/reminderMode
+// cross-rule, so the service layer must merge onto the current row and re-validate with eventWriteSchema.
 export const updateEventSchema = z
   .object({
     ...sharedEventFields,
     allDay: z.boolean(),
     frequency: eventFrequencySchema,
-    reminderLead: reminderLeadSchema.optional(),
+    reminderMode: reminderModeSchema.optional(),
   })
   .partial()
   .superRefine(applyEventBusinessRules);
@@ -93,4 +89,4 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 export type Event = z.infer<typeof eventSchema>;
 export type EventFrequency = z.infer<typeof eventFrequencySchema>;
 export type AllDayEventFrequency = z.infer<typeof allDayEventFrequencySchema>;
-export type ReminderLead = z.infer<typeof reminderLeadSchema>;
+export type ReminderMode = z.infer<typeof reminderModeSchema>;
