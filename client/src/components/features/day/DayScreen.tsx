@@ -12,6 +12,8 @@ import { useArchiveDayMutation } from "../../../hooks/useArchiveDayMutation";
 import { useClearDayMutation } from "../../../hooks/useClearDayMutation";
 import { buildDayViewData } from "../../../utils/buildDayViewData";
 import { computeRescheduledEnd } from "../../../utils/rescheduleEvent";
+import { EventFormDialog } from "../eventForm";
+import type { EventFormMode } from "../../../types/eventForm";
 import { AllDayEventDetail } from "./AllDayEventDetail";
 import { AllDayEventRow } from "./AllDayEventRow";
 import { DayHeader } from "./DayHeader";
@@ -40,14 +42,7 @@ function getConfirmDialogContent(target: DayConfirmTarget, t: TFunction) {
   };
 }
 
-export function DayScreen({
-  dayOfWeek,
-  onBackToWeek,
-  onNavigateDay,
-  onOpenArchive,
-  onAddEvent,
-  onEditEvent,
-}: DayScreenProps) {
+export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchive }: DayScreenProps) {
   const { t } = useTranslation();
   const { data: events } = useWeekEvents();
   const data = buildDayViewData(events ?? [], dayOfWeek);
@@ -55,6 +50,7 @@ export function DayScreen({
   const [expandedEventIds, setExpandedEventIds] = useState<Record<string, boolean>>({});
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<DayConfirmTarget | null>(null);
+  const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
 
   const muteDayMutation = useMuteDayMutation();
   const unmuteDayMutation = useUnmuteDayMutation();
@@ -77,6 +73,11 @@ export function DayScreen({
     if (action === "archiveDay") return setConfirmTarget({ kind: "archiveDay" });
     if (action === "clearDay") return setConfirmTarget({ kind: "clearDay" });
     onOpenArchive();
+  }
+
+  function handleEditEvent(eventId: string) {
+    const event = data.timedEvents.find((item) => item.id === eventId) ?? data.allDayEvents.find((item) => item.id === eventId);
+    if (event) setFormTarget({ kind: "edit", event });
   }
 
   function handleReorder(eventId: string, newStart: string) {
@@ -124,7 +125,7 @@ export function DayScreen({
             const event = data.timedEvents.find((item) => item.id === eventId);
             if (event) muteEventMutation.mutate({ id: eventId, muted: !event.mutedUntilArchive });
           }}
-          onEditEvent={onEditEvent}
+          onEditEvent={handleEditEvent}
           onDeleteEvent={(eventId) => setConfirmTarget({ kind: "deleteEvent", eventId })}
           onOpenAllDayDetail={setOpenAllDayId}
           onReorder={handleReorder}
@@ -132,7 +133,7 @@ export function DayScreen({
       </div>
 
       <div className="p-4">
-        <Button variant="primary" className="w-full" onClick={() => onAddEvent(dayOfWeek)}>
+        <Button variant="primary" className="w-full" onClick={() => setFormTarget({ kind: "create", dayOfWeek })}>
           {t("day.addEvent")}
         </Button>
       </div>
@@ -141,9 +142,13 @@ export function DayScreen({
         <AllDayEventDetail
           event={openAllDayEvent}
           onClose={() => setOpenAllDayId(null)}
-          onEdit={onEditEvent}
+          onEdit={handleEditEvent}
           onDelete={(eventId) => setConfirmTarget({ kind: "deleteEvent", eventId })}
         />
+      )}
+
+      {formTarget && (
+        <EventFormDialog mode={formTarget} onClose={() => setFormTarget(null)} onSaved={() => setFormTarget(null)} />
       )}
 
       <ConfirmDialog

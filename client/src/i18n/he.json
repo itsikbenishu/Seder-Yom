@@ -1,7 +1,8 @@
 {
   "common": {
     "close": "סגור",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "save": "שמירה"
   },
   "week": {
     "dayNames": ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
@@ -65,5 +66,69 @@
       "deleteEventConfirm": "מחק"
     },
     "addEvent": "+ הוסף אירוע"
+  },
+  "eventForm": {
+    "dialog": {
+      "createTitle": "אירוע חדש",
+      "editTitle": "עריכת אירוע"
+    },
+    "fields": {
+      "title": "כותרת",
+      "allDayToggle": "כל היום",
+      "start": "שעת התחלה",
+      "end": "שעת סיום",
+      "description": "תיאור",
+      "note": "הערה"
+    },
+    "frequency": {
+      "label": "תדירות",
+      "once": "פעם אחת",
+      "daily": "יומי",
+      "weekly": "שבועי"
+    },
+    "reminder": {
+      "toggleLabel": "תזכורת",
+      "leadLabel": "מועד התזכורת",
+      "lead15m": "15 דקות לפני",
+      "lead30m": "30 דקות לפני",
+      "lead1h": "שעה לפני",
+      "lead1d": "יום לפני",
+      "leadTime": "בשעה מסוימת",
+      "timeLabel": "שעת תזכורת"
+    },
+    "attachments": {
+      "addAria": "הוספת קובץ מצורף",
+      "removeAria": "הסרת קובץ מצורף",
+      "uploading": "מעלה…",
+      "uploadError": "ההעלאה נכשלה. נסו שוב.",
+      "countLabel": "{{count}}/{{max}} קבצים"
+    }
+  },
+  "validation": {
+    "title": {
+      "required": "כותרת נדרשת",
+      "maxLength": "כותרת יכולה לכלול עד 80 תווים"
+    },
+    "description": {
+      "maxLength": "תיאור יכול לכלול עד 200 תווים"
+    },
+    "note": {
+      "maxLength": "הערה יכולה לכלול עד 500 תווים"
+    },
+    "time": {
+      "invalid": "שעה לא תקינה",
+      "endBeforeStart": "שעת סיום חייבת להיות אחרי שעת התחלה"
+    },
+    "reminder": {
+      "modeRequired": "יש לבחור מועד תזכורת",
+      "timeRequired": "יש להזין שעה לתזכורת"
+    },
+    "file": {
+      "count": "מקסימום 5 קבצים לאירוע",
+      "size": "גודל הקובץ חייב להיות פחות מ-10 MB",
+      "type": "סוג הקובץ אינו נתמך",
+      "totalSize": "גודל כולל של הקבצים חייב להיות פחות מ-25 MB",
+      "duplicate": "קובץ זה כבר קיים באירוע זה"
+    }
   }
 }

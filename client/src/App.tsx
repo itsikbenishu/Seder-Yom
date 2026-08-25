@@ -14,8 +14,6 @@ function App() {
         onBackToWeek={() => setScreen({ screen: "week" })}
         onNavigateDay={(dayOfWeek) => setScreen({ screen: "day", dayOfWeek })}
         onOpenArchive={() => {}}
-        onAddEvent={() => {}}
-        onEditEvent={() => {}}
       />
     );
   }

@@ -68,9 +68,9 @@ export function AllDayEventDetail({ event, onClose, onEdit, onDelete }: AllDayEv
             {t("day.allDay.googleSynced")}
           </span>
         )}
-        {event.reminder && event.reminderLeadTime && (
+        {event.reminder && event.reminderTime && (
           <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">
-            {t("day.allDay.reminderAt", { time: event.reminderLeadTime })}
+            {t("day.allDay.reminderAt", { time: event.reminderTime })}
           </span>
         )}
         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">

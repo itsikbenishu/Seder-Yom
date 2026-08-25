@@ -1,7 +1,8 @@
 {
   "common": {
     "close": "Close",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "week": {
     "dayNames": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -65,5 +66,69 @@
       "deleteEventConfirm": "Delete"
     },
     "addEvent": "+ Add event"
+  },
+  "eventForm": {
+    "dialog": {
+      "createTitle": "New event",
+      "editTitle": "Edit event"
+    },
+    "fields": {
+      "title": "Title",
+      "allDayToggle": "All day",
+      "start": "Start time",
+      "end": "End time",
+      "description": "Description",
+      "note": "Note"
+    },
+    "frequency": {
+      "label": "Frequency",
+      "once": "Once",
+      "daily": "Daily",
+      "weekly": "Weekly"
+    },
+    "reminder": {
+      "toggleLabel": "Reminder",
+      "leadLabel": "Reminder time",
+      "lead15m": "15 minutes before",
+      "lead30m": "30 minutes before",
+      "lead1h": "1 hour before",
+      "lead1d": "1 day before",
+      "leadTime": "At a specific time",
+      "timeLabel": "Reminder time"
+    },
+    "attachments": {
+      "addAria": "Add attachment",
+      "removeAria": "Remove attachment",
+      "uploading": "Uploading…",
+      "uploadError": "Upload failed. Please try again.",
+      "countLabel": "{{count}}/{{max}} files"
+    }
+  },
+  "validation": {
+    "title": {
+      "required": "Title is required",
+      "maxLength": "Title must be 80 characters or fewer"
+    },
+    "description": {
+      "maxLength": "Description must be 200 characters or fewer"
+    },
+    "note": {
+      "maxLength": "Note must be 500 characters or fewer"
+    },
+    "time": {
+      "invalid": "Invalid time",
+      "endBeforeStart": "End time must be after start time"
+    },
+    "reminder": {
+      "modeRequired": "Please choose a reminder time",
+      "timeRequired": "Please enter a reminder time"
+    },
+    "file": {
+      "count": "Maximum 5 files per event",
+      "size": "File size must be under 10 MB",
+      "type": "File type not supported",
+      "totalSize": "Total attachments size must be under 25 MB",
+      "duplicate": "This file already exists in this event"
+    }
   }
 }
