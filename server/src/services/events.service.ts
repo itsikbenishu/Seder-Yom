@@ -121,8 +121,8 @@ function toWritableFields(row: EventRow) {
     allDay: row.allDay,
     frequency: row.frequency,
     reminder: row.reminder,
-    reminderLead: row.reminderLead ?? undefined,
-    reminderLeadTime: row.reminderLeadTime ? trimSeconds(row.reminderLeadTime) : undefined,
+    reminderMode: row.reminderMode ?? undefined,
+    reminderTime: row.reminderTime ? trimSeconds(row.reminderTime) : undefined,
     mutedUntilArchive: row.mutedUntilArchive,
   };
 }
@@ -145,8 +145,8 @@ export async function createEvent(userId: string, input: CreateEventInput, corre
     const reminderTime = computeReminderTime({
       dayOfWeek: input.dayOfWeek,
       start: input.start,
-      reminderLead: input.reminderLead ?? "time",
-      reminderLeadTime: input.reminderLeadTime,
+      reminderMode: input.reminderMode ?? "time",
+      reminderTime: input.reminderTime,
     });
 
     await publishReminderJob({
