@@ -113,6 +113,17 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
       <div className="sy-scroll flex flex-1 flex-col gap-2 overflow-y-auto p-4">
         {isEmpty && <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">{t("week.noEvents")}</p>}
 
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setFormTarget({ kind: "create", dayOfWeek, allDay: true })}
+            aria-label={t("day.addAllDayEventAria")}
+          >
+            +
+          </Button>
+        </div>
+
         {data.allDayEvents.map((event) => (
           <AllDayEventRow key={event.id} event={event} onOpenDetail={setOpenAllDayId} />
         ))}
@@ -133,7 +144,11 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
       </div>
 
       <div className="p-4">
-        <Button variant="primary" className="w-full" onClick={() => setFormTarget({ kind: "create", dayOfWeek })}>
+        <Button
+          variant="primary"
+          className="w-full"
+          onClick={() => setFormTarget({ kind: "create", dayOfWeek, allDay: false })}
+        >
           {t("day.addEvent")}
         </Button>
       </div>

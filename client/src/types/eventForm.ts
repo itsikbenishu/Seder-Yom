@@ -4,7 +4,9 @@ import type { CalendarEvent } from "./calendarEvent";
 /** Reused as-is for both create and edit — only the submit handler differs, not the shape. */
 export type EventFormValues = CreateEventInput;
 
-export type EventFormMode = { kind: "create"; dayOfWeek: number } | { kind: "edit"; event: CalendarEvent };
+export type EventFormMode =
+  | { kind: "create"; dayOfWeek: number; allDay: boolean }
+  | { kind: "edit"; event: CalendarEvent };
 
 export interface EventFormDialogProps {
   mode: EventFormMode;

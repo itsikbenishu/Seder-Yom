@@ -45,11 +45,11 @@ export function Modal({ open, onClose, title, footer, children, className }: Mod
         aria-labelledby={titleId}
         onClick={stopPropagation}
         className={cn(
-          "flex max-h-[85vh] w-full max-w-lg flex-col rounded-xl bg-white shadow-xl dark:bg-slate-900",
+          "flex max-h-[92vh] w-full max-w-lg flex-col rounded-xl bg-white shadow-xl dark:bg-slate-900",
           className,
         )}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-1 dark:border-slate-800">
           <h2 id={titleId} className="text-lg font-semibold text-slate-800 dark:text-slate-100">
             {title}
           </h2>
@@ -57,7 +57,7 @@ export function Modal({ open, onClose, title, footer, children, className }: Mod
             <CloseIcon />
           </Button>
         </div>
-        <div className="sy-scroll overflow-auto px-4 py-4">{children}</div>
+        <div className="sy-scroll min-h-0 flex-1 overflow-auto px-4 py-4">{children}</div>
         {footer && (
           <div className="sticky bottom-0 flex justify-end gap-2 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
             {footer}

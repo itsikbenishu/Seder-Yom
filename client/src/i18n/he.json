@@ -65,16 +65,18 @@
       "deleteEventBody": "האירוע יימחק לצמיתות. פעולה זו אינה הפיכה.",
       "deleteEventConfirm": "מחק"
     },
-    "addEvent": "+ הוסף אירוע"
+    "addEvent": "+ הוסף אירוע",
+    "allDaySection": "אירועי יום שלם",
+    "addAllDayEventAria": "הוספת אירוע יום שלם"
   },
   "eventForm": {
     "dialog": {
       "createTitle": "אירוע חדש",
+      "allDayCreateTitle": "אירוע יום שלם",
       "editTitle": "עריכת אירוע"
     },
     "fields": {
       "title": "כותרת",
-      "allDayToggle": "כל היום",
       "start": "שעת התחלה",
       "end": "שעת סיום",
       "description": "תיאור",
@@ -82,12 +84,14 @@
     },
     "frequency": {
       "label": "תדירות",
-      "once": "פעם אחת",
+      "once": "חד-פעמי",
       "daily": "יומי",
       "weekly": "שבועי"
     },
     "reminder": {
       "toggleLabel": "תזכורת",
+      "off": "כבוי",
+      "on": "פעיל",
       "leadLabel": "מועד התזכורת",
       "lead15m": "15 דקות לפני",
       "lead30m": "30 דקות לפני",
@@ -97,11 +101,11 @@
       "timeLabel": "שעת תזכורת"
     },
     "attachments": {
-      "addAria": "הוספת קובץ מצורף",
-      "removeAria": "הסרת קובץ מצורף",
+      "addAria": "הוספת קובץ",
+      "removeAria": "הסרת קובץ",
       "uploading": "מעלה…",
       "uploadError": "ההעלאה נכשלה. נסו שוב.",
-      "countLabel": "{{count}}/{{max}} קבצים"
+      "label": "קבצים (תמונה / Office / PDF)"
     }
   },
   "validation": {

@@ -28,11 +28,15 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   const updateMutation = useUpdateEventMutation();
   const [removedFileIds, setRemovedFileIds] = useState<Set<string>>(new Set());
 
+  // Fixed for the dialog's lifetime — chosen by which "+" opened it (create) or by the
+  // event being edited; there's no in-form toggle (matches the reference design).
+  const isAllDay = mode.kind === "create" ? mode.allDay : mode.event.allDay;
+
   const existingFiles = mode.kind === "edit" ? mode.event.files.filter((file) => !removedFileIds.has(file.id)) : [];
   const { attachments, addFiles, removeFile } = useEventFileUpload(existingFiles);
 
   const defaultValues =
-    mode.kind === "create" ? createDefaultEventFormValues(mode.dayOfWeek) : eventToFormValues(mode.event);
+    mode.kind === "create" ? createDefaultEventFormValues(mode.dayOfWeek, mode.allDay) : eventToFormValues(mode.event);
 
   const { register, control, setValue, handleSubmit, formState } = useForm<
     EventFormInput,
@@ -46,24 +50,17 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   // useWatch (not useForm's own `watch()`) so this component stays compatible with the
   // React Compiler: `watch()` is a subscription-based API the compiler can't safely
   // memoize around, while `useWatch` is a proper hook the compiler can analyze normally.
-  const allDay = useWatch({ control, name: "allDay" }) ?? false;
   const frequency = useWatch({ control, name: "frequency" });
   const reminder = useWatch({ control, name: "reminder" }) ?? false;
   const reminderMode = useWatch({ control, name: "reminderMode" });
   const reminderTime = useWatch({ control, name: "reminderTime" });
 
-  function handleAllDayChange(nextAllDay: boolean) {
-    setValue("allDay", nextAllDay);
-    if (nextAllDay) {
-      if (frequency === "once") setValue("frequency", "daily");
-      setValue("reminderMode", "time");
-    }
-  }
-
   function onSubmit(values: EventFormValues) {
     const uploadedIds = attachments
       .filter((attachment) => attachment.status === "uploaded")
       .map((attachment) => attachment.uploadedFile!.id);
+    // values.allDay is already correct — seeded once via defaultValues and never
+    // touched by setValue/register, since there's no in-form toggle to change it.
     const payload = { ...values, fileIds: [...existingFiles.map((file) => file.id), ...uploadedIds] };
 
     if (mode.kind === "create") {
@@ -75,11 +72,17 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
+  const title =
+    mode.kind === "edit"
+      ? t("eventForm.dialog.editTitle")
+      : t(isAllDay ? "eventForm.dialog.allDayCreateTitle" : "eventForm.dialog.createTitle");
+
   return (
     <Modal
       open
       onClose={onClose}
-      title={mode.kind === "create" ? t("eventForm.dialog.createTitle") : t("eventForm.dialog.editTitle")}
+      title={title}
+      className="max-w-3xl"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
@@ -91,7 +94,7 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <Input
           label={t("eventForm.fields.title")}
           maxLength={80}
@@ -99,47 +102,61 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
           {...register("title")}
         />
 
-        <Button
-          type="button"
-          variant={allDay ? "primary" : "secondary"}
-          aria-pressed={allDay}
-          onClick={() => handleAllDayChange(!allDay)}
-        >
-          {t("eventForm.fields.allDayToggle")}
-        </Button>
-
-        {!allDay && (
+        {!isAllDay && (
           <div className="flex gap-3">
-            <Input
-              type="time"
-              label={t("eventForm.fields.start")}
-              error={formState.errors.start?.message && t(formState.errors.start.message)}
-              {...register("start")}
-            />
-            <Input
-              type="time"
-              label={t("eventForm.fields.end")}
-              error={formState.errors.end?.message && t(formState.errors.end.message)}
-              {...register("end")}
-            />
+            <div className="flex-1">
+              <Input
+                type="time"
+                className="w-full"
+                label={t("eventForm.fields.start")}
+                error={formState.errors.start?.message && t(formState.errors.start.message)}
+                {...register("start")}
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                type="time"
+                className="w-full"
+                label={t("eventForm.fields.end")}
+                error={formState.errors.end?.message && t(formState.errors.end.message)}
+                {...register("end")}
+              />
+            </div>
           </div>
         )}
 
-        <FrequencyField
-          allDay={allDay}
-          value={frequency as EventFrequency}
-          onChange={(value) => setValue("frequency", value)}
-        />
-
-        <ReminderField
-          allDay={allDay}
-          reminder={reminder}
-          reminderMode={reminderMode as ReminderMode | undefined}
-          reminderTime={reminderTime}
-          onReminderChange={(value) => setValue("reminder", value)}
-          onReminderModeChange={(value) => setValue("reminderMode", value)}
-          onReminderTimeChange={(value) => setValue("reminderTime", value)}
-        />
+        {isAllDay ? (
+          <ReminderField
+            allDay
+            reminder={reminder}
+            reminderMode={reminderMode as ReminderMode | undefined}
+            reminderTime={reminderTime}
+            onReminderChange={(value) => setValue("reminder", value)}
+            onReminderModeChange={(value) => setValue("reminderMode", value)}
+            onReminderTimeChange={(value) => setValue("reminderTime", value)}
+          />
+        ) : (
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <FrequencyField
+                allDay={false}
+                value={frequency as EventFrequency}
+                onChange={(value) => setValue("frequency", value)}
+              />
+            </div>
+            <div className="flex-1">
+              <ReminderField
+                allDay={false}
+                reminder={reminder}
+                reminderMode={reminderMode as ReminderMode | undefined}
+                reminderTime={reminderTime}
+                onReminderChange={(value) => setValue("reminder", value)}
+                onReminderModeChange={(value) => setValue("reminderMode", value)}
+                onReminderTimeChange={(value) => setValue("reminderTime", value)}
+              />
+            </div>
+          </div>
+        )}
 
         <Textarea
           label={t("eventForm.fields.description")}

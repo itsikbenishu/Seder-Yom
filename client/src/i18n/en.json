@@ -65,16 +65,18 @@
       "deleteEventBody": "This event will be permanently deleted. This can't be undone.",
       "deleteEventConfirm": "Delete"
     },
-    "addEvent": "+ Add event"
+    "addEvent": "+ Add event",
+    "allDaySection": "All-day",
+    "addAllDayEventAria": "Add all-day event"
   },
   "eventForm": {
     "dialog": {
       "createTitle": "New event",
+      "allDayCreateTitle": "New all-day event",
       "editTitle": "Edit event"
     },
     "fields": {
       "title": "Title",
-      "allDayToggle": "All day",
       "start": "Start time",
       "end": "End time",
       "description": "Description",
@@ -88,6 +90,8 @@
     },
     "reminder": {
       "toggleLabel": "Reminder",
+      "off": "Off",
+      "on": "On",
       "leadLabel": "Reminder time",
       "lead15m": "15 minutes before",
       "lead30m": "30 minutes before",
@@ -101,7 +105,7 @@
       "removeAria": "Remove attachment",
       "uploading": "Uploading…",
       "uploadError": "Upload failed. Please try again.",
-      "countLabel": "{{count}}/{{max}} files"
+      "label": "Files (image / Office / PDF)"
     }
   },
   "validation": {
