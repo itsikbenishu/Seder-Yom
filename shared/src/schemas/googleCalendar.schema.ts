@@ -31,3 +31,11 @@ export const googleCalendarCallbackQuerySchema = z.object({
 });
 
 export type GoogleCalendarCallbackQuery = z.infer<typeof googleCalendarCallbackQuerySchema>;
+
+export const googleCalendarEventsQuerySchema = z.object({
+  year: z.coerce.number().int().optional(),
+  month: z.coerce.number().int().min(0).max(11).optional(),
+  day: z.coerce.number().int().min(1).max(31).optional(),
+});
+
+export type GoogleCalendarEventsQuery = z.infer<typeof googleCalendarEventsQuerySchema>;

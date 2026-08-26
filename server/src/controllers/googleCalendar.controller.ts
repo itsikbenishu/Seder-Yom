@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { GoogleCalendarCallbackQuery } from "@project/shared";
+import type { GoogleCalendarCallbackQuery, GoogleCalendarEventsQuery } from "@project/shared";
 import {
   GOOGLE_CALENDAR_OAUTH_STATE_COOKIE,
   buildConnectUrl,
@@ -9,7 +9,7 @@ import {
   getGoogleCalendarStatus,
   upsertGoogleCalendarTokens,
 } from "../services/googleCalendarAuth.service.js";
-import { listGoogleCalendarEvents } from "../services/googleCalendarEvents.service.js";
+import { listGoogleCalendarEvents, listGoogleCalendarEventsForDate } from "../services/googleCalendarEvents.service.js";
 import { sendSuccess } from "../utils/apiResponse.js";
 import { env } from "../config/env.js";
 import { logger } from "../config/logger.js";
@@ -57,7 +57,11 @@ export async function getStatus(req: Request, res: Response): Promise<void> {
 }
 
 export async function getEvents(req: Request, res: Response): Promise<void> {
-  const events = await listGoogleCalendarEvents(req.userId);
+  const query = req.query as unknown as GoogleCalendarEventsQuery;
+  const events =
+    query.year !== undefined && query.month !== undefined && query.day !== undefined
+      ? await listGoogleCalendarEventsForDate(req.userId, new Date(query.year, query.month, query.day))
+      : await listGoogleCalendarEvents(req.userId);
   sendSuccess(res, events);
 }
 

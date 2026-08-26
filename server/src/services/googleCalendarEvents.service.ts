@@ -126,12 +126,30 @@ export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleC
   });
 }
 
+async function fetchAndMapGoogleEvents(accessToken: string, range: WeekRange): Promise<GoogleCalendarEvent[]> {
+  const googleEvents = await fetchGoogleEvents(accessToken, range);
+  return googleEvents.filter((event) => event.status !== "cancelled").map(mapToGoogleCalendarEvent);
+}
+
 export async function listGoogleCalendarEvents(userId: string): Promise<GoogleCalendarEvent[]> {
   const accessToken = await getValidAccessToken(userId);
   if (!accessToken) {
     return [];
   }
 
-  const googleEvents = await fetchGoogleEvents(accessToken, currentWeekRange());
-  return googleEvents.filter((event) => event.status !== "cancelled").map(mapToGoogleCalendarEvent);
+  return fetchAndMapGoogleEvents(accessToken, currentWeekRange());
+}
+
+export async function listGoogleCalendarEventsForDate(userId: string, date: Date): Promise<GoogleCalendarEvent[]> {
+  const accessToken = await getValidAccessToken(userId);
+  if (!accessToken) {
+    return [];
+  }
+
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+
+  return fetchAndMapGoogleEvents(accessToken, { start, end });
 }

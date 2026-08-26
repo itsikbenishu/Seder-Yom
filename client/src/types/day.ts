@@ -47,8 +47,9 @@ export interface EventRowProps {
 }
 
 export interface AllDayEventRowProps {
-  event: AllDayCalendarEvent;
-  onOpenDetail: (eventId: string) => void;
+  title: string;
+  isSynced: boolean;
+  onOpenDetail: () => void;
 }
 
 export interface AllDayEventDetailProps {
