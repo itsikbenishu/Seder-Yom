@@ -108,6 +108,15 @@
       "label": "Files (image / Office / PDF)"
     }
   },
+  "archive": {
+    "title": "Archive",
+    "backAria": "Back to week",
+    "searchPlaceholder": "Search...",
+    "searchAria": "Search archive",
+    "countLabel": "{{count}} events",
+    "emptyState": "No archived days found",
+    "loadingMore": "Loading more…"
+  },
   "validation": {
     "title": {
       "required": "Title is required",

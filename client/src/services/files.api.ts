@@ -5,7 +5,7 @@ import type { ApiResponse, EventFile } from "@project/shared";
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api/v1";
 
 /**
- * Uploads a single picked file immediately (SPEC.md §7 `POST /files/upload`), before the
+ * Uploads a single picked file immediately (`POST /files/upload`), before the
  * event form is saved. Returns the created `EventFile` row (`eventId: null` until it is
  * attached via `fileIds` on `POST /events` / `PATCH /events/:id`).
  *

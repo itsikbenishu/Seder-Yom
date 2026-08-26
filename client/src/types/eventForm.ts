@@ -14,7 +14,7 @@ export interface EventFormDialogProps {
   onSaved: () => void;
 }
 
-/** `allDay` narrows the option set: timed offers once|daily|weekly, all-day drops "once" (SPEC.md §3). */
+/** `allDay` narrows the option set: timed offers once|daily|weekly, all-day drops "once". */
 export interface FrequencyFieldProps {
   allDay: boolean;
   value: EventFrequency;
@@ -34,7 +34,7 @@ export interface ReminderFieldProps {
 
 export type AttachmentUploadStatus = "uploading" | "uploaded" | "error";
 
-/** Files upload immediately on picking (SPEC.md §7), not deferred to save — this tracks per-file progress. */
+/** Files upload immediately on picking, not deferred to save — this tracks per-file progress. */
 export interface AttachmentUploadState {
   localId: string;
   file: File;
@@ -43,7 +43,7 @@ export interface AttachmentUploadState {
   errorMessage?: string;
 }
 
-/** Caps enforced client-side to match SPEC.md §4 validation (≤5 files, ≤10MB/file, ≤25MB total, duplicate name+size blocked). */
+/** Caps enforced client-side to match validation (≤5 files, ≤10MB/file, ≤25MB total, duplicate name+size blocked). */
 export interface AttachmentsFieldProps {
   attachments: AttachmentUploadState[];
   onAdd: (files: File[]) => void;

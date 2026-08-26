@@ -108,6 +108,15 @@
       "label": "קבצים (תמונה / Office / PDF)"
     }
   },
+  "archive": {
+    "title": "ארכיון",
+    "backAria": "חזרה לשבוע",
+    "searchPlaceholder": "חיפוש...",
+    "searchAria": "חיפוש בארכיון",
+    "countLabel": "{{count}} אירועים",
+    "emptyState": "לא נמצאו ימים בארכיון",
+    "loadingMore": "טוען עוד…"
+  },
   "validation": {
     "title": {
       "required": "כותרת נדרשת",

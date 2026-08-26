@@ -13,9 +13,10 @@ function formatWeekRange(start: Date, end: Date, language: string): string {
 
 export interface WeekScreenProps {
   onSelectDay: (dayOfWeek: number) => void;
+  onOpenArchive: () => void;
 }
 
-export function WeekScreen({ onSelectDay }: WeekScreenProps) {
+export function WeekScreen({ onSelectDay, onOpenArchive }: WeekScreenProps) {
   const { t, i18n } = useTranslation();
   const { data: events } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
@@ -37,7 +38,7 @@ export function WeekScreen({ onSelectDay }: WeekScreenProps) {
           <Button variant="ghost" size="icon" aria-label={t("week.settingsAria")}>
             ⚙️
           </Button>
-          <Button variant="ghost" size="icon" aria-label={t("week.archiveAria")}>
+          <Button variant="ghost" size="icon" onClick={onOpenArchive} aria-label={t("week.archiveAria")}>
             🗄️
           </Button>
         </div>

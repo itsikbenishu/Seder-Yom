@@ -20,7 +20,7 @@ export interface DayViewData {
 /** ⋯ menu items. "openArchive" navigates; the rest act on this day's events. */
 export type DayMenuAction = "toggleMute" | "archiveDay" | "clearDay" | "openArchive";
 
-/** Pending destructive action awaiting the generic confirm dialog (SPEC.md §5 Overlays). */
+/** Pending destructive action awaiting the generic confirm dialog. */
 export type DayConfirmTarget = { kind: "archiveDay" } | { kind: "clearDay" } | { kind: "deleteEvent"; eventId: string };
 
 export interface DayHeaderProps {
@@ -38,7 +38,7 @@ export interface EventRowProps {
   isNextUp: boolean;
   /** desc/note "show more"/"show less" state, only relevant when combined length > 80 chars. */
   isExpanded: boolean;
-  /** false for Google-synced events — never draggable, no edit/delete (SPEC.md §5). */
+  /** false for Google-synced events — never draggable, no edit/delete.*/
   isDraggable: boolean;
   onToggleExpand: (eventId: string) => void;
   onMuteToggle: (eventId: string) => void;

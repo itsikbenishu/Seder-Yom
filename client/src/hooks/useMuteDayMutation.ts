@@ -19,7 +19,7 @@ export function useMuteDayMutation() {
 
       queryClient.setQueryData<CalendarEvent[]>(eventKeys.week(), (events) =>
         events?.map((event) =>
-          // all-day events have no mute control (SPEC.md), so only timed events are updated
+          // all-day events have no mute control, so only timed events are updated
           event.allDay === false && event.dayOfWeek === dayOfWeek
             ? { ...event, mutedUntilArchive: true }
             : event

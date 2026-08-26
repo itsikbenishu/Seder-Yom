@@ -78,7 +78,7 @@ export function useScheduleDnd(
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  // Google-synced events are never drag sources (SPEC.md §5) — only local events participate
+  // Google-synced events are never drag sources — only local events participate
   // in the sortable list, so reorder math only ever considers positions among each other.
   const draggableEvents = useMemo(() => events.filter((event) => !event.googleCalendarSynced), [events]);
   const sortableIds = useMemo(() => draggableEvents.map((event) => event.id), [draggableEvents]);

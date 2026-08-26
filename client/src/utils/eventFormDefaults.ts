@@ -1,7 +1,7 @@
 import type { EventFormValues } from "../types/eventForm";
 import type { CalendarEvent } from "../types/calendarEvent";
 
-/** Blank form defaults for a new event on the given day (SPEC.md §3). */
+/** Blank form defaults for a new event on the given day. */
 export function createDefaultEventFormValues(dayOfWeek: number, allDay: boolean): EventFormValues {
   const shared = {
     dayOfWeek,
