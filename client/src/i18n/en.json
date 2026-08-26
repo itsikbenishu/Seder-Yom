@@ -108,6 +108,10 @@
       "label": "Files (image / Office / PDF)"
     }
   },
+  "archiveDay": {
+    "backAria": "Back to archive",
+    "archivedTag": "Archived"
+  },
   "archive": {
     "title": "Archive",
     "backAria": "Back to week",

@@ -1,18 +1,30 @@
 import { useState } from "react";
+import type { ArchivedDay } from "@project/shared";
 import { ArchiveScreen } from "./components/features/archive";
+import { ArchiveDayScreen } from "./components/features/archiveDay";
 import { DayScreen } from "./components/features/day";
 import { WeekScreen } from "./components/features/week";
 
-type Screen = { screen: "week" } | { screen: "day"; dayOfWeek: number } | { screen: "archive" };
+type Screen =
+  | { screen: "week" }
+  | { screen: "day"; dayOfWeek: number }
+  | { screen: "archive" }
+  | { screen: "archiveDay"; day: ArchivedDay };
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ screen: "week" });
+
+  if (screen.screen === "archiveDay") {
+    return (
+      <ArchiveDayScreen day={screen.day} onBackToArchive={() => setScreen({ screen: "archive" })} />
+    );
+  }
 
   if (screen.screen === "archive") {
     return (
       <ArchiveScreen
         onBack={() => setScreen({ screen: "week" })}
-        onOpenArchivedDay={() => {}}
+        onOpenArchivedDay={(day) => setScreen({ screen: "archiveDay", day })}
       />
     );
   }

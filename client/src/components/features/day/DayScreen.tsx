@@ -125,7 +125,12 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
         </div>
 
         {data.allDayEvents.map((event) => (
-          <AllDayEventRow key={event.id} event={event} onOpenDetail={setOpenAllDayId} />
+          <AllDayEventRow
+            key={event.id}
+            title={event.title}
+            isSynced={event.googleCalendarSynced}
+            onOpenDetail={() => setOpenAllDayId(event.id)}
+          />
         ))}
 
         <EventList

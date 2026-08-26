@@ -108,6 +108,10 @@
       "label": "קבצים (תמונה / Office / PDF)"
     }
   },
+  "archiveDay": {
+    "backAria": "חזרה לארכיון",
+    "archivedTag": "בארכיון"
+  },
   "archive": {
     "title": "ארכיון",
     "backAria": "חזרה לשבוע",
