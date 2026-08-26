@@ -66,7 +66,6 @@ export interface EventListProps {
   onMuteToggleEvent: (eventId: string) => void;
   onEditEvent: (eventId: string) => void;
   onDeleteEvent: (eventId: string) => void;
-  onOpenAllDayDetail: (eventId: string) => void;
   onReorder: (eventId: string, newStart: string) => void;
 }
 

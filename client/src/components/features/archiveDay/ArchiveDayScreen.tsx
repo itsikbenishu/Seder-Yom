@@ -26,7 +26,7 @@ export function ArchiveDayScreen({ day, onBackToArchive }: ArchiveDayScreenProps
           <AllDayEventRow
             key={event.id}
             title={event.title}
-            isSynced={isGoogleCalendarEvent(event)}
+            isSynced={isGoogleCalendarEvent(event) || event.googleCalendarSynced}
             onOpenDetail={() => setOpenAllDayId(event.id)}
           />
         ))}
@@ -35,7 +35,6 @@ export function ArchiveDayScreen({ day, onBackToArchive }: ArchiveDayScreenProps
           data={data}
           expandedEventIds={expandedEventIds}
           onToggleExpand={(eventId) => setExpandedEventIds((prev) => ({ ...prev, [eventId]: !prev[eventId] }))}
-          onOpenAllDayDetail={setOpenAllDayId}
         />
       </div>
 

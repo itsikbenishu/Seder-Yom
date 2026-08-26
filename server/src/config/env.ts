@@ -1,6 +1,13 @@
 import "dotenv/config";
 import { z } from "zod";
 
+// Product is Israel-only — pin the process's timezone unconditionally so every
+// Date/Intl call (dateForDayOfWeek, currentWeekRange, archive.service.ts, the
+// Google Calendar day-range lookup) resolves "today"/day-boundaries the same
+// way regardless of the host's own OS timezone (many hosts/containers default
+// to UTC). Must run before anything else touches Date/Intl.
+process.env.TZ = "Asia/Jerusalem";
+
 const envSchema = z.object({
   POSTGRES_HOST: z.string().min(1),
   POSTGRES_PORT: z.coerce.number().int().positive(),

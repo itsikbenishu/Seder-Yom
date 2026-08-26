@@ -143,7 +143,6 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           }}
           onEditEvent={handleEditEvent}
           onDeleteEvent={(eventId) => setConfirmTarget({ kind: "deleteEvent", eventId })}
-          onOpenAllDayDetail={setOpenAllDayId}
           onReorder={handleReorder}
         />
       </div>

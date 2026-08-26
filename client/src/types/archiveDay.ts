@@ -42,7 +42,6 @@ export interface ArchiveDayEventListProps {
   data: ArchiveDayViewData;
   expandedEventIds: Record<string, boolean>;
   onToggleExpand: (eventId: string) => void;
-  onOpenAllDayDetail: (eventId: string) => void;
 }
 
 export interface ArchiveDayScreenProps {
