@@ -4,10 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { EventRowProps } from "../../../types/day";
+import { ClampableDetails } from "./ClampableDetails";
 import { FileChip } from "./FileChip";
-
-/** Description+note only clamp (and offer a show-more toggle) past this combined length (design README). */
-const CLAMP_THRESHOLD = 80;
 
 export function EventRow({
   event,
@@ -24,11 +22,6 @@ export function EventRow({
     id: event.id,
     disabled: !isDraggable,
   });
-
-  const description = event.description ?? "";
-  const note = event.note ?? "";
-  const hasDetails = description.length > 0 || note.length > 0;
-  const shouldClamp = description.length + note.length > CLAMP_THRESHOLD;
 
   const style = { transform: CSS.Transform.toString(transform), transition };
   const dragProps = isDraggable ? { ...attributes, ...listeners } : {};
@@ -66,24 +59,12 @@ export function EventRow({
           )}
         </div>
 
-        {hasDetails && (
-          <div className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
-            <p className={cn(shouldClamp && !isExpanded && "line-clamp-2")}>
-              {description}
-              {description && note && " · "}
-              {note}
-            </p>
-            {shouldClamp && (
-              <button
-                type="button"
-                onClick={() => onToggleExpand(event.id)}
-                className="mt-0.5 text-xs font-medium text-violet-600 hover:underline dark:text-violet-400"
-              >
-                {t(isExpanded ? "day.event.showLess" : "day.event.showMore")}
-              </button>
-            )}
-          </div>
-        )}
+        <ClampableDetails
+          description={event.description ?? ""}
+          note={event.note ?? ""}
+          isExpanded={isExpanded}
+          onToggleExpand={() => onToggleExpand(event.id)}
+        />
 
         {event.files.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
