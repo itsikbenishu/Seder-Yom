@@ -6,6 +6,11 @@ import './i18n'
 import App from './App.tsx'
 import { queryClient } from './services/queryClient'
 
+const THEME_STORAGE_KEY = 'sederyom:theme'
+const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+const isDark = storedTheme === 'dark' || (storedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+document.documentElement.classList.toggle('dark', isDark)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

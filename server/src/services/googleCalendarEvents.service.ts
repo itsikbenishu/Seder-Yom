@@ -27,7 +27,7 @@ interface GoogleCalendarApiEvent {
 // gcal events" rather than surfacing a failure). Throws GOOGLE_CALENDAR_RECONNECT_REQUIRED
 // when a stored refresh token is no longer valid (revoked access, or Google's 7-day
 // expiry in OAuth consent-screen "Testing" mode) — the row is deleted so /gcal/status
-// immediately reflects "disconnected".
+// immereconnectdiately reflects "disconnected".
 async function getValidAccessToken(userId: string): Promise<string | undefined> {
   const [row] = await db.select().from(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
   if (!row) {

@@ -13,4 +13,10 @@ export const archiveKeys = {
 export const googleCalendarKeys = {
   all: ["googleCalendar"] as const,
   forArchivedDay: (day: ArchivedDay) => [...googleCalendarKeys.all, day.year, day.month, day.dayOfMonth] as const,
+  status: () => [...googleCalendarKeys.all, "status"] as const,
+};
+
+export const notificationKeys = {
+  all: ["notifications"] as const,
+  preferences: () => [...notificationKeys.all, "preferences"] as const,
 };

@@ -3,16 +3,22 @@ import type { ArchivedDay } from "@project/shared";
 import { ArchiveScreen } from "./components/features/archive";
 import { ArchiveDayScreen } from "./components/features/archiveDay";
 import { DayScreen } from "./components/features/day";
+import { SettingsScreen } from "./components/features/settings";
 import { WeekScreen } from "./components/features/week";
 
 type Screen =
   | { screen: "week" }
   | { screen: "day"; dayOfWeek: number }
   | { screen: "archive" }
-  | { screen: "archiveDay"; day: ArchivedDay };
+  | { screen: "archiveDay"; day: ArchivedDay }
+  | { screen: "settings" };
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ screen: "week" });
+
+  if (screen.screen === "settings") {
+    return <SettingsScreen onBack={() => setScreen({ screen: "week" })} />;
+  }
 
   if (screen.screen === "archiveDay") {
     return (
@@ -44,6 +50,7 @@ function App() {
     <WeekScreen
       onSelectDay={(dayOfWeek) => setScreen({ screen: "day", dayOfWeek })}
       onOpenArchive={() => setScreen({ screen: "archive" })}
+      onOpenSettings={() => setScreen({ screen: "settings" })}
     />
   );
 }
