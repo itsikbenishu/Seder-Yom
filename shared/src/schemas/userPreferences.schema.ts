@@ -21,7 +21,7 @@ export const userPreferencesSchema = z.object({
 // Write shape — deliberately NOT `userPreferencesSchema.partial()`: that would keep
 // each field's `.default()`, which fills in a value for every omitted key (Zod applies
 // `.default()` whenever a key is `undefined`, missing or not) and defeat "any subset"
-// partial updates (SPEC.md §9). Every field here is a plain `.optional()` with no
+// partial updates. Every field here is a plain `.optional()` with no
 // default, so an omitted key stays genuinely absent from the parsed object.
 export const updateUserPreferencesSchema = z.object({
   language: appLanguageSchema.optional(),

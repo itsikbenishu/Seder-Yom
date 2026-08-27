@@ -16,7 +16,7 @@ export const googleCalendarKeys = {
   status: () => [...googleCalendarKeys.all, "status"] as const,
 };
 
-export const notificationKeys = {
-  all: ["notifications"] as const,
-  preferences: () => [...notificationKeys.all, "preferences"] as const,
+export const preferencesKeys = {
+  all: ["preferences"] as const,
+  detail: () => [...preferencesKeys.all, "detail"] as const,
 };

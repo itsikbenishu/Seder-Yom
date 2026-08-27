@@ -1,10 +1,6 @@
-import type { GoogleCalendarConnectionStatus } from "@project/shared";
+import type { AppLanguage, AppTheme, GoogleCalendarConnectionStatus, NotificationChannel } from "@project/shared";
 
-export type AppLanguage = "he" | "en";
-export type AppTheme = "light" | "dark";
-
-/** Mirrors notificationPreferencesSchema's `channels` enum (shared/notificationPreferences.schema.ts) — not re-exported from there, so kept as a literal union here. */
-export type NotificationChannel = "browser" | "mobile";
+export type { AppLanguage, AppTheme, NotificationChannel };
 
 export interface LanguageSectionProps {
   language: AppLanguage;

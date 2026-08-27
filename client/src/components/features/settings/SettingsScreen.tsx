@@ -4,8 +4,8 @@ import { useAppLanguage } from "../../../hooks/useAppLanguage";
 import { useAppTheme } from "../../../hooks/useAppTheme";
 import { useGoogleCalendarStatus } from "../../../hooks/useGoogleCalendarStatus";
 import { useDisconnectGoogleCalendarMutation } from "../../../hooks/useDisconnectGoogleCalendarMutation";
-import { useNotificationPreferences } from "../../../hooks/useNotificationPreferences";
-import { useUpdateNotificationChannelMutation } from "../../../hooks/useUpdateNotificationChannelMutation";
+import { useUserPreferences } from "../../../hooks/useUserPreferences";
+import { useUpdateUserPreferencesMutation } from "../../../hooks/useUpdateUserPreferencesMutation";
 import { useSignOutMutation } from "../../../hooks/useSignOutMutation";
 import type { SettingsScreenProps } from "../../../types/settings";
 import { AppearanceSection } from "./AppearanceSection";
@@ -24,8 +24,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { data: googleStatus } = useGoogleCalendarStatus();
   const disconnectGoogleCalendarMutation = useDisconnectGoogleCalendarMutation();
 
-  const { data: notificationPreferences } = useNotificationPreferences();
-  const updateNotificationChannelMutation = useUpdateNotificationChannelMutation();
+  const { data: userPreferences } = useUserPreferences();
+  const updatePreferencesMutation = useUpdateUserPreferencesMutation();
 
   const signOutMutation = useSignOutMutation();
 
@@ -59,8 +59,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           onReconnect={handleConnectGoogleCalendar}
         />
         <NotificationsSection
-          channel={notificationPreferences?.channels[0] ?? "browser"}
-          onChange={(channel) => updateNotificationChannelMutation.mutate(channel)}
+          channel={userPreferences?.channels[0] ?? "browser"}
+          onChange={(channel) => updatePreferencesMutation.mutate({ channels: [channel] })}
         />
         <SignOutSection onSignOut={() => signOutMutation.mutate()} />
       </div>

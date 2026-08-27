@@ -13,6 +13,7 @@ export function AppearanceSection({ theme, onChange }: AppearanceSectionProps) {
         options={[
           { value: "light", label: t("settings.appearance.light") },
           { value: "dark", label: t("settings.appearance.dark") },
+          { value: "system", label: t("settings.appearance.system") },
         ]}
         value={theme}
         onChange={onChange}

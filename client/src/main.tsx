@@ -7,10 +7,11 @@ import './i18n'
 import App from './App.tsx'
 import { queryClient } from './services/queryClient'
 
-const THEME_STORAGE_KEY = 'sederyom:theme'
-const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
-const isDark = storedTheme === 'dark' || (storedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-document.documentElement.classList.toggle('dark', isDark)
+// Theme is an account-level preference, fetched from the server only
+// after the app mounts — there's no synchronous source for it pre-paint. Guess with
+// the OS preference to avoid a flash of the wrong theme; `useAppTheme` corrects this
+// once the real stored preference loads, same as the spec's own pre-auth fallback.
+document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,27 +1,40 @@
-import { useEffect, useState } from "react";
-import type { AppTheme } from "../types/settings";
+import { useEffect } from "react";
+import type { AppTheme } from "@project/shared";
+import { useUserPreferences } from "./useUserPreferences";
+import { useUpdateUserPreferencesMutation } from "./useUpdateUserPreferencesMutation";
 
-const THEME_STORAGE_KEY = "sederyom:theme";
-
-function readInitialTheme(): AppTheme {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  if (stored === "light" || stored === "dark") {
-    return stored;
-  }
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+function prefersDark(): boolean {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
+/**
+ * Account-level preference — the server is the source of truth once
+ * signed in; before that (or if the fetch fails) this falls back to "system". `theme`
+ * itself can be a genuine, persisted "system" choice (not just a pre-auth fallback),
+ * in which case the applied light/dark class keeps following the OS preference live
+ * for as long as the app stays open.
+ */
 export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) => void } {
-  const [theme, setThemeState] = useState<AppTheme>(readInitialTheme);
+  const { data } = useUserPreferences();
+  const updateMutation = useUpdateUserPreferencesMutation();
+  const theme = data?.theme ?? "system";
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    function applyResolvedTheme() {
+      const isDark = theme === "dark" || (theme === "system" && prefersDark());
+      document.documentElement.classList.toggle("dark", isDark);
+    }
+
+    applyResolvedTheme();
+    if (theme !== "system") return;
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    media.addEventListener("change", applyResolvedTheme);
+    return () => media.removeEventListener("change", applyResolvedTheme);
   }, [theme]);
 
-  function setTheme(next: AppTheme): void {
-    setThemeState(next);
-  }
-
-  return { theme, setTheme };
+  return {
+    theme,
+    setTheme: (next) => updateMutation.mutate({ theme: next }),
+  };
 }

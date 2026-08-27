@@ -117,7 +117,8 @@
     "appearance": {
       "label": "מראה",
       "light": "בהיר",
-      "dark": "כהה"
+      "dark": "כהה",
+      "system": "לפי המערכת"
     },
     "googleCalendar": {
       "label": "סנכרון Google Calendar",

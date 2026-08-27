@@ -137,12 +137,25 @@ count: number
 events: Event[]
 ```
 
-### NotificationPreferences
+### UserPreferences
 ```
 user_id: UUID
+language: "he" | "en"      # default "he"
+theme: "light" | "dark" | "system"   # default "system"
 reminderEnabled: bool
 channels: string[]         # "browser" | "mobile" — pick one, default "browser"
 ```
+Account-level settings, keyed by `user_id` — persisted server-side, not
+`localStorage`. Signing in on a different device/browser restores the same
+values, same as the Google Calendar sync toggle: `language` and `theme` are
+account configuration, not device state, so they belong alongside the
+notification settings in the same table.
+
+Before authentication (Login/2FA screens), there's no `user_id` yet to key
+this on — `language` there falls back to browser language (or `he` if
+undetected) and `theme` to `prefers-color-scheme`. Once signed in, the
+stored `UserPreferences` values take over and apply everywhere, including
+future sessions on other devices.
 
 ## 4. Validation Rules
 | Field | Rule | Error (He) | Error (En) |
@@ -171,7 +184,10 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
    each timed event, ⋯ menu (mute-day/archive/clear/open archive)
 5. **Archive** — searchable list, lazy-loaded (12/page in design, 50/page per API — see §9 note)
 6. **Archive Day** — read-only day view
-7. **Settings** — language, theme, Google sync, notification channel, sign out
+7. **Settings** — language, theme, Google sync, notification channel, sign
+   out. The first four are all `UserPreferences` fields (or the Google sync
+   toggle, stored separately) — account-level, not device-local; sign out is
+   an action, not a stored setting.
 
 Overlays:
 - **Event form dialog** (create/edit) — fields differ for timed vs. all-day
@@ -260,8 +276,8 @@ GET    /archive?limit=50&offset=0&search=
 POST   /archive/:dayOfWeek            archive a day — copies events, then deletes originals (transactional)
 GET    /gcal/events                   read-only
 POST   /files/upload                  upload a file, returns id; eventId set later via fileIds on events
-POST   /notifications/preferences
-GET    /notifications/preferences
+POST   /preferences                   sets language/theme/reminderEnabled/channels (any subset)
+GET    /preferences                   returns the caller's UserPreferences
 ```
 All responses: `{ success: true, data }` or `{ success: false, error: { message, code } }`.
 
