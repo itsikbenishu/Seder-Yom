@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { notificationChannelSchema } from "./notificationPreferences.schema.js";
+import { notificationChannelSchema } from "./userPreferences.schema.js";
 
 export const reminderJobStatusSchema = z.enum(["pending", "sent", "failed"]);
 
