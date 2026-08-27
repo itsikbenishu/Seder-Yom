@@ -1,4 +1,4 @@
-import type { ArchivedDay, GoogleCalendarEvent } from "@project/shared";
+import type { ArchivedDay, GoogleCalendarConnectionStatus, GoogleCalendarEvent } from "@project/shared";
 import { apiRequest } from "./apiClient";
 
 export function getGoogleCalendarEventsForDate(day: ArchivedDay): Promise<GoogleCalendarEvent[]> {
@@ -9,4 +9,12 @@ export function getGoogleCalendarEventsForDate(day: ArchivedDay): Promise<Google
   });
 
   return apiRequest<GoogleCalendarEvent[]>(`/gcal/events?${query.toString()}`);
+}
+
+export function getGoogleCalendarStatus(): Promise<GoogleCalendarConnectionStatus> {
+  return apiRequest<GoogleCalendarConnectionStatus>("/gcal/status");
+}
+
+export async function disconnectGoogleCalendar(): Promise<void> {
+  await apiRequest<null>("/gcal/disconnect", { method: "POST" });
 }
