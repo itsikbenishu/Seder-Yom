@@ -24,3 +24,13 @@ export async function postVerify(req: Request, res: Response): Promise<void> {
 
   sendSuccess(res, null);
 }
+
+export function postLogout(_req: Request, res: Response): void {
+  res.clearCookie(ACCESS_TOKEN_COOKIE, {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "lax" : "none",
+    path: "/",
+  });
+  sendSuccess(res, null);
+}
