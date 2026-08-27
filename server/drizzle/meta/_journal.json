@@ -43,6 +43,13 @@
       "when": 1787900200000,
       "tag": "0005_rename_reminder_timing_to_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787900300000,
+      "tag": "0006_rename_notification_preferences_to_user_preferences",
+      "breakpoints": true
     }
   ]
 }

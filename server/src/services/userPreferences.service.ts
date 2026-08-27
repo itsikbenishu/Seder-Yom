@@ -29,7 +29,7 @@ export async function upsertUserPreferences(
   userId: string,
   input: UpdateUserPreferencesInput,
 ): Promise<UserPreferences> {
-  // `input` only carries the keys the caller actually sent (SPEC.md §9 "any subset") —
+  // `input` only carries the keys the caller actually sent —
   // spreading it into both `.values()` and `.set()` means an insert falls back to the
   // column defaults for anything omitted, and an update patches only what was provided.
   const [row] = await db
