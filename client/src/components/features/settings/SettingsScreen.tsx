@@ -44,13 +44,13 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   return (
     <div className="flex h-svh flex-col">
       <header className="flex items-center gap-1.5 p-4">
-        <Button variant="ghost" size="icon" className="text-2xl" onClick={onBack} aria-label={t("common.cancel")}>
+        <Button variant="ghost" size="icon" className="text-2xl" onClick={onBack} aria-label={t("day.header.backAria")}>
           &lt;
         </Button>
         <h1 className="text-xl font-semibold">{t("week.settingsAria")}</h1>
       </header>
 
-      <div className="sy-scroll mx-auto flex w-full max-w-[540px] flex-1 flex-col gap-6 overflow-y-auto p-4">
+      <div className="sy-scroll me-auto flex w-full max-w-[540px] flex-1 flex-col gap-6 overflow-y-auto p-4">
         <LanguageSection language={language} onChange={setLanguage} />
         <AppearanceSection theme={theme} onChange={setTheme} />
         <GoogleCalendarSection

@@ -8,7 +8,7 @@ export function GoogleCalendarSection({ status, onToggleConnected, onReconnect }
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col items-start gap-1.5">
       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
         {t("settings.googleCalendar.label")}
       </p>
@@ -23,6 +23,7 @@ export function GoogleCalendarSection({ status, onToggleConnected, onReconnect }
           aria-label={t("settings.googleCalendar.label")}
         />
         <Button variant="secondary" onClick={onReconnect}>
+          <span aria-hidden="true">🔄</span>
           {t("settings.googleCalendar.reconnect")}
         </Button>
       </div>

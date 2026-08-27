@@ -130,7 +130,7 @@
       "label": "Notifications",
       "browser": "Browser",
       "mobile": "Mobile",
-      "note": "Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear inside the app itself."
+      "note": "Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear inside the app itself."
     },
     "signOut": {
       "label": "Account",

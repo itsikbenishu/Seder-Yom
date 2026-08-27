@@ -13,11 +13,12 @@ export function SignOutSection({ onSignOut }: SignOutSectionProps) {
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col items-start gap-1.5">
       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">
         {t("settings.signOut.label")}
       </p>
       <Button variant="secondary" onClick={() => setConfirmOpen(true)}>
+        <span aria-hidden="true">🚪</span>
         {t("settings.signOut.button")}
       </Button>
 
