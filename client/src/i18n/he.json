@@ -108,6 +108,38 @@
       "label": "קבצים (תמונה / Office / PDF)"
     }
   },
+  "settings": {
+    "language": {
+      "label": "שפה",
+      "hebrew": "עברית",
+      "english": "English"
+    },
+    "appearance": {
+      "label": "מראה",
+      "light": "בהיר",
+      "dark": "כהה"
+    },
+    "googleCalendar": {
+      "label": "סנכרון Google Calendar",
+      "off": "כבוי",
+      "on": "פעיל",
+      "reconnect": "חיבור מחדש",
+      "note": "אירועי Google Calendar מוצגים לצפייה בלבד ואינם ניתנים לעריכה באפליקציה."
+    },
+    "notifications": {
+      "label": "התראות",
+      "browser": "דפדפן",
+      "mobile": "נייד",
+      "note": "התראות נשלחות כ-push (Firebase). בחרו איפה לקבל אותן — האפליקציה עצמה אינה מציגה התראות פנימיות."
+    },
+    "signOut": {
+      "label": "חשבון",
+      "button": "התנתקות",
+      "confirmTitle": "התנתקות",
+      "confirmBody": "תנותקו מהחשבון במכשיר זה.",
+      "confirmButton": "התנתקות"
+    }
+  },
   "archiveDay": {
     "backAria": "חזרה לארכיון",
     "archivedTag": "בארכיון"

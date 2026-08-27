@@ -108,6 +108,38 @@
       "label": "Files (image / Office / PDF)"
     }
   },
+  "settings": {
+    "language": {
+      "label": "Language",
+      "hebrew": "עברית",
+      "english": "English"
+    },
+    "appearance": {
+      "label": "Appearance",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "googleCalendar": {
+      "label": "Google Calendar sync",
+      "off": "Off",
+      "on": "On",
+      "reconnect": "Reconnect",
+      "note": "Google Calendar events are shown read-only and can't be edited in the app."
+    },
+    "notifications": {
+      "label": "Notifications",
+      "browser": "Browser",
+      "mobile": "Mobile",
+      "note": "Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear inside the app itself."
+    },
+    "signOut": {
+      "label": "Account",
+      "button": "Sign out",
+      "confirmTitle": "Sign out",
+      "confirmBody": "You'll be signed out of your account on this device.",
+      "confirmButton": "Sign out"
+    }
+  },
   "archiveDay": {
     "backAria": "Back to archive",
     "archivedTag": "Archived"
