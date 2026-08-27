@@ -54,8 +54,8 @@ export function DayHeader({
         <Button variant="ghost" size="icon" onClick={onBackToWeek} aria-label={t("day.header.backAria")}>
           <GridIcon />
         </Button>
-        <Button variant="ghost" size="icon" onClick={onPrevDay} aria-label={t("day.header.prevDayAria")}>
-          ‹
+        <Button variant="ghost" size="icon" className="text-2xl" onClick={onPrevDay} aria-label={t("day.header.prevDayAria")}>
+          &lt;
         </Button>
       </div>
 
@@ -67,8 +67,8 @@ export function DayHeader({
       </div>
 
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" onClick={onNextDay} aria-label={t("day.header.nextDayAria")}>
-          ›
+        <Button variant="ghost" size="icon" className="text-2xl" onClick={onNextDay} aria-label={t("day.header.nextDayAria")}>
+          &gt;
         </Button>
         <DropdownMenu<DayMenuAction>
           items={menuItems}

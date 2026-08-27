@@ -14,8 +14,8 @@ export function ArchiveDayHeader({ day, onBackToArchive }: ArchiveDayHeaderProps
 
   return (
     <header className="flex items-center gap-1.5 p-4">
-      <Button variant="ghost" size="icon" onClick={onBackToArchive} aria-label={t("archiveDay.backAria")}>
-        ‹
+      <Button variant="ghost" size="icon" className="text-xl" onClick={onBackToArchive} aria-label={t("archiveDay.backAria")}>
+        &lt;
       </Button>
 
       <div className="min-w-0 flex-1">
