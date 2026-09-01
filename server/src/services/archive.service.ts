@@ -3,7 +3,7 @@ import { archivedDaySchema, type ArchivedDay, type ArchiveQuery, type ArchiveRes
 import { db } from "../db/client.js";
 import { archivedDays, events } from "../db/schema/index.js";
 import { ConflictError } from "../utils/AppError.js";
-import { toApiEvent } from "./events.service.js";
+import { toApiEvents } from "./events.service.js";
 import { dateForDayOfWeek } from "./weekDates.js";
 
 type ArchivedDayRow = typeof archivedDays.$inferSelect;
@@ -41,11 +41,6 @@ export async function listArchivedDays(userId: string, query: ArchiveQuery): Pro
 export async function archiveDay(userId: string, dayOfWeek: number): Promise<ArchivedDay> {
   const localEventsPredicate = and(eq(events.userId, userId), eq(events.dayOfWeek, dayOfWeek), eq(events.googleCalendarSynced, false));
 
-  const precheck = await db.select().from(events).where(localEventsPredicate);
-  if (precheck.length === 0) {
-    throw new ConflictError("No events to archive for this day", "ARCHIVE_EMPTY_DAY");
-  }
-
   try {
     const inserted = await db.transaction(async (archiveTransaction) => {
       const localEvents = await archiveTransaction.select().from(events).where(localEventsPredicate);
@@ -58,7 +53,7 @@ export async function archiveDay(userId: string, dayOfWeek: number): Promise<Arc
         .map((event) => event.title)
         .join(", ");
       const date = dateForDayOfWeek(dayOfWeek);
-      const eventsSnapshot = await Promise.all(localEvents.map(toApiEvent));
+      const eventsSnapshot = await toApiEvents(localEvents);
 
       const [row] = await archiveTransaction
         .insert(archivedDays)

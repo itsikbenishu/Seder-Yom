@@ -23,14 +23,47 @@ function trimSeconds(time: string): string {
   return time.slice(0, 5);
 }
 
-export async function toApiEvent(row: EventRow): Promise<Event> {
-  const fileRows = await db.select().from(eventFiles).where(eq(eventFiles.eventId, row.id));
+type EventFileRow = typeof eventFiles.$inferSelect;
+
+function toApiEventFromRow(row: EventRow, fileRows: EventFileRow[]): Event {
   return eventSchema.parse({
     ...toWritableFields(row),
     id: row.id,
     googleCalendarSynced: row.googleCalendarSynced,
     files: fileRows.map(toApiEventFile),
   });
+}
+
+export async function toApiEvent(row: EventRow): Promise<Event> {
+  const fileRows = await db.select().from(eventFiles).where(eq(eventFiles.eventId, row.id));
+  return toApiEventFromRow(row, fileRows);
+}
+
+// Batched variant of toApiEvent — issues a single eventFiles query for all rows instead of
+export async function toApiEvents(rows: EventRow[]): Promise<Event[]> {
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const fileRows = await db
+    .select()
+    .from(eventFiles)
+    .where(inArray(eventFiles.eventId, rows.map((row) => row.id)));
+
+  const filesByEventId = new Map<string, EventFileRow[]>();
+  for (const fileRow of fileRows) {
+    if (!fileRow.eventId) {
+      continue;
+    }
+    const existing = filesByEventId.get(fileRow.eventId);
+    if (existing) {
+      existing.push(fileRow);
+    } else {
+      filesByEventId.set(fileRow.eventId, [fileRow]);
+    }
+  }
+
+  return rows.map((row) => toApiEventFromRow(row, filesByEventId.get(row.id) ?? []));
 }
 
 // Only files owned by this user, unattached or already on this event, are eligible — keeps
