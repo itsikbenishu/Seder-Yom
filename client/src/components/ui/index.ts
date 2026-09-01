@@ -5,3 +5,5 @@ export * from "./Input";
 export * from "./Modal";
 export * from "./SegmentedControl";
 export * from "./Textarea";
+export * from "./Toast";
+export * from "./ToastProvider";

@@ -145,6 +145,13 @@
     "backAria": "Back to archive",
     "archivedTag": "Archived"
   },
+  "login": {
+    "appName": "SederYom",
+    "tagline": "Your weekly event planner",
+    "emailLabel": "Email",
+    "submit": "Send code",
+    "invalidEmail": "Invalid email address"
+  },
   "archive": {
     "title": "Archive",
     "backAria": "Back to week",
@@ -155,6 +162,9 @@
     "loadingMore": "Loading more…"
   },
   "validation": {
+    "email": {
+      "invalid": "Invalid email address"
+    },
     "title": {
       "required": "Title is required",
       "maxLength": "Title must be 80 characters or fewer"

@@ -6,6 +6,7 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 import { queryClient } from './services/queryClient'
+import { ToastProvider } from './components/ui'
 
 // Theme is an account-level preference, fetched from the server only
 // after the app mounts — there's no synchronous source for it pre-paint. Guess with
@@ -16,7 +17,9 @@ document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-co
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>,

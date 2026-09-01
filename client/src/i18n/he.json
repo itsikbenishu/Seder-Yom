@@ -145,6 +145,13 @@
     "backAria": "חזרה לארכיון",
     "archivedTag": "בארכיון"
   },
+  "login": {
+    "appName": "סדר יום",
+    "tagline": "מתכנן האירועים השבועי שלך",
+    "emailLabel": "דוא\"ל",
+    "submit": "שליחת קוד",
+    "invalidEmail": "כתובת דוא\"ל לא תקינה"
+  },
   "archive": {
     "title": "ארכיון",
     "backAria": "חזרה לשבוע",
@@ -155,6 +162,9 @@
     "loadingMore": "טוען עוד…"
   },
   "validation": {
+    "email": {
+      "invalid": "כתובת דוא\"ל לא תקינה"
+    },
     "title": {
       "required": "כותרת נדרשת",
       "maxLength": "כותרת יכולה לכלול עד 80 תווים"
