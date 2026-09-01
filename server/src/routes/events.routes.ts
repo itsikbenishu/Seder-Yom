@@ -10,6 +10,7 @@ import {
   postEvent,
   unmuteDayEvents,
 } from "../controllers/events.controller.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.middleware.js";
 import { requireAuth } from "./middlewares/requireAuth.middleware.js";
 import { validate } from "./middlewares/validate.middleware.js";
 
@@ -19,6 +20,7 @@ const dayOfWeekParamsSchema = z.object({ dayOfWeek: z.coerce.number().int().min(
 export const eventsRouter = Router();
 
 eventsRouter.use(requireAuth);
+eventsRouter.use(rateLimitMiddleware);
 
 eventsRouter.get("/", getEvents);
 eventsRouter.post("/", validate({ body: createEventSchema }), postEvent);

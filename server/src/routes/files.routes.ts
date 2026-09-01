@@ -3,6 +3,7 @@ import multer, { type FileFilterCallback } from "multer";
 import type { Request } from "express";
 import { ALLOWED_FILE_MIME_TYPES, MAX_FILE_SIZE_BYTES } from "@project/shared";
 import { postFileUpload } from "../controllers/files.controller.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.middleware.js";
 import { requireAuth } from "./middlewares/requireAuth.middleware.js";
 import { ValidationError } from "../utils/AppError.js";
 
@@ -21,5 +22,6 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX
 export const filesRouter = Router();
 
 filesRouter.use(requireAuth);
+filesRouter.use(rateLimitMiddleware);
 
 filesRouter.post("/upload", upload.single("file"), postFileUpload);

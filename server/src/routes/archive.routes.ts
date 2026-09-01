@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { archiveQuerySchema } from "@project/shared";
 import { getArchive, postArchiveDay } from "../controllers/archive.controller.js";
+import { rateLimitMiddleware } from "./middlewares/rateLimit.middleware.js";
 import { requireAuth } from "./middlewares/requireAuth.middleware.js";
 import { validate } from "./middlewares/validate.middleware.js";
 
@@ -10,6 +11,7 @@ const dayOfWeekParamsSchema = z.object({ dayOfWeek: z.coerce.number().int().min(
 export const archiveRouter = Router();
 
 archiveRouter.use(requireAuth);
+archiveRouter.use(rateLimitMiddleware);
 
 archiveRouter.get("/", validate({ query: archiveQuerySchema }), getArchive);
 archiveRouter.post("/:dayOfWeek", validate({ params: dayOfWeekParamsSchema }), postArchiveDay);
