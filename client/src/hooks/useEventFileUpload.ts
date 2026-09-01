@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import {
@@ -66,48 +66,45 @@ export function useEventFileUpload(existingFiles: ExistingAttachment[] = []): Us
   const { t } = useTranslation();
   const [attachments, setAttachments] = useState<AttachmentUploadState[]>([]);
 
-  const addFiles = useCallback(
-    (files: File[]) => {
-      const batch: AttachmentUploadState[] = [];
+  function addFiles(files: File[]) {
+    const batch: AttachmentUploadState[] = [];
 
-      for (const file of files) {
-        const localId = crypto.randomUUID();
-        const errorMessage = validateFile(file, [...attachments, ...batch], existingFiles, t);
+    for (const file of files) {
+      const localId = crypto.randomUUID();
+      const errorMessage = validateFile(file, [...attachments, ...batch], existingFiles, t);
 
-        if (errorMessage) {
-          batch.push({ localId, file, status: "error", errorMessage });
-          continue;
-        }
-
-        batch.push({ localId, file, status: "uploading" });
-
-        uploadEventFile(file)
-          .then((uploadedFile) => {
-            setAttachments((current) =>
-              current.map((attachment) =>
-                attachment.localId === localId ? { ...attachment, status: "uploaded", uploadedFile } : attachment,
-              ),
-            );
-          })
-          .catch(() => {
-            setAttachments((current) =>
-              current.map((attachment) =>
-                attachment.localId === localId
-                  ? { ...attachment, status: "error", errorMessage: t("eventForm.attachments.uploadError") }
-                  : attachment,
-              ),
-            );
-          });
+      if (errorMessage) {
+        batch.push({ localId, file, status: "error", errorMessage });
+        continue;
       }
 
-      setAttachments((current) => [...current, ...batch]);
-    },
-    [attachments, existingFiles, t],
-  );
+      batch.push({ localId, file, status: "uploading" });
 
-  const removeFile = useCallback((localId: string) => {
+      uploadEventFile(file)
+        .then((uploadedFile) => {
+          setAttachments((current) =>
+            current.map((attachment) =>
+              attachment.localId === localId ? { ...attachment, status: "uploaded", uploadedFile } : attachment,
+            ),
+          );
+        })
+        .catch(() => {
+          setAttachments((current) =>
+            current.map((attachment) =>
+              attachment.localId === localId
+                ? { ...attachment, status: "error", errorMessage: t("eventForm.attachments.uploadError") }
+                : attachment,
+            ),
+          );
+        });
+    }
+
+    setAttachments((current) => [...current, ...batch]);
+  }
+
+  function removeFile(localId: string) {
     setAttachments((current) => current.filter((attachment) => attachment.localId !== localId));
-  }, []);
+  }
 
   return { attachments, addFiles, removeFile };
 }

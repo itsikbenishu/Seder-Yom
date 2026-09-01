@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   KeyboardSensor,
   PointerSensor,
@@ -80,29 +80,26 @@ export function useScheduleDnd(
 
   // Google-synced events are never drag sources — only local events participate
   // in the sortable list, so reorder math only ever considers positions among each other.
-  const draggableEvents = useMemo(() => events.filter((event) => !event.googleCalendarSynced), [events]);
-  const sortableIds = useMemo(() => draggableEvents.map((event) => event.id), [draggableEvents]);
+  const draggableEvents = events.filter((event) => !event.googleCalendarSynced);
+  const sortableIds = draggableEvents.map((event) => event.id);
 
-  const onDragStart = useCallback((event: DragStartEvent) => {
+  function onDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
-  }, []);
+  }
 
-  const onDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setActiveId(null);
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
+  function onDragEnd(event: DragEndEvent) {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
 
-      const oldIndex = draggableEvents.findIndex((item) => item.id === active.id);
-      const newIndex = draggableEvents.findIndex((item) => item.id === over.id);
-      if (oldIndex === -1 || newIndex === -1) return;
+    const oldIndex = draggableEvents.findIndex((item) => item.id === active.id);
+    const newIndex = draggableEvents.findIndex((item) => item.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
 
-      const reordered = arrayMove(draggableEvents, oldIndex, newIndex);
-      const newStart = computeNewStart(reordered, newIndex);
-      onReorder(String(active.id), newStart);
-    },
-    [draggableEvents, onReorder],
-  );
+    const reordered = arrayMove(draggableEvents, oldIndex, newIndex);
+    const newStart = computeNewStart(reordered, newIndex);
+    onReorder(String(active.id), newStart);
+  }
 
   return { sensors, activeId, sortableIds, onDragStart, onDragEnd };
 }

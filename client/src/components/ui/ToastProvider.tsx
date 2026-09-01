@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { ToastContext } from "../../hooks/useToast";
 import { Toast, type ToastVariant } from "./Toast";
@@ -14,13 +14,13 @@ interface ToastItem {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const showToast = useCallback((message: string, variant: ToastVariant = "error") => {
+  function showToast(message: string, variant: ToastVariant = "error") {
     const id = crypto.randomUUID();
     setToasts((current) => [...current, { id, message, variant }]);
     setTimeout(() => {
       setToasts((current) => current.filter((toast) => toast.id !== id));
     }, TOAST_DURATION_MS);
-  }, []);
+  }
 
   return (
     <ToastContext.Provider value={{ showToast }}>
