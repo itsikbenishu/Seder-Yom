@@ -3,6 +3,7 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Button, ConfirmDialog } from "../../ui";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
+import { useRequireSession } from "../../../hooks/useRequireSession";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
 import { useMuteEventMutation } from "../../../hooks/useMuteEventMutation";
@@ -51,6 +52,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<DayConfirmTarget | null>(null);
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
+  const requireSession = useRequireSession();
 
   const muteDayMutation = useMuteDayMutation();
   const unmuteDayMutation = useUnmuteDayMutation();
@@ -70,14 +72,14 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
 
   function handleMenuAction(action: DayMenuAction) {
     if (action === "toggleMute") return handleToggleMuteDay();
-    if (action === "archiveDay") return setConfirmTarget({ kind: "archiveDay" });
-    if (action === "clearDay") return setConfirmTarget({ kind: "clearDay" });
+    if (action === "archiveDay") return requireSession(() => setConfirmTarget({ kind: "archiveDay" }));
+    if (action === "clearDay") return requireSession(() => setConfirmTarget({ kind: "clearDay" }));
     onOpenArchive();
   }
 
   function handleEditEvent(eventId: string) {
     const event = data.timedEvents.find((item) => item.id === eventId) ?? data.allDayEvents.find((item) => item.id === eventId);
-    if (event) setFormTarget({ kind: "edit", event });
+    if (event) requireSession(() => setFormTarget({ kind: "edit", event }));
   }
 
   function handleReorder(eventId: string, newStart: string) {
@@ -117,7 +119,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setFormTarget({ kind: "create", dayOfWeek, allDay: true })}
+            onClick={() => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
             aria-label={t("day.addAllDayEventAria")}
           >
             +
@@ -142,7 +144,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
             if (event) muteEventMutation.mutate({ id: eventId, muted: !event.mutedUntilArchive });
           }}
           onEditEvent={handleEditEvent}
-          onDeleteEvent={(eventId) => setConfirmTarget({ kind: "deleteEvent", eventId })}
+          onDeleteEvent={(eventId) => requireSession(() => setConfirmTarget({ kind: "deleteEvent", eventId }))}
           onReorder={handleReorder}
         />
       </div>
@@ -151,7 +153,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
         <Button
           variant="primary"
           className="w-full"
-          onClick={() => setFormTarget({ kind: "create", dayOfWeek, allDay: false })}
+          onClick={() => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: false }))}
         >
           {t("day.addEvent")}
         </Button>
@@ -162,7 +164,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           event={openAllDayEvent}
           onClose={() => setOpenAllDayId(null)}
           onEdit={handleEditEvent}
-          onDelete={(eventId) => setConfirmTarget({ kind: "deleteEvent", eventId })}
+          onDelete={(eventId) => requireSession(() => setConfirmTarget({ kind: "deleteEvent", eventId }))}
         />
       )}
 

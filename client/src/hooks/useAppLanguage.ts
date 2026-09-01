@@ -1,15 +1,11 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@project/shared";
+import { hasNoSession } from "../services/queryClient";
 import { useUserPreferences } from "./useUserPreferences";
 import { useUpdateUserPreferencesMutation } from "./useUpdateUserPreferencesMutation";
 
-/**
- * Account-level preference — the server is the source of truth once
- * signed in. Before that (or if the fetch fails), `i18n.language` already resolved to
- * the browser's own language via i18next's own detection, so there's nothing to fall
- * back to here beyond just leaving it alone.
- */
+/** Account-level once signed in; falls back to the browser's own detected language before that. */
 export function useAppLanguage(): { language: AppLanguage; setLanguage: (language: AppLanguage) => void } {
   const { i18n } = useTranslation();
   const { data } = useUserPreferences();
@@ -25,6 +21,7 @@ export function useAppLanguage(): { language: AppLanguage; setLanguage: (languag
     language: (data?.language ?? i18n.language) as AppLanguage,
     setLanguage: (language) => {
       void i18n.changeLanguage(language);
+      if (hasNoSession()) return; // no account to save it to yet — applied locally only
       updateMutation.mutate({ language });
     },
   };

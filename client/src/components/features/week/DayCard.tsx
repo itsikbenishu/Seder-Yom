@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../ui";
+import { ArchiveIcon, Button } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { DayCardProps } from "../../../types/week";
 
@@ -76,7 +76,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
             onClick={stopPropagationThen(() => onArchiveDay(day.dayOfWeek))}
             aria-label={t("week.archiveDayAria")}
           >
-            🗄️
+            <ArchiveIcon className="h-3 w-3" />
           </Button>
         </div>
         <Button

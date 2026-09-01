@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { AppTheme } from "@project/shared";
+import { hasNoSession } from "../services/queryClient";
 import { useUserPreferences } from "./useUserPreferences";
 import { useUpdateUserPreferencesMutation } from "./useUpdateUserPreferencesMutation";
 
@@ -7,17 +8,12 @@ function prefersDark(): boolean {
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-/**
- * Account-level preference — the server is the source of truth once
- * signed in; before that (or if the fetch fails) this falls back to "system". `theme`
- * itself can be a genuine, persisted "system" choice (not just a pre-auth fallback),
- * in which case the applied light/dark class keeps following the OS preference live
- * for as long as the app stays open.
- */
+/** Account-level once signed in; falls back to local-only state (lost on reload) before that. */
 export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) => void } {
   const { data } = useUserPreferences();
   const updateMutation = useUpdateUserPreferencesMutation();
-  const theme = data?.theme ?? "system";
+  const [localTheme, setLocalTheme] = useState<AppTheme | null>(null);
+  const theme = data?.theme ?? localTheme ?? "system";
 
   useEffect(() => {
     function applyResolvedTheme() {
@@ -35,6 +31,12 @@ export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) =>
 
   return {
     theme,
-    setTheme: (next) => updateMutation.mutate({ theme: next }),
+    setTheme: (next) => {
+      if (hasNoSession()) {
+        setLocalTheme(next);
+        return;
+      }
+      updateMutation.mutate({ theme: next });
+    },
   };
 }

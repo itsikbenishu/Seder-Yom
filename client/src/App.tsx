@@ -32,7 +32,7 @@ function App() {
   // No upfront auth check — Login only appears once a mutation 401s.
   useEffect(() => onSessionEnd(() => startTransition(() => setScreen({ screen: "login" }))), [startTransition]);
 
-  // Settings/Archive have no query of their own to catch a missing session, so check first.
+  // Archive has no query of its own to catch a missing session, so check first.
   function goToDataScreen(target: Screen) {
     startTransition(() => setScreen(hasNoSession() ? { screen: "login" } : target));
   }
@@ -89,7 +89,7 @@ function App() {
         <WeekScreen
           onSelectDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
           onOpenArchive={() => goToDataScreen({ screen: "archive" })}
-          onOpenSettings={() => goToDataScreen({ screen: "settings" })}
+          onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
         />
       )}
     </Suspense>

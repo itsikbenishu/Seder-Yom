@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../ui";
+import { ArchiveIcon, Button } from "../../ui";
 import { WeekGrid } from "./WeekGrid";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
+import { useRequireSession } from "../../../hooks/useRequireSession";
 import { buildWeekViewData } from "../../../utils/buildWeekViewData";
 import { EventFormDialog } from "../eventForm";
 import type { EventFormMode } from "../../../types/eventForm";
@@ -24,6 +25,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
   const { t, i18n } = useTranslation();
   const { data: events } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
+  const requireSession = useRequireSession();
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
 
   const weekViewData = buildWeekViewData(events ?? [], new Date());
@@ -44,7 +46,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
             ⚙️
           </Button>
           <Button variant="ghost" size="icon" onClick={onOpenArchive} aria-label={t("week.archiveAria")}>
-            🗄️
+            <ArchiveIcon className="h-5 w-5" />
           </Button>
         </div>
       </header>
@@ -52,7 +54,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
         days={weekViewData.days}
         onSelectDay={onSelectDay}
         onMuteDay={(dayOfWeek) => muteDayMutation.mutate(dayOfWeek)}
-        onAddEvent={(dayOfWeek) => setFormTarget({ kind: "create", dayOfWeek, allDay: false })}
+        onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: false }))}
         onArchiveDay={() => {}}
       />
 

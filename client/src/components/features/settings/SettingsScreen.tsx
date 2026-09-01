@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui";
+import { hasNoSession } from "../../../services/queryClient";
 import { useAppLanguage } from "../../../hooks/useAppLanguage";
+import { useRequireSession } from "../../../hooks/useRequireSession";
 import { useAppTheme } from "../../../hooks/useAppTheme";
 import { useGoogleCalendarStatus } from "../../../hooks/useGoogleCalendarStatus";
 import { useDisconnectGoogleCalendarMutation } from "../../../hooks/useDisconnectGoogleCalendarMutation";
@@ -28,9 +30,12 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const updatePreferencesMutation = useUpdateUserPreferencesMutation();
 
   const signOutMutation = useSignOutMutation();
+  const requireSession = useRequireSession();
 
   function handleConnectGoogleCalendar() {
-    window.location.href = `${API_URL}/gcal/connect`;
+    requireSession(() => {
+      window.location.href = `${API_URL}/gcal/connect`;
+    });
   }
 
   function handleToggleGoogleCalendarConnected(connected: boolean) {
@@ -62,7 +67,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           channel={userPreferences?.channels[0] ?? "browser"}
           onChange={(channel) => updatePreferencesMutation.mutate({ channels: [channel] })}
         />
-        <SignOutSection onSignOut={() => signOutMutation.mutate()} />
+        {!hasNoSession() && <SignOutSection onSignOut={() => signOutMutation.mutate()} />}
       </div>
     </div>
   );
