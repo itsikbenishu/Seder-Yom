@@ -152,6 +152,13 @@
     "submit": "Send code",
     "invalidEmail": "Invalid email address"
   },
+  "twofa": {
+    "title": "Two-factor authentication",
+    "codeSentTo": "Code sent to {{email}}",
+    "codeLabel": "Code",
+    "submit": "Verify",
+    "invalidCode": "Invalid or expired code"
+  },
   "archive": {
     "title": "Archive",
     "backAria": "Back to week",
@@ -164,6 +171,9 @@
   "validation": {
     "email": {
       "invalid": "Invalid email address"
+    },
+    "code": {
+      "invalid": "Code must be 6 digits"
     },
     "title": {
       "required": "Title is required",

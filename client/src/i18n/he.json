@@ -152,6 +152,13 @@
     "submit": "שליחת קוד",
     "invalidEmail": "כתובת דוא\"ל לא תקינה"
   },
+  "twofa": {
+    "title": "אימות דו-שלבי",
+    "codeSentTo": "קוד נשלח אל {{email}}",
+    "codeLabel": "קוד",
+    "submit": "אימות",
+    "invalidCode": "קוד שגוי או שפג תוקפו"
+  },
   "archive": {
     "title": "ארכיון",
     "backAria": "חזרה לשבוע",
@@ -164,6 +171,9 @@
   "validation": {
     "email": {
       "invalid": "כתובת דוא\"ל לא תקינה"
+    },
+    "code": {
+      "invalid": "קוד חייב להיות 6 ספרות"
     },
     "title": {
       "required": "כותרת נדרשת",
