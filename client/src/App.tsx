@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { lazy, Suspense, useState, useTransition } from "react";
 import type { ArchivedDay } from "@project/shared";
-import { ArchiveScreen } from "./components/features/archive";
-import { ArchiveDayScreen } from "./components/features/archiveDay";
-import { DayScreen } from "./components/features/day";
-import { SettingsScreen } from "./components/features/settings";
-import { WeekScreen } from "./components/features/week";
+
+const ArchiveScreen = lazy(() =>
+  import("./components/features/archive").then((m) => ({ default: m.ArchiveScreen })),
+);
+const ArchiveDayScreen = lazy(() =>
+  import("./components/features/archiveDay").then((m) => ({ default: m.ArchiveDayScreen })),
+);
+const DayScreen = lazy(() =>
+  import("./components/features/day").then((m) => ({ default: m.DayScreen })),
+);
+const SettingsScreen = lazy(() =>
+  import("./components/features/settings").then((m) => ({ default: m.SettingsScreen })),
+);
+const WeekScreen = lazy(() =>
+  import("./components/features/week").then((m) => ({ default: m.WeekScreen })),
+);
 
 type Screen =
   | { screen: "week" }
@@ -15,43 +26,51 @@ type Screen =
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ screen: "week" });
+  const [, startTransition] = useTransition();
 
-  if (screen.screen === "settings") {
-    return <SettingsScreen onBack={() => setScreen({ screen: "week" })} />;
-  }
-
-  if (screen.screen === "archiveDay") {
-    return (
-      <ArchiveDayScreen day={screen.day} onBackToArchive={() => setScreen({ screen: "archive" })} />
-    );
-  }
-
-  if (screen.screen === "archive") {
-    return (
-      <ArchiveScreen
-        onBack={() => setScreen({ screen: "week" })}
-        onOpenArchivedDay={(day) => setScreen({ screen: "archiveDay", day })}
-      />
-    );
-  }
-
-  if (screen.screen === "day") {
-    return (
-      <DayScreen
-        dayOfWeek={screen.dayOfWeek}
-        onBackToWeek={() => setScreen({ screen: "week" })}
-        onNavigateDay={(dayOfWeek) => setScreen({ screen: "day", dayOfWeek })}
-        onOpenArchive={() => setScreen({ screen: "archive" })}
-      />
-    );
-  }
+  const fallback = (
+    <div className="flex min-h-svh items-center justify-center">
+      <span className="text-sm text-neutral-500">Loading…</span>
+    </div>
+  );
 
   return (
-    <WeekScreen
-      onSelectDay={(dayOfWeek) => setScreen({ screen: "day", dayOfWeek })}
-      onOpenArchive={() => setScreen({ screen: "archive" })}
-      onOpenSettings={() => setScreen({ screen: "settings" })}
-    />
+    <Suspense fallback={fallback}>
+      {screen.screen === "settings" && (
+        <SettingsScreen onBack={() => startTransition(() => setScreen({ screen: "week" }))} />
+      )}
+
+      {screen.screen === "archiveDay" && (
+        <ArchiveDayScreen
+          day={screen.day}
+          onBackToArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
+        />
+      )}
+
+      {screen.screen === "archive" && (
+        <ArchiveScreen
+          onBack={() => startTransition(() => setScreen({ screen: "week" }))}
+          onOpenArchivedDay={(day) => startTransition(() => setScreen({ screen: "archiveDay", day }))}
+        />
+      )}
+
+      {screen.screen === "day" && (
+        <DayScreen
+          dayOfWeek={screen.dayOfWeek}
+          onBackToWeek={() => startTransition(() => setScreen({ screen: "week" }))}
+          onNavigateDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
+          onOpenArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
+        />
+      )}
+
+      {screen.screen === "week" && (
+        <WeekScreen
+          onSelectDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
+          onOpenArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
+          onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
+        />
+      )}
+    </Suspense>
   );
 }
 
