@@ -302,13 +302,69 @@ Job format:
   (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic
 - Directional icons (chevrons) must mirror in RTL
 
-## 12. Non-Functional
-- Page load < 2s
-- Rate limit: 100 req/min/user
-- JWT in httpOnly cookie, RLS on all Supabase tables, all inputs Zod-validated
-- Responsive: mobile <640px (1 col) / tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid)
+## 12. Performance & Optimization
+**Frontend:**
+- React 19 Compiler handles memoization automatically — no manual `useMemo`/
+  `useCallback` for this. Don't hand-roll memoization the compiler already covers.
+- Route/screen-level code splitting with `React.lazy` + `<Suspense>` — each
+  of the 8 screens (§5) loads as its own chunk, not one bundle.
+- `useTransition` for navigation between screens (Week↔Day↔Archive) so the
+  UI stays responsive during the transition.
+- `useOptimistic` for immediate feedback on archive/mute/create actions
+  (§3 Muting, §6 Archive) — the UI updates before the server confirms.
+- Archive lazy-loading (§6): loaded pages cached in React state, no refetch
+  on scroll up/down; search filters the client-side cache first.
 
-## 13. Design Reference
+**Backend:**
+- DB indexing on every filtered/sorted path: `archived_days` composite index
+  (§6), plus standard indexes on `events(user_id, dayOfWeek)` and
+  `event_files(eventId)`.
+- Rate limiting: 100 req/min/user.
+- Archive query target: < 50ms (§6).
+- Bulk day operations (mute-day/unmute-day §3, clear-day §7, archive-day §6)
+  are each a single indexed query/transaction — never a client-side loop
+  over per-item requests, which is what actually protects these paths at
+  scale as event counts grow.
+
+**Overall targets:** page load < 2s. JWT in httpOnly cookie, RLS on all
+Supabase tables, all inputs Zod-validated. Responsive: mobile <640px (1 col)
+/ tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid).
+
+## 13. Session Expiry & Re-authentication
+Since the JWT lives in an httpOnly cookie, client-side JS can't read it or
+proactively check its expiry — the only reliable signal that a session has
+lapsed is the API rejecting a request. Unauthenticated visitors can still
+browse the app shell — Week/Day/Archive/Settings render normally, just with
+no data — so people get a taste of the app before being pushed to log in.
+The Login screen only appears once they attempt something that actually
+needs a session:
+
+- Only **mutations** (`useMutation` — user-initiated actions: mute, create/
+  edit/delete an event, archive/clear a day, update a setting, sign out,
+  etc.) participate in the auth-redirect check, via the shared `QueryClient`'s
+  global `MutationCache` `onError` handler. A failed background **query**
+  (e.g. a screen's initial data fetch on mount) never triggers anything —
+  that screen just renders with no data, same as it would for a genuinely
+  empty account.
+- Any mutation failing with **HTTP 401** and `code: "UNAUTHENTICATED"`
+  triggers the same handler, regardless of which mutation or which screen
+  made the call — except `POST /auth/login` and `POST /auth/verify`
+  themselves, which also 401/`UNAUTHENTICATED` for "wrong credentials" (a
+  bad email, a mistyped 2FA code), not "session gone", and are excluded.
+- The handler clears any local auth/user state (the query cache) and sends
+  the user to the **Login** screen (§5) — not straight to 2FA, since an
+  expired/missing session means the client can no longer assume which email
+  it was for.
+- After a successful re-login, the user lands on **Week View** (home) —
+  there's no deep-linking to preserve; every other screen is reachable from
+  there in one or two taps, so returning to a specific prior screen isn't
+  worth the extra state.
+- This is the same mechanism whether it's a first-time visitor with no
+  session yet, or a mid-session cookie expiry while the user is active — the
+  first write action either kind of user attempts is what surfaces it, not
+  a passive page load.
+
+## 14. Design Reference
 Full visual spec (tokens, per-screen layout, state shape, copy) lives in
 `design_handoff_sederyom/README.md`. Read **only** that file — the accompanying
 `.dc.html`/`support.js` in the same folder are a non-runnable prototype

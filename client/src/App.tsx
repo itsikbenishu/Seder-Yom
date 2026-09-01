@@ -1,5 +1,6 @@
-import { lazy, Suspense, useState, useTransition } from "react";
+import { lazy, Suspense, useEffect, useState, useTransition } from "react";
 import type { ArchivedDay } from "@project/shared";
+import { hasNoSession, onSessionEnd } from "./services/queryClient";
 
 const ArchiveScreen = lazy(() =>
   import("./components/features/archive").then((m) => ({ default: m.ArchiveScreen })),
@@ -7,26 +8,34 @@ const ArchiveScreen = lazy(() =>
 const ArchiveDayScreen = lazy(() =>
   import("./components/features/archiveDay").then((m) => ({ default: m.ArchiveDayScreen })),
 );
-const DayScreen = lazy(() =>
-  import("./components/features/day").then((m) => ({ default: m.DayScreen })),
-);
+const DayScreen = lazy(() => import("./components/features/day").then((m) => ({ default: m.DayScreen })));
+const LoginScreen = lazy(() => import("./components/features/login").then((m) => ({ default: m.LoginScreen })));
 const SettingsScreen = lazy(() =>
   import("./components/features/settings").then((m) => ({ default: m.SettingsScreen })),
 );
-const WeekScreen = lazy(() =>
-  import("./components/features/week").then((m) => ({ default: m.WeekScreen })),
-);
+const TwoFaScreen = lazy(() => import("./components/features/twofa").then((m) => ({ default: m.TwoFaScreen })));
+const WeekScreen = lazy(() => import("./components/features/week").then((m) => ({ default: m.WeekScreen })));
 
 type Screen =
   | { screen: "week" }
   | { screen: "day"; dayOfWeek: number }
   | { screen: "archive" }
   | { screen: "archiveDay"; day: ArchivedDay }
-  | { screen: "settings" };
+  | { screen: "settings" }
+  | { screen: "login" }
+  | { screen: "twofa"; email: string };
 
 function App() {
   const [screen, setScreen] = useState<Screen>({ screen: "week" });
   const [, startTransition] = useTransition();
+
+  // No upfront auth check — Login only appears once a mutation 401s.
+  useEffect(() => onSessionEnd(() => startTransition(() => setScreen({ screen: "login" }))), [startTransition]);
+
+  // Settings/Archive have no query of their own to catch a missing session, so check first.
+  function goToDataScreen(target: Screen) {
+    startTransition(() => setScreen(hasNoSession() ? { screen: "login" } : target));
+  }
 
   const fallback = (
     <div className="flex min-h-svh items-center justify-center">
@@ -36,6 +45,19 @@ function App() {
 
   return (
     <Suspense fallback={fallback}>
+      {screen.screen === "login" && (
+        <LoginScreen
+          onLoginSuccess={(email) => startTransition(() => setScreen({ screen: "twofa", email }))}
+        />
+      )}
+
+      {screen.screen === "twofa" && (
+        <TwoFaScreen
+          email={screen.email}
+          onVerifySuccess={() => startTransition(() => setScreen({ screen: "week" }))}
+        />
+      )}
+
       {screen.screen === "settings" && (
         <SettingsScreen onBack={() => startTransition(() => setScreen({ screen: "week" }))} />
       )}
@@ -59,15 +81,15 @@ function App() {
           dayOfWeek={screen.dayOfWeek}
           onBackToWeek={() => startTransition(() => setScreen({ screen: "week" }))}
           onNavigateDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
-          onOpenArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
+          onOpenArchive={() => goToDataScreen({ screen: "archive" })}
         />
       )}
 
       {screen.screen === "week" && (
         <WeekScreen
           onSelectDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
-          onOpenArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
-          onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
+          onOpenArchive={() => goToDataScreen({ screen: "archive" })}
+          onOpenSettings={() => goToDataScreen({ screen: "settings" })}
         />
       )}
     </Suspense>

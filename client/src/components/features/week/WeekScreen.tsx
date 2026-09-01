@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui";
 import { WeekGrid } from "./WeekGrid";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { buildWeekViewData } from "../../../utils/buildWeekViewData";
+import { EventFormDialog } from "../eventForm";
+import type { EventFormMode } from "../../../types/eventForm";
 
 function formatWeekRange(start: Date, end: Date, language: string): string {
   const locale = language === "he" ? "he-IL" : "en-US";
@@ -21,6 +24,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
   const { t, i18n } = useTranslation();
   const { data: events } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
+  const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
 
   const weekViewData = buildWeekViewData(events ?? [], new Date());
 
@@ -48,9 +52,13 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
         days={weekViewData.days}
         onSelectDay={onSelectDay}
         onMuteDay={(dayOfWeek) => muteDayMutation.mutate(dayOfWeek)}
-        onAddEvent={() => {}}
+        onAddEvent={(dayOfWeek) => setFormTarget({ kind: "create", dayOfWeek, allDay: false })}
         onArchiveDay={() => {}}
       />
+
+      {formTarget && (
+        <EventFormDialog mode={formTarget} onClose={() => setFormTarget(null)} onSaved={() => setFormTarget(null)} />
+      )}
     </div>
   );
 }
