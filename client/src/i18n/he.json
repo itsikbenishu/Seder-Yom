@@ -158,7 +158,11 @@
     "codeSentTo": "קוד נשלח אל {{email}}",
     "codeLabel": "קוד",
     "submit": "אימות",
-    "invalidCode": "קוד שגוי או שפג תוקפו"
+    "invalidCode": "קוד שגוי או שפג תוקפו",
+    "resend": "לא קיבלת קוד? שלח שוב",
+    "resendCooldown": "שלח שוב בעוד {{seconds}} שניות",
+    "resendSuccess": "קוד חדש נשלח",
+    "resendError": "שליחת הקוד נכשלה. נסו שוב."
   },
   "archive": {
     "title": "ארכיון",

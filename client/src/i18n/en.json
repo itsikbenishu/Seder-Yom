@@ -158,7 +158,11 @@
     "codeSentTo": "Code sent to {{email}}",
     "codeLabel": "Code",
     "submit": "Verify",
-    "invalidCode": "Invalid or expired code"
+    "invalidCode": "Invalid or expired code",
+    "resend": "Didn't get a code? Resend",
+    "resendCooldown": "Resend in {{seconds}}s",
+    "resendSuccess": "A new code was sent",
+    "resendError": "Couldn't resend the code. Please try again."
   },
   "archive": {
     "title": "Archive",
