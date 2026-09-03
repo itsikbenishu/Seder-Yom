@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArchiveIcon, Button, ConfirmDialog } from "../../ui";
 import { WeekGrid } from "./WeekGrid";
+import { WeekGridSkeleton } from "./WeekGridSkeleton";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
@@ -25,28 +26,43 @@ export interface WeekScreenProps {
 
 export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekScreenProps) {
   const { t, i18n } = useTranslation();
-  const { data: events } = useWeekEvents();
+  const { data: events, isPending: isEventsPending } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
   const unmuteDayMutation = useUnmuteDayMutation();
   const archiveDayMutation = useArchiveDayMutation();
   const requireSession = useRequireSession();
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
   const [confirmArchiveDay, setConfirmArchiveDay] = useState<number | null>(null);
+  // Tracked locally rather than read off mutation.variables — the mute/unmute mutations
+  // are shared across every day card, so .variables only ever reflects the single most
+  // recent call and would misreport pending state under concurrent per-day toggles.
+  const [pendingMuteDayIds, setPendingMuteDayIds] = useState<Set<number>>(new Set());
 
   const weekViewData = buildWeekViewData(events ?? [], new Date());
 
   function handleToggleMuteDay(dayOfWeek: number) {
     const day = weekViewData.days.find((item) => item.dayOfWeek === dayOfWeek);
-    if (day?.isMuted) {
-      unmuteDayMutation.mutate(dayOfWeek);
-      return;
-    }
-    muteDayMutation.mutate(dayOfWeek);
+    const mutation = day?.isMuted ? unmuteDayMutation : muteDayMutation;
+
+    setPendingMuteDayIds((current) => new Set(current).add(dayOfWeek));
+    mutation.mutate(dayOfWeek, {
+      onSettled: () => {
+        setPendingMuteDayIds((current) => {
+          const next = new Set(current);
+          next.delete(dayOfWeek);
+          return next;
+        });
+      },
+    });
   }
 
   function handleConfirmArchiveDay() {
-    if (confirmArchiveDay !== null) archiveDayMutation.mutate(confirmArchiveDay);
-    setConfirmArchiveDay(null);
+    if (confirmArchiveDay === null) return;
+    archiveDayMutation.mutate(confirmArchiveDay, { onSuccess: () => setConfirmArchiveDay(null) });
+  }
+
+  function isMutePending(dayOfWeek: number): boolean {
+    return pendingMuteDayIds.has(dayOfWeek);
   }
 
   return (
@@ -69,13 +85,18 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
           </Button>
         </div>
       </header>
-      <WeekGrid
-        days={weekViewData.days}
-        onSelectDay={onSelectDay}
-        onMuteDay={handleToggleMuteDay}
-        onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
-        onArchiveDay={(dayOfWeek) => requireSession(() => setConfirmArchiveDay(dayOfWeek))}
-      />
+      {isEventsPending ? (
+        <WeekGridSkeleton />
+      ) : (
+        <WeekGrid
+          days={weekViewData.days}
+          onSelectDay={onSelectDay}
+          onMuteDay={handleToggleMuteDay}
+          onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
+          onArchiveDay={(dayOfWeek) => requireSession(() => setConfirmArchiveDay(dayOfWeek))}
+          isMutePending={isMutePending}
+        />
+      )}
 
       {formTarget && (
         <EventFormDialog mode={formTarget} onClose={() => setFormTarget(null)} onSaved={() => setFormTarget(null)} />
@@ -88,6 +109,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
         confirmLabel={t("day.confirm.archiveDayConfirm")}
         cancelLabel={t("common.cancel")}
         danger
+        confirmPending={archiveDayMutation.isPending}
         onConfirm={handleConfirmArchiveDay}
         onCancel={() => setConfirmArchiveDay(null)}
       />

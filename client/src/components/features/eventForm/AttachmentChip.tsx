@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Spinner } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { AttachmentUploadStatus } from "../../../types/eventForm";
 
@@ -36,10 +37,7 @@ export function AttachmentChip({ filename, status, errorMessage, onRemove }: Att
 
       {status === "uploading" && (
         <>
-          <span
-            aria-hidden="true"
-            className="h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-slate-300 border-t-violet-600 dark:border-slate-600 dark:border-t-violet-400"
-          />
+          <Spinner className="h-3 w-3 shrink-0" />
           <span className="sr-only">{t("eventForm.attachments.uploading")}</span>
         </>
       )}

@@ -32,6 +32,7 @@ export interface WeekGridProps {
   onMuteDay: (dayOfWeek: number) => void;
   onAddEvent: (dayOfWeek: number) => void;
   onArchiveDay: (dayOfWeek: number) => void;
+  isMutePending: (dayOfWeek: number) => boolean;
 }
 
 export interface DayCardProps {
@@ -40,4 +41,5 @@ export interface DayCardProps {
   onMuteDay: (dayOfWeek: number) => void;
   onAddEvent: (dayOfWeek: number) => void;
   onArchiveDay: (dayOfWeek: number) => void;
+  isMutePending: boolean;
 }

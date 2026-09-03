@@ -138,7 +138,8 @@
       "button": "Sign out",
       "confirmTitle": "Sign out",
       "confirmBody": "You'll be signed out of your account on this device.",
-      "confirmButton": "Sign out"
+      "confirmButton": "Sign out",
+      "error": "Sign out failed. Please try again."
     }
   },
   "archiveDay": {

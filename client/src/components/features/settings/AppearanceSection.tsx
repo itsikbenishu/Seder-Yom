@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { SegmentedControl } from "../../ui";
 import type { AppTheme, AppearanceSectionProps } from "../../../types/settings";
 
-export function AppearanceSection({ theme, onChange }: AppearanceSectionProps) {
+export function AppearanceSection({ theme, onChange, isPending }: AppearanceSectionProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-start gap-1.5">
@@ -17,6 +17,7 @@ export function AppearanceSection({ theme, onChange }: AppearanceSectionProps) {
         ]}
         value={theme}
         onChange={onChange}
+        disabled={isPending}
         aria-label={t("settings.appearance.label")}
       />
     </div>

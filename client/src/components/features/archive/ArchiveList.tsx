@@ -1,5 +1,6 @@
 import type { UIEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { Spinner } from "../../ui";
 import type { ArchiveListProps } from "../../../types/archive";
 import { ArchiveRow } from "./ArchiveRow";
 
@@ -38,10 +39,7 @@ export function ArchiveList({ data, onSelect, onReachEnd }: ArchiveListProps) {
 
       {data.isLoadingMore && (
         <div className="flex items-center justify-center gap-2 py-4">
-          <div
-            className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-violet-600"
-            aria-hidden="true"
-          />
+          <Spinner />
           <span className="text-sm text-slate-500 dark:text-slate-400">{t("archive.loadingMore")}</span>
         </div>
       )}

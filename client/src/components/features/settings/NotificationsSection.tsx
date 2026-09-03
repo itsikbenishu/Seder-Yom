@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { SegmentedControl } from "../../ui";
 import type { NotificationChannel, NotificationsSectionProps } from "../../../types/settings";
 
-export function NotificationsSection({ channel, onChange }: NotificationsSectionProps) {
+export function NotificationsSection({ channel, onChange, isPending }: NotificationsSectionProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-start gap-1.5">
@@ -16,6 +16,7 @@ export function NotificationsSection({ channel, onChange }: NotificationsSection
         ]}
         value={channel}
         onChange={onChange}
+        disabled={isPending}
         aria-label={t("settings.notifications.label")}
       />
       <p className="text-xs text-slate-500 dark:text-slate-400">{t("settings.notifications.note")}</p>

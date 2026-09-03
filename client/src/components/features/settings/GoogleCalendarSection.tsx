@@ -4,7 +4,7 @@ import type { GoogleCalendarSectionProps } from "../../../types/settings";
 
 type ConnectedState = "on" | "off";
 
-export function GoogleCalendarSection({ status, onToggleConnected, onReconnect }: GoogleCalendarSectionProps) {
+export function GoogleCalendarSection({ status, onToggleConnected, onReconnect, isPending }: GoogleCalendarSectionProps) {
   const { t } = useTranslation();
 
   return (
@@ -20,9 +20,10 @@ export function GoogleCalendarSection({ status, onToggleConnected, onReconnect }
           ]}
           value={status.connected ? "on" : "off"}
           onChange={(value) => onToggleConnected(value === "on")}
+          disabled={isPending}
           aria-label={t("settings.googleCalendar.label")}
         />
-        <Button variant="secondary" onClick={onReconnect}>
+        <Button variant="secondary" onClick={onReconnect} disabled={isPending}>
           <span aria-hidden="true">🔄</span>
           {t("settings.googleCalendar.reconnect")}
         </Button>

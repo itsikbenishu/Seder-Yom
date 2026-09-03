@@ -6,7 +6,11 @@ import { useUserPreferences } from "./useUserPreferences";
 import { useUpdateUserPreferencesMutation } from "./useUpdateUserPreferencesMutation";
 
 /** Account-level once signed in; falls back to the browser's own detected language before that. */
-export function useAppLanguage(): { language: AppLanguage; setLanguage: (language: AppLanguage) => void } {
+export function useAppLanguage(): {
+  language: AppLanguage;
+  setLanguage: (language: AppLanguage) => void;
+  isPending: boolean;
+} {
   const { i18n } = useTranslation();
   const { data } = useUserPreferences();
   const updateMutation = useUpdateUserPreferencesMutation();
@@ -24,5 +28,6 @@ export function useAppLanguage(): { language: AppLanguage; setLanguage: (languag
       if (hasNoSession()) return; // no account to save it to yet — applied locally only
       updateMutation.mutate({ language });
     },
+    isPending: updateMutation.isPending,
   };
 }

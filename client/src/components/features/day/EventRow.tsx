@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../ui";
+import { Button, Spinner } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { EventRowProps } from "../../../types/day";
 import { ClampableDetails } from "./ClampableDetails";
@@ -14,6 +14,7 @@ export function EventRow({
   isDraggable,
   onToggleExpand,
   onMuteToggle,
+  isMuteTogglePending,
   onEdit,
   onDelete,
 }: EventRowProps) {
@@ -81,9 +82,10 @@ export function EventRow({
             variant="ghost"
             size="icon"
             onClick={() => onMuteToggle(event.id)}
+            disabled={isMuteTogglePending}
             aria-label={t(event.mutedUntilArchive ? "day.event.unmuteAria" : "day.event.muteAria")}
           >
-            {event.mutedUntilArchive ? "🔕" : "🔔"}
+            {isMuteTogglePending ? <Spinner className="h-3.5 w-3.5" /> : event.mutedUntilArchive ? "🔕" : "🔔"}
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onEdit(event.id)} aria-label={t("day.event.editAria")}>
             ✏️

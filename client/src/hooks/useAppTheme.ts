@@ -9,7 +9,7 @@ function prefersDark(): boolean {
 }
 
 /** Account-level once signed in; falls back to local-only state (lost on reload) before that. */
-export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) => void } {
+export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) => void; isPending: boolean } {
   const { data } = useUserPreferences();
   const updateMutation = useUpdateUserPreferencesMutation();
   const [localTheme, setLocalTheme] = useState<AppTheme | null>(null);
@@ -38,5 +38,6 @@ export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) =>
       }
       updateMutation.mutate({ theme: next });
     },
+    isPending: updateMutation.isPending,
   };
 }

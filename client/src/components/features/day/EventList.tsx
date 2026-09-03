@@ -9,6 +9,7 @@ export function EventList({
   expandedEventIds,
   onToggleExpand,
   onMuteToggleEvent,
+  isMuteTogglePending,
   onEditEvent,
   onDeleteEvent,
   onReorder,
@@ -28,6 +29,7 @@ export function EventList({
               isDraggable={!event.googleCalendarSynced}
               onToggleExpand={onToggleExpand}
               onMuteToggle={onMuteToggleEvent}
+              isMuteTogglePending={isMuteTogglePending(event.id)}
               onEdit={onEditEvent}
               onDelete={onDeleteEvent}
             />

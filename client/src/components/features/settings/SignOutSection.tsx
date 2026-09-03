@@ -3,12 +3,13 @@ import { useTranslation } from "react-i18next";
 import { Button, ConfirmDialog } from "../../ui";
 import type { SignOutSectionProps } from "../../../types/settings";
 
-export function SignOutSection({ onSignOut }: SignOutSectionProps) {
+export function SignOutSection({ onSignOut, isPending }: SignOutSectionProps) {
   const { t } = useTranslation();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  // Dialog stays open (showing the pending spinner) until sign-out settles — ConfirmDialog
+  // itself now blocks Escape/backdrop/X while confirmPending, so nothing can dismiss it early.
   function handleConfirm() {
-    setConfirmOpen(false);
     onSignOut();
   }
 
@@ -29,6 +30,7 @@ export function SignOutSection({ onSignOut }: SignOutSectionProps) {
         confirmLabel={t("settings.signOut.confirmButton")}
         cancelLabel={t("common.cancel")}
         danger
+        confirmPending={isPending}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmOpen(false)}
       />

@@ -5,17 +5,20 @@ export type { AppLanguage, AppTheme, NotificationChannel };
 export interface LanguageSectionProps {
   language: AppLanguage;
   onChange: (language: AppLanguage) => void;
+  isPending?: boolean;
 }
 
 export interface AppearanceSectionProps {
   theme: AppTheme;
   onChange: (theme: AppTheme) => void;
+  isPending?: boolean;
 }
 
 export interface GoogleCalendarSectionProps {
   status: GoogleCalendarConnectionStatus;
   onToggleConnected: (connected: boolean) => void;
   onReconnect: () => void;
+  isPending?: boolean;
 }
 
 /**
@@ -26,10 +29,12 @@ export interface GoogleCalendarSectionProps {
 export interface NotificationsSectionProps {
   channel: NotificationChannel;
   onChange: (channel: NotificationChannel) => void;
+  isPending?: boolean;
 }
 
 export interface SignOutSectionProps {
   onSignOut: () => void;
+  isPending?: boolean;
 }
 
 export interface SettingsScreenProps {

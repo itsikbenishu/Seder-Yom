@@ -138,7 +138,8 @@
       "button": "התנתקות",
       "confirmTitle": "התנתקות",
       "confirmBody": "תנותקו מהחשבון במכשיר זה.",
-      "confirmButton": "התנתקות"
+      "confirmButton": "התנתקות",
+      "error": "ההתנתקות נכשלה. נסו שוב."
     }
   },
   "archiveDay": {

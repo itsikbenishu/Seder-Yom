@@ -20,8 +20,8 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api/v1";
 
 export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const { t } = useTranslation();
-  const { language, setLanguage } = useAppLanguage();
-  const { theme, setTheme } = useAppTheme();
+  const { language, setLanguage, isPending: isLanguagePending } = useAppLanguage();
+  const { theme, setTheme, isPending: isThemePending } = useAppTheme();
 
   const { data: googleStatus } = useGoogleCalendarStatus();
   const disconnectGoogleCalendarMutation = useDisconnectGoogleCalendarMutation();
@@ -56,18 +56,22 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       </header>
 
       <div className="sy-scroll me-auto flex w-full max-w-[540px] flex-1 flex-col gap-6 overflow-y-auto p-4">
-        <LanguageSection language={language} onChange={setLanguage} />
-        <AppearanceSection theme={theme} onChange={setTheme} />
+        <LanguageSection language={language} onChange={setLanguage} isPending={isLanguagePending} />
+        <AppearanceSection theme={theme} onChange={setTheme} isPending={isThemePending} />
         <GoogleCalendarSection
           status={googleStatus ?? { connected: false }}
           onToggleConnected={handleToggleGoogleCalendarConnected}
           onReconnect={handleConnectGoogleCalendar}
+          isPending={disconnectGoogleCalendarMutation.isPending}
         />
         <NotificationsSection
           channel={userPreferences?.channels[0] ?? "browser"}
           onChange={(channel) => updatePreferencesMutation.mutate({ channels: [channel] })}
+          isPending={updatePreferencesMutation.isPending}
         />
-        {!hasNoSession() && <SignOutSection onSignOut={() => signOutMutation.mutate()} />}
+        {!hasNoSession() && (
+          <SignOutSection onSignOut={() => signOutMutation.mutate()} isPending={signOutMutation.isPending} />
+        )}
       </div>
     </div>
   );

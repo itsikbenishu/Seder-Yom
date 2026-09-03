@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState, useTransition } from "react";
 import type { ArchivedDay } from "@project/shared";
+import { GlobalLoadingBar } from "./components/ui";
 import { hasNoSession, onSessionEnd } from "./services/queryClient";
 
 const ArchiveScreen = lazy(() =>
@@ -44,55 +45,58 @@ function App() {
   );
 
   return (
-    <Suspense fallback={fallback}>
-      {screen.screen === "login" && (
-        <LoginScreen
-          onLoginSuccess={(email) => startTransition(() => setScreen({ screen: "twofa", email }))}
-        />
-      )}
+    <>
+      <GlobalLoadingBar />
+      <Suspense fallback={fallback}>
+        {screen.screen === "login" && (
+          <LoginScreen
+            onLoginSuccess={(email) => startTransition(() => setScreen({ screen: "twofa", email }))}
+          />
+        )}
 
-      {screen.screen === "twofa" && (
-        <TwoFaScreen
-          email={screen.email}
-          onVerifySuccess={() => startTransition(() => setScreen({ screen: "week" }))}
-        />
-      )}
+        {screen.screen === "twofa" && (
+          <TwoFaScreen
+            email={screen.email}
+            onVerifySuccess={() => startTransition(() => setScreen({ screen: "week" }))}
+          />
+        )}
 
-      {screen.screen === "settings" && (
-        <SettingsScreen onBack={() => startTransition(() => setScreen({ screen: "week" }))} />
-      )}
+        {screen.screen === "settings" && (
+          <SettingsScreen onBack={() => startTransition(() => setScreen({ screen: "week" }))} />
+        )}
 
-      {screen.screen === "archiveDay" && (
-        <ArchiveDayScreen
-          day={screen.day}
-          onBackToArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
-        />
-      )}
+        {screen.screen === "archiveDay" && (
+          <ArchiveDayScreen
+            day={screen.day}
+            onBackToArchive={() => startTransition(() => setScreen({ screen: "archive" }))}
+          />
+        )}
 
-      {screen.screen === "archive" && (
-        <ArchiveScreen
-          onBack={() => startTransition(() => setScreen({ screen: "week" }))}
-          onOpenArchivedDay={(day) => startTransition(() => setScreen({ screen: "archiveDay", day }))}
-        />
-      )}
+        {screen.screen === "archive" && (
+          <ArchiveScreen
+            onBack={() => startTransition(() => setScreen({ screen: "week" }))}
+            onOpenArchivedDay={(day) => startTransition(() => setScreen({ screen: "archiveDay", day }))}
+          />
+        )}
 
-      {screen.screen === "day" && (
-        <DayScreen
-          dayOfWeek={screen.dayOfWeek}
-          onBackToWeek={() => startTransition(() => setScreen({ screen: "week" }))}
-          onNavigateDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
-          onOpenArchive={() => goToDataScreen({ screen: "archive" })}
-        />
-      )}
+        {screen.screen === "day" && (
+          <DayScreen
+            dayOfWeek={screen.dayOfWeek}
+            onBackToWeek={() => startTransition(() => setScreen({ screen: "week" }))}
+            onNavigateDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
+            onOpenArchive={() => goToDataScreen({ screen: "archive" })}
+          />
+        )}
 
-      {screen.screen === "week" && (
-        <WeekScreen
-          onSelectDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
-          onOpenArchive={() => goToDataScreen({ screen: "archive" })}
-          onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
-        />
-      )}
-    </Suspense>
+        {screen.screen === "week" && (
+          <WeekScreen
+            onSelectDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
+            onOpenArchive={() => goToDataScreen({ screen: "archive" })}
+            onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
+          />
+        )}
+      </Suspense>
+    </>
   );
 }
 

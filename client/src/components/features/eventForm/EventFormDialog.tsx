@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { createEventSchema, type EventFrequency, type ReminderMode } from "@project/shared";
-import { Button, Input, Modal, Textarea } from "../../ui";
+import { Button, Input, Modal, Spinner, Textarea } from "../../ui";
 import { useCreateEventMutation } from "../../../hooks/useCreateEventMutation";
 import { useUpdateEventMutation } from "../../../hooks/useUpdateEventMutation";
 import { useEventFileUpload } from "../../../hooks/useEventFileUpload";
@@ -72,6 +72,11 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
+  // Don't let the dialog close (backdrop/Escape/X/Cancel) while a save is in flight.
+  function handleClose() {
+    if (!isPending) onClose();
+  }
+
   const title =
     mode.kind === "edit"
       ? t("eventForm.dialog.editTitle")
@@ -80,113 +85,116 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   return (
     <Modal
       open
-      onClose={onClose}
+      onClose={handleClose}
       title={title}
       className="max-w-3xl"
       footer={
         <>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={handleClose} disabled={isPending}>
             {t("common.cancel")}
           </Button>
           <Button variant="primary" onClick={handleSubmit(onSubmit)} disabled={isPending}>
+            {isPending && <Spinner className="h-3.5 w-3.5 border-white/40 border-t-white" />}
             {t("common.save")}
           </Button>
         </>
       }
     >
-      <div className="flex flex-col gap-2">
-        <Input
-          label={t("eventForm.fields.title")}
-          maxLength={80}
-          error={formState.errors.title?.message && t(formState.errors.title.message)}
-          {...register("title")}
-        />
-
-        {!isAllDay && (
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Input
-                type="time"
-                className="w-full"
-                label={t("eventForm.fields.start")}
-                error={formState.errors.start?.message && t(formState.errors.start.message)}
-                {...register("start")}
-              />
-            </div>
-            <div className="flex-1">
-              <Input
-                type="time"
-                className="w-full"
-                label={t("eventForm.fields.end")}
-                error={formState.errors.end?.message && t(formState.errors.end.message)}
-                {...register("end")}
-              />
-            </div>
-          </div>
-        )}
-
-        {isAllDay ? (
-          <ReminderField
-            allDay
-            reminder={reminder}
-            reminderMode={reminderMode as ReminderMode | undefined}
-            reminderTime={reminderTime}
-            onReminderChange={(value) => setValue("reminder", value)}
-            onReminderModeChange={(value) => setValue("reminderMode", value)}
-            onReminderTimeChange={(value) => setValue("reminderTime", value)}
+      <fieldset disabled={isPending} className="contents">
+        <div className="flex flex-col gap-2">
+          <Input
+            label={t("eventForm.fields.title")}
+            maxLength={80}
+            error={formState.errors.title?.message && t(formState.errors.title.message)}
+            {...register("title")}
           />
-        ) : (
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <FrequencyField
-                allDay={false}
-                value={frequency as EventFrequency}
-                onChange={(value) => setValue("frequency", value)}
-              />
+
+          {!isAllDay && (
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Input
+                  type="time"
+                  className="w-full"
+                  label={t("eventForm.fields.start")}
+                  error={formState.errors.start?.message && t(formState.errors.start.message)}
+                  {...register("start")}
+                />
+              </div>
+              <div className="flex-1">
+                <Input
+                  type="time"
+                  className="w-full"
+                  label={t("eventForm.fields.end")}
+                  error={formState.errors.end?.message && t(formState.errors.end.message)}
+                  {...register("end")}
+                />
+              </div>
             </div>
-            <div className="flex-1">
-              <ReminderField
-                allDay={false}
-                reminder={reminder}
-                reminderMode={reminderMode as ReminderMode | undefined}
-                reminderTime={reminderTime}
-                onReminderChange={(value) => setValue("reminder", value)}
-                onReminderModeChange={(value) => setValue("reminderMode", value)}
-                onReminderTimeChange={(value) => setValue("reminderTime", value)}
-              />
+          )}
+
+          {isAllDay ? (
+            <ReminderField
+              allDay
+              reminder={reminder}
+              reminderMode={reminderMode as ReminderMode | undefined}
+              reminderTime={reminderTime}
+              onReminderChange={(value) => setValue("reminder", value)}
+              onReminderModeChange={(value) => setValue("reminderMode", value)}
+              onReminderTimeChange={(value) => setValue("reminderTime", value)}
+            />
+          ) : (
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <FrequencyField
+                  allDay={false}
+                  value={frequency as EventFrequency}
+                  onChange={(value) => setValue("frequency", value)}
+                />
+              </div>
+              <div className="flex-1">
+                <ReminderField
+                  allDay={false}
+                  reminder={reminder}
+                  reminderMode={reminderMode as ReminderMode | undefined}
+                  reminderTime={reminderTime}
+                  onReminderChange={(value) => setValue("reminder", value)}
+                  onReminderModeChange={(value) => setValue("reminderMode", value)}
+                  onReminderTimeChange={(value) => setValue("reminderTime", value)}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <Textarea
-          label={t("eventForm.fields.description")}
-          maxLength={200}
-          error={formState.errors.description?.message && t(formState.errors.description.message)}
-          {...register("description")}
-        />
+          <Textarea
+            label={t("eventForm.fields.description")}
+            maxLength={200}
+            error={formState.errors.description?.message && t(formState.errors.description.message)}
+            {...register("description")}
+          />
 
-        <Textarea
-          label={t("eventForm.fields.note")}
-          maxLength={500}
-          error={formState.errors.note?.message && t(formState.errors.note.message)}
-          {...register("note")}
-        />
+          <Textarea
+            label={t("eventForm.fields.note")}
+            maxLength={500}
+            error={formState.errors.note?.message && t(formState.errors.note.message)}
+            {...register("note")}
+          />
 
-        {existingFiles.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {existingFiles.map((file) => (
-              <AttachmentChip
-                key={file.id}
-                filename={file.filename}
-                status="existing"
-                onRemove={() => setRemovedFileIds((current) => new Set(current).add(file.id))}
-              />
-            ))}
-          </div>
-        )}
+          {existingFiles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {existingFiles.map((file) => (
+                <AttachmentChip
+                  key={file.id}
+                  filename={file.filename}
+                  status="existing"
+                  onRemove={() => setRemovedFileIds((current) => new Set(current).add(file.id))}
+                />
+              ))}
+            </div>
+          )}
 
-        <AttachmentsField attachments={attachments} onAdd={addFiles} onRemove={removeFile} />
-      </div>
+          <AttachmentsField attachments={attachments} onAdd={addFiles} onRemove={removeFile} />
+        </div>
+      </fieldset>
     </Modal>
   );
 }

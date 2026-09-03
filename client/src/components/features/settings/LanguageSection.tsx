@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { SegmentedControl } from "../../ui";
 import type { AppLanguage, LanguageSectionProps } from "../../../types/settings";
 
-export function LanguageSection({ language, onChange }: LanguageSectionProps) {
+export function LanguageSection({ language, onChange, isPending }: LanguageSectionProps) {
   const { t } = useTranslation();
 
   return (
@@ -17,6 +17,7 @@ export function LanguageSection({ language, onChange }: LanguageSectionProps) {
         ]}
         value={language}
         onChange={onChange}
+        disabled={isPending}
         aria-label={t("settings.language.label")}
       />
     </div>

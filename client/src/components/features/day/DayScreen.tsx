@@ -52,6 +52,10 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<DayConfirmTarget | null>(null);
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
+  // Tracked locally rather than read off muteEventMutation.variables — a shared mutation's
+  // .variables only reflects the single most recent call, which misreports pending state
+  // if the user toggles mute on more than one event before the first request settles.
+  const [pendingMuteEventIds, setPendingMuteEventIds] = useState<Set<string>>(new Set());
   const requireSession = useRequireSession();
 
   const muteDayMutation = useMuteDayMutation();
@@ -91,11 +95,21 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
 
   function handleConfirm() {
     if (!confirmTarget) return;
-    if (confirmTarget.kind === "archiveDay") archiveDayMutation.mutate(dayOfWeek);
-    if (confirmTarget.kind === "clearDay") clearDayMutation.mutate(dayOfWeek);
-    if (confirmTarget.kind === "deleteEvent") deleteEventMutation.mutate(confirmTarget.eventId);
-    setConfirmTarget(null);
+    // Captured by reference so a stale success (from a target the user already dismissed
+    // and replaced) can't clear a newer, unrelated confirm dialog.
+    const target = confirmTarget;
+    const close = () => setConfirmTarget((current) => (current === target ? null : current));
+    if (target.kind === "archiveDay") archiveDayMutation.mutate(dayOfWeek, { onSuccess: close });
+    if (target.kind === "clearDay") clearDayMutation.mutate(dayOfWeek, { onSuccess: close });
+    if (target.kind === "deleteEvent") deleteEventMutation.mutate(target.eventId, { onSuccess: close });
   }
+
+  const pendingByKind: Record<DayConfirmTarget["kind"], boolean> = {
+    archiveDay: archiveDayMutation.isPending,
+    clearDay: clearDayMutation.isPending,
+    deleteEvent: deleteEventMutation.isPending,
+  };
+  const confirmPending = confirmTarget ? pendingByKind[confirmTarget.kind] : false;
 
   const openAllDayEvent = data.allDayEvents.find((event) => event.id === openAllDayId) ?? null;
   const isEmpty = data.timedEvents.length === 0 && data.allDayEvents.length === 0;
@@ -141,8 +155,22 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           onToggleExpand={(eventId) => setExpandedEventIds((prev) => ({ ...prev, [eventId]: !prev[eventId] }))}
           onMuteToggleEvent={(eventId) => {
             const event = data.timedEvents.find((item) => item.id === eventId);
-            if (event) muteEventMutation.mutate({ id: eventId, muted: !event.mutedUntilArchive });
+            if (!event) return;
+            setPendingMuteEventIds((current) => new Set(current).add(eventId));
+            muteEventMutation.mutate(
+              { id: eventId, muted: !event.mutedUntilArchive },
+              {
+                onSettled: () => {
+                  setPendingMuteEventIds((current) => {
+                    const next = new Set(current);
+                    next.delete(eventId);
+                    return next;
+                  });
+                },
+              },
+            );
           }}
+          isMuteTogglePending={(eventId) => pendingMuteEventIds.has(eventId)}
           onEditEvent={handleEditEvent}
           onDeleteEvent={(eventId) => requireSession(() => setConfirmTarget({ kind: "deleteEvent", eventId }))}
           onReorder={handleReorder}
@@ -176,6 +204,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
         open={confirmTarget !== null}
         cancelLabel={t("common.cancel")}
         danger
+        confirmPending={confirmPending}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmTarget(null)}
         {...(confirmTarget

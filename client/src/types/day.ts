@@ -42,6 +42,7 @@ export interface EventRowProps {
   isDraggable: boolean;
   onToggleExpand: (eventId: string) => void;
   onMuteToggle: (eventId: string) => void;
+  isMuteTogglePending: boolean;
   onEdit: (eventId: string) => void;
   onDelete: (eventId: string) => void;
 }
@@ -64,6 +65,7 @@ export interface EventListProps {
   expandedEventIds: Record<string, boolean>;
   onToggleExpand: (eventId: string) => void;
   onMuteToggleEvent: (eventId: string) => void;
+  isMuteTogglePending: (eventId: string) => boolean;
   onEditEvent: (eventId: string) => void;
   onDeleteEvent: (eventId: string) => void;
   onReorder: (eventId: string, newStart: string) => void;

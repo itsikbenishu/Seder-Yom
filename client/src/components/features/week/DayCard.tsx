@@ -1,10 +1,10 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ArchiveIcon, Button } from "../../ui";
+import { ArchiveIcon, Button, Spinner } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { DayCardProps } from "../../../types/week";
 
-export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: DayCardProps) {
+export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay, isMutePending }: DayCardProps) {
   const { t } = useTranslation();
   const dayNames = t("week.dayNames", { returnObjects: true }) as string[];
 
@@ -67,8 +67,10 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
             variant="ghost"
             className="min-w-0 whitespace-nowrap px-2"
             onClick={stopPropagationThen(() => onMuteDay(day.dayOfWeek))}
+            disabled={isMutePending}
           >
-            {day.isMuted ? "🔕" : "🔔"} {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
+            {isMutePending ? <Spinner className="h-3.5 w-3.5" /> : day.isMuted ? "🔕" : "🔔"}{" "}
+            {t(day.isMuted ? "week.unmuteDayAria" : "week.muteDayAria")}
           </Button>
           <Button
             variant="ghost"
