@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArchiveIcon, Button } from "../../ui";
+import { ArchiveIcon, Button, ConfirmDialog } from "../../ui";
 import { WeekGrid } from "./WeekGrid";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
+import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
+import { useArchiveDayMutation } from "../../../hooks/useArchiveDayMutation";
 import { useRequireSession } from "../../../hooks/useRequireSession";
 import { buildWeekViewData } from "../../../utils/buildWeekViewData";
 import { EventFormDialog } from "../eventForm";
@@ -25,10 +27,27 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
   const { t, i18n } = useTranslation();
   const { data: events } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
+  const unmuteDayMutation = useUnmuteDayMutation();
+  const archiveDayMutation = useArchiveDayMutation();
   const requireSession = useRequireSession();
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
+  const [confirmArchiveDay, setConfirmArchiveDay] = useState<number | null>(null);
 
   const weekViewData = buildWeekViewData(events ?? [], new Date());
+
+  function handleToggleMuteDay(dayOfWeek: number) {
+    const day = weekViewData.days.find((item) => item.dayOfWeek === dayOfWeek);
+    if (day?.isMuted) {
+      unmuteDayMutation.mutate(dayOfWeek);
+      return;
+    }
+    muteDayMutation.mutate(dayOfWeek);
+  }
+
+  function handleConfirmArchiveDay() {
+    if (confirmArchiveDay !== null) archiveDayMutation.mutate(confirmArchiveDay);
+    setConfirmArchiveDay(null);
+  }
 
   return (
     <div className="p-4">
@@ -53,14 +72,25 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
       <WeekGrid
         days={weekViewData.days}
         onSelectDay={onSelectDay}
-        onMuteDay={(dayOfWeek) => muteDayMutation.mutate(dayOfWeek)}
-        onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: false }))}
-        onArchiveDay={() => {}}
+        onMuteDay={handleToggleMuteDay}
+        onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
+        onArchiveDay={(dayOfWeek) => requireSession(() => setConfirmArchiveDay(dayOfWeek))}
       />
 
       {formTarget && (
         <EventFormDialog mode={formTarget} onClose={() => setFormTarget(null)} onSaved={() => setFormTarget(null)} />
       )}
+
+      <ConfirmDialog
+        open={confirmArchiveDay !== null}
+        title={t("day.confirm.archiveDayTitle")}
+        body={t("day.confirm.archiveDayBody")}
+        confirmLabel={t("day.confirm.archiveDayConfirm")}
+        cancelLabel={t("common.cancel")}
+        danger
+        onConfirm={handleConfirmArchiveDay}
+        onCancel={() => setConfirmArchiveDay(null)}
+      />
     </div>
   );
 }
