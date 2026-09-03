@@ -52,7 +52,7 @@ function applyEventBusinessRules(data: EventBusinessRuleInput, ctx: z.Refinement
   if (data.reminder && !data.reminderMode) {
     ctx.addIssue({ code: "custom", message: "validation.reminder.modeRequired", path: ["reminderMode"] });
   }
-  if (data.reminderMode === "time" && !data.reminderTime) {
+  if (data.reminder && data.reminderMode === "time" && !data.reminderTime) {
     ctx.addIssue({ code: "custom", message: "validation.reminder.timeRequired", path: ["reminderTime"] });
   }
 }
