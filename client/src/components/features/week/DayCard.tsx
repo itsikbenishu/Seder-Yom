@@ -26,7 +26,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
         onSelect(day.dayOfWeek);
       }}
       className={cn(
-        "rounded-xl border p-3.5 text-start transition-colors cursor-pointer",
+        "flex flex-col rounded-xl border p-3.5 text-start transition-colors cursor-pointer",
         day.isToday
           ? "bg-violet-100 dark:bg-violet-500/15 border-violet-300 dark:border-violet-500/40"
           : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
@@ -51,7 +51,7 @@ export function DayCard({ day, onSelect, onMuteDay, onAddEvent, onArchiveDay }: 
           )}
         </div>
       </div>
-      <div className="mt-2.5">
+      <div className="mt-2.5 flex-1">
         {day.nearestEvent ? (
           <p className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-200">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" aria-hidden="true" />
