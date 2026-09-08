@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState, useTransition } from "react";
 import type { ArchivedDay } from "@project/shared";
 import { GlobalLoadingBar } from "./components/ui";
+import { usePushRegistration } from "./hooks/usePushRegistration";
 import { hasNoSession, onSessionEnd } from "./services/queryClient";
 
 const ArchiveScreen = lazy(() =>
@@ -29,6 +30,9 @@ type Screen =
 function App() {
   const [screen, setScreen] = useState<Screen>({ screen: "week" });
   const [, startTransition] = useTransition();
+
+  // Refresh an already-granted push token and listen for foreground messages.
+  usePushRegistration();
 
   // No upfront auth check — Login only appears once a mutation 401s.
   useEffect(() => onSessionEnd(() => startTransition(() => setScreen({ screen: "login" }))), [startTransition]);

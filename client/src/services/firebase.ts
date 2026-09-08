@@ -10,6 +10,15 @@ const firebaseConfig = {
 
 export const firebaseVapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
 
+// The service worker reads its config from these query params (see the file in
+// public/) so the values live only in .env, not duplicated in the worker script.
+export const firebaseSwUrl = `/firebase-messaging-sw.js?${new URLSearchParams({
+  apiKey: firebaseConfig.apiKey ?? "",
+  projectId: firebaseConfig.projectId ?? "",
+  messagingSenderId: firebaseConfig.messagingSenderId ?? "",
+  appId: firebaseConfig.appId ?? "",
+}).toString()}`;
+
 let app: FirebaseApp | undefined;
 let messaging: Messaging | null | undefined;
 

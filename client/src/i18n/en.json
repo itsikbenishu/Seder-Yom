@@ -131,7 +131,11 @@
       "label": "Notifications",
       "browser": "Browser",
       "mobile": "Mobile",
-      "note": "Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear inside the app itself."
+      "note": "Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear inside the app itself.",
+      "blocked": "Notifications are blocked for this site. Allow them in your browser settings to receive alerts.",
+      "unsupported": "This browser can't receive push notifications.",
+      "deviceMismatch": "This device won't receive alerts for the selected channel - open the app on a matching device.",
+      "enableError": "Couldn't enable notifications on this device."
     },
     "signOut": {
       "label": "Account",

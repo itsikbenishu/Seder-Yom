@@ -8,6 +8,7 @@ import { useGoogleCalendarStatus } from "../../../hooks/useGoogleCalendarStatus"
 import { useDisconnectGoogleCalendarMutation } from "../../../hooks/useDisconnectGoogleCalendarMutation";
 import { useUserPreferences } from "../../../hooks/useUserPreferences";
 import { useUpdateUserPreferencesMutation } from "../../../hooks/useUpdateUserPreferencesMutation";
+import { usePushRegistration } from "../../../hooks/usePushRegistration";
 import { useSignOutMutation } from "../../../hooks/useSignOutMutation";
 import type { SettingsScreenProps } from "../../../types/settings";
 import { AppearanceSection } from "./AppearanceSection";
@@ -28,6 +29,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
 
   const { data: userPreferences } = useUserPreferences();
   const updatePreferencesMutation = useUpdateUserPreferencesMutation();
+  const { permission: pushPermission, enable: enablePush } = usePushRegistration();
 
   const signOutMutation = useSignOutMutation();
   const requireSession = useRequireSession();
@@ -66,7 +68,11 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         />
         <NotificationsSection
           channel={userPreferences?.channels[0] ?? "browser"}
-          onChange={(channel) => updatePreferencesMutation.mutate({ channels: [channel] })}
+          permission={pushPermission}
+          onChange={(channel) => {
+            updatePreferencesMutation.mutate({ channels: [channel] });
+            enablePush();
+          }}
           isPending={updatePreferencesMutation.isPending}
         />
         {!hasNoSession() && (

@@ -1,4 +1,5 @@
 import type { AppLanguage, AppTheme, GoogleCalendarConnectionStatus, NotificationChannel } from "@project/shared";
+import type { PushPermission } from "../hooks/usePushRegistration";
 
 export type { AppLanguage, AppTheme, NotificationChannel };
 
@@ -29,6 +30,7 @@ export interface GoogleCalendarSectionProps {
 export interface NotificationsSectionProps {
   channel: NotificationChannel;
   onChange: (channel: NotificationChannel) => void;
+  permission: PushPermission;
   isPending?: boolean;
 }
 
