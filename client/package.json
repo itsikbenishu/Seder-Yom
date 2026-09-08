@@ -17,6 +17,7 @@
     "@project/shared": "*",
     "@tanstack/react-query": "^5.101.4",
     "clsx": "^2.1.1",
+    "firebase": "^12.18.0",
     "i18next": "^26.3.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
