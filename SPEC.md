@@ -293,6 +293,8 @@ GET    /gcal/events                   read-only
 POST   /files/upload                  upload a file, returns id; eventId set later via fileIds on events
 POST   /preferences                   sets language/theme/reminderEnabled/channels (any subset)
 GET    /preferences                   returns the caller's UserPreferences
+POST   /devices                       { token, platform } — register/refresh an FCM device token
+DELETE /devices                       { token } — remove a device token (called on sign-out)
 ```
 All responses: `{ success: true, data }` or `{ success: false, error: { message, code } }`.
 

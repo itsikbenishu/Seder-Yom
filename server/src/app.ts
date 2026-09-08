@@ -13,6 +13,7 @@ import { eventsRouter } from "./routes/events.routes.js";
 import { filesRouter } from "./routes/files.routes.js";
 import { googleCalendarRouter } from "./routes/googleCalendar.routes.js";
 import { preferencesRouter } from "./routes/preferences.routes.js";
+import { pushDevicesRouter } from "./routes/pushDevices.routes.js";
 
 // pino-http ships as CommonJS without an "exports" map; under real Node ESM (this
 // package has "type": "module"), `import pinoHttp from "pino-http"` resolves to the
@@ -42,5 +43,6 @@ app.use("/api/v1/archive", archiveRouter);
 app.use("/api/v1/files", filesRouter);
 app.use("/api/v1/gcal", googleCalendarRouter);
 app.use("/api/v1/preferences", preferencesRouter);
+app.use("/api/v1/devices", pushDevicesRouter);
 
 app.use(errorHandlerMiddleware);
