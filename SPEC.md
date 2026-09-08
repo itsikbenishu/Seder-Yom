@@ -157,6 +157,21 @@ undetected) and `theme` to `prefers-color-scheme`. Once signed in, the
 stored `UserPreferences` values take over and apply everywhere, including
 future sessions on other devices.
 
+### PushDevice (table: `push_devices`)
+```
+token: string              # FCM registration token, primary key
+user_id: UUID              # FK -> auth.users.id, ON DELETE CASCADE
+platform: "browser" | "mobile"   # derived client-side from the user agent
+userAgent: string | null
+createdAt, lastSeenAt: timestamp
+```
+One row per registered device token. The client obtains the token via the
+Firebase Messaging SDK after the user grants notification permission and
+`POST`s it here; it's removed on sign-out. The notification worker (§10)
+looks up a user's tokens filtered by the `channels` value in
+`UserPreferences` (a single choice), so a user whose `platform` never
+matches their chosen channel simply receives no push.
+
 ## 4. Validation Rules
 | Field | Rule | Error (He) | Error (En) |
 |---|---|---|---|

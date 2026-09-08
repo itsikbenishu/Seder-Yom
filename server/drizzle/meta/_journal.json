@@ -50,6 +50,13 @@
       "when": 1787900300000,
       "tag": "0006_rename_notification_preferences_to_user_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788875649468,
+      "tag": "0007_wooden_maria_hill",
+      "breakpoints": true
     }
   ]
 }
