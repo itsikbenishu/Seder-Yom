@@ -7,4 +7,5 @@ export * from "./schemas/archive.schema.js";
 export * from "./schemas/apiResponse.schema.js";
 export * from "./schemas/reminderJob.schema.js";
 export * from "./schemas/googleCalendar.schema.js";
+export * from "./schemas/pushDevice.schema.js";
 export * from "./utils/weekDates.js";
