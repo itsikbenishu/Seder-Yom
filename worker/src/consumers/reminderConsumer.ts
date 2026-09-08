@@ -57,7 +57,7 @@ async function handleMessage(channel: Channel, msg: ConsumeMessage): Promise<voi
     }
 
     try {
-      await sendPushNotification({ userId: job.userId, title: job.eventTitle });
+      await sendPushNotification({ userId: job.userId, title: job.eventTitle, channels: job.channels });
       logger.info(logCtx, "Reminder push sent");
     } catch (sendErr) {
       if (retryCount < MAX_SEND_RETRIES) {
