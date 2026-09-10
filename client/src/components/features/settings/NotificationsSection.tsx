@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { SegmentedControl } from "../../ui";
+import { isMobileUserAgent } from "../../../utils/userAgent";
 import type { NotificationChannel, NotificationsSectionProps } from "../../../types/settings";
-
-const isMobileUA = () => /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 export function NotificationsSection({ channel, onChange, permission, isPending }: NotificationsSectionProps) {
   const { t } = useTranslation();
@@ -12,7 +11,7 @@ export function NotificationsSection({ channel, onChange, permission, isPending 
   let hintKey = "settings.notifications.note";
   if (permission === "denied") hintKey = "settings.notifications.blocked";
   else if (permission === "unsupported") hintKey = "settings.notifications.unsupported";
-  else if ((channel === "mobile") !== isMobileUA()) hintKey = "settings.notifications.deviceMismatch";
+  else if ((channel === "mobile") !== isMobileUserAgent()) hintKey = "settings.notifications.deviceMismatch";
 
   return (
     <div className="flex flex-col items-start gap-1.5">

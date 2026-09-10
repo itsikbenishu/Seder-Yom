@@ -13,11 +13,12 @@ function getApp(): admin.app.App {
   return app;
 }
 
-// FCM error codes that mean the token is permanently dead — safe to delete.
+// FCM error codes that mean this specific token is permanently dead — safe to
+// delete. Deliberately excludes messaging/invalid-argument: that's a payload
+// error, and pruning on it would wipe every token the moment a bad payload ships.
 const PRUNE_CODES = new Set([
   "messaging/registration-token-not-registered",
   "messaging/invalid-registration-token",
-  "messaging/invalid-argument",
 ]);
 
 const MULTICAST_LIMIT = 500;
