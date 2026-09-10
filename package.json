@@ -6,5 +6,9 @@
     "client",
     "server",
     "worker"
-  ]
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "check-types": "npm run check-types --workspaces --if-present"
+  }
 }
