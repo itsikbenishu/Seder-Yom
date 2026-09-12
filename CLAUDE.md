@@ -38,7 +38,7 @@ metadata:
   decision is plain Tailwind with a native `dark:` variant theme, per the
   design README's "Design Tokens" section.
 * **Atomic UI Architecture:** Reusable UI primitives (e.g., `Button`, `Input`, `Modal`, `SegmentedControl`) reside in `client/src/components/ui/`. Build these **first**, from the design README's token section, before building any screen. Every feature component must compose these base primitives rather than writing raw HTML tags or one-off styling.
-* **Data Fetching (TanStack Query v5+):** Prohibit `useEffect` for data fetching. Use `useQuery` and `useMutation` exclusively. Use query key factories and handle optimistic updates properly (`useOptimistic` for archive/event creation per SPEC.md).
+* **Data Fetching (TanStack Query v5+):** Prohibit `useEffect` for data fetching. Use `useQuery` and `useMutation` exclusively. Use query key factories and handle optimistic updates properly (`onMutate` cache updates or `useOptimistic`, per SPEC.md §12).
 * **Forms & Validation:** All forms use `react-hook-form` with `zodResolver`, against the shared schemas in `/shared`. Derive TypeScript types directly from schemas (`type FormInput = z.infer<typeof schema>`).
 * **Drag & Drop:** Encapsulate `@dnd-kit` DnD state and event handlers inside custom hooks (e.g., `useScheduleDnd`). Google-synced events (`gcal: true`) are never draggable.
 * **Styling & RTL:** Use utility-first Tailwind classes merged via `cn()` (`clsx` + `tailwind-merge`). Zero hardcoded UI strings; use `t('namespace.key')`. Use logical CSS properties (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) for automatic RTL/LTR mirroring; mirror directional icons explicitly.

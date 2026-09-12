@@ -81,10 +81,12 @@ remove the Storage objects explicitly as part of the same operation.
 schema with a discriminated union, not just the base enums above):
 - **Timed event** (`allDay: false`): `freq` ∈ `once | daily | weekly`. `lead`
   ∈ `15m | 30m | 1h | 1d | time` (full offset menu).
-- **All-day event** (`allDay: true`): `freq` ∈ `daily | weekly` only — **no
-  `once`**; form defaults to `daily` when the user opens it for an all-day
-  event. `lead` is always effectively `time` — a fixed clock-time picker
-  (`leadTime`), with **no offset options** (15m/30m/1h/1d are not offered).
+- **All-day event** (`allDay: true`): `freq` ∈ `once | daily | weekly` — same
+  set as timed events (a holiday or a one-off day off is the common case, not
+  a daily repeat); form defaults to `once` when the user opens it for an
+  all-day event. `lead` is always effectively `time` — a fixed clock-time
+  picker (`leadTime`), with **no offset options** (15m/30m/1h/1d are not
+  offered).
 
 **Muting.** Two independent actions, both act on timed (non-all-day) events
 only — all-day events have no mute control:
@@ -142,7 +144,7 @@ events: Event[]
 user_id: UUID
 language: "he" | "en"      # default "he"
 theme: "light" | "dark" | "system"   # default "system"
-reminderEnabled: bool
+reminderEnabled: bool      # reserved; not currently surfaced in the Settings UI
 channels: string[]         # "browser" | "mobile" — pick one, default "browser"
 ```
 Account-level settings, keyed by `user_id` — persisted server-side, not
@@ -317,7 +319,9 @@ Job format:
 - All system/error strings: localized both languages, required
 - RTL: `dir="rtl"` (he) / `dir="ltr"` (en) — use logical CSS properties
   (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic
-- Directional icons (chevrons) must mirror in RTL
+- Directional icons (chevrons) must mirror in RTL — applies to icon
+  glyphs/SVGs; plain text arrow characters used as nav affordances are
+  acceptable as-is and need no mirroring
 
 ## 12. Performance & Optimization
 **Frontend:**
@@ -327,8 +331,9 @@ Job format:
   of the 8 screens (§5) loads as its own chunk, not one bundle.
 - `useTransition` for navigation between screens (Week↔Day↔Archive) so the
   UI stays responsive during the transition.
-- `useOptimistic` for immediate feedback on archive/mute/create actions
-  (§3 Muting, §6 Archive) — the UI updates before the server confirms.
+- Optimistic UI for mute/archive/create actions (§3 Muting, §6 Archive) — the
+  UI updates before the server confirms, via TanStack Query `onMutate` cache
+  updates or `useOptimistic` (implementer's choice).
 - Archive lazy-loading (§6): loaded pages cached in React state, no refetch
   on scroll up/down; search filters the client-side cache first.
 
@@ -345,7 +350,8 @@ Job format:
 
 **Overall targets:** page load < 2s. JWT in httpOnly cookie, RLS on all
 Supabase tables, all inputs Zod-validated. Responsive: mobile <640px (1 col)
-/ tablet 640–1024px (3–4 col) / desktop >1024px (7-col week grid).
+/ tablet 640–1024px (3–4 col) / desktop >1024px (4-col week grid, matching
+the design handoff).
 
 ## 13. Session Expiry & Re-authentication
 Since the JWT lives in an httpOnly cookie, client-side JS can't read it or
