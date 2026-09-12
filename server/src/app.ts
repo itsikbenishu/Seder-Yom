@@ -11,6 +11,7 @@ import { archiveRouter } from "./routes/archive.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { eventsRouter } from "./routes/events.routes.js";
 import { filesRouter } from "./routes/files.routes.js";
+import { probesRouter } from "./routes/probes.routes.js";
 import { googleCalendarRouter } from "./routes/googleCalendar.routes.js";
 import { preferencesRouter } from "./routes/preferences.routes.js";
 import { pushDevicesRouter } from "./routes/pushDevices.routes.js";
@@ -36,6 +37,8 @@ app.use(
     genReqId: (req) => (req as unknown as { correlationId: string }).correlationId,
   }),
 );
+
+app.use(probesRouter);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventsRouter);

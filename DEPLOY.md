@@ -10,7 +10,7 @@ SederYom self-hosts with Docker Compose. Two things stay external and managed:
 | Service | Port | Notes |
 |---|---|---|
 | `client` | `8080` → 80 | nginx serving the built SPA; proxies `/api/v1` to `server` |
-| `server` | `3000` | Express API (`tsx`, no build step) |
+| `server` | `3000` | Express API (`tsx`, no build step); `/healthz` liveness, `/readyz` checks Supabase DB + RabbitMQ |
 | `worker` | — | RabbitMQ consumer + daily cleanup cron |
 | `rabbitmq` | `5672`, `15672` | management UI on 15672 (guest/guest) |
 | `redis` | `6379` | present in compose; not currently used by app code |
@@ -81,5 +81,3 @@ docker compose up -d --build
 
 - No CI. Run `npm test` and `npm run check-types` before pushing.
 - No managed-PaaS config (Fly/Render/etc.) — this is the self-host path only.
-- `/healthz` and `/readyz` endpoints are not implemented yet, so compose has no
-  app-level healthchecks (only RabbitMQ has one).
