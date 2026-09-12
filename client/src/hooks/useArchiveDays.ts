@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { archiveKeys } from "../services/queryKeys";
 import { getArchive } from "../services/archive.api";
+import { useDebouncedValue } from "./useDebouncedValue";
 import type { ArchiveViewData } from "../types/archive";
 
 const REVEAL_STEP = 12;
@@ -23,14 +24,17 @@ export function useArchiveDays(search: string): UseArchiveDaysResult {
     setRevealCount(REVEAL_STEP);
   }
 
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
+
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
-    queryKey: archiveKeys.list(),
-    queryFn: ({ pageParam }) => getArchive({ offset: pageParam }),
+    queryKey: archiveKeys.list(debouncedSearch),
+    queryFn: ({ pageParam }) => getArchive({ offset: pageParam, search: debouncedSearch }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.reduce((sum, page) => sum + page.days.length, 0);
       return lastPage.has_more ? loaded : undefined;
     },
+    placeholderData: keepPreviousData,
   });
 
   const flattenedDays = data?.pages.flatMap((page) => page.days) ?? [];
