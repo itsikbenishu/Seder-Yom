@@ -184,7 +184,15 @@ export async function createEvent(userId: string, input: CreateEventInput, corre
   return toApiEvent(row);
 }
 
-export async function updateEvent(userId: string, id: string, patch: UpdateEventInput): Promise<Event> {
+// Changing any of these moves the reminder's due instant, so any prior delivery marker is stale.
+const REMINDER_INSTANT_FIELDS = ["dayOfWeek", "start", "reminderMode", "reminderTime"] as const;
+
+export async function updateEvent(
+  userId: string,
+  id: string,
+  patch: UpdateEventInput,
+  correlationId: string,
+): Promise<Event> {
   const [existing] = await db
     .select()
     .from(events)
@@ -195,13 +203,19 @@ export async function updateEvent(userId: string, id: string, patch: UpdateEvent
   }
 
   const { fileIds, ...patchFields } = patch;
-  const merged = eventWriteSchema.parse({ ...toWritableFields(existing), ...patchFields });
+  const existingWritable = toWritableFields(existing);
+  const merged = eventWriteSchema.parse({ ...existingWritable, ...patchFields });
   const { fileIds: _mergedFileIds, ...mergedFields } = merged;
+
+  const instantChanged = REMINDER_INSTANT_FIELDS.some((field) => existingWritable[field] !== mergedFields[field]);
+  // Turning reminder back on (with the instant unchanged) needs a fresh job too, but must NOT
+  // clear reminderSentFor — an already-delivered past instant would otherwise re-send.
+  const reminderFlagChanged = existingWritable.reminder !== mergedFields.reminder;
 
   const row = await db.transaction(async (tx) => {
     const [updated] = await tx
       .update(events)
-      .set(mergedFields)
+      .set(instantChanged ? { ...mergedFields, reminderSentFor: null } : mergedFields)
       .where(and(eq(events.id, id), eq(events.userId, userId)))
       .returning();
 
@@ -211,6 +225,24 @@ export async function updateEvent(userId: string, id: string, patch: UpdateEvent
 
     return updated;
   });
+
+  // Re-enqueue when the instant moved or reminder was (re)enabled; the worker re-checks reminder/mute/existence at send time.
+  if ((instantChanged || reminderFlagChanged) && merged.reminder) {
+    const reminderTime = computeReminderTime({
+      dayOfWeek: merged.dayOfWeek,
+      start: merged.start,
+      reminderMode: merged.reminderMode ?? "time",
+      reminderTime: merged.reminderTime,
+    });
+
+    await publishReminderJob({
+      eventId: row.id,
+      userId,
+      eventTitle: row.title,
+      reminderTime,
+      correlationId,
+    });
+  }
 
   return toApiEvent(row);
 }

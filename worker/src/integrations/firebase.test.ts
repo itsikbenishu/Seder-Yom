@@ -39,21 +39,21 @@ beforeEach(() => {
 describe("sendPushNotification", () => {
   it("does nothing when the user has no registered tokens", async () => {
     findDeviceTokens.mockResolvedValue([]);
-    await expect(sendPushNotification(input)).resolves.toBeUndefined();
+    await expect(sendPushNotification(input)).resolves.toEqual({ sent: 0, pruned: 0 });
     expect(sendEachForMulticast).not.toHaveBeenCalled();
   });
 
   it("sends and prunes nothing when every token succeeds", async () => {
     findDeviceTokens.mockResolvedValue(["t1", "t2"]);
     sendEachForMulticast.mockResolvedValue(batchResponse([ok, ok]));
-    await expect(sendPushNotification(input)).resolves.toBeUndefined();
+    await expect(sendPushNotification(input)).resolves.toEqual({ sent: 2, pruned: 0 });
     expect(deleteDeviceTokens).not.toHaveBeenCalled();
   });
 
   it("prunes a token FCM reports as unregistered", async () => {
     findDeviceTokens.mockResolvedValue(["t1", "t2"]);
     sendEachForMulticast.mockResolvedValue(batchResponse([ok, fail("messaging/registration-token-not-registered")]));
-    await sendPushNotification(input);
+    await expect(sendPushNotification(input)).resolves.toEqual({ sent: 1, pruned: 1 });
     expect(deleteDeviceTokens).toHaveBeenCalledWith(["t2"]);
   });
 
@@ -75,6 +75,6 @@ describe("sendPushNotification", () => {
   it("treats a partial success as delivered (no throw)", async () => {
     findDeviceTokens.mockResolvedValue(["t1", "t2"]);
     sendEachForMulticast.mockResolvedValue(batchResponse([ok, fail("messaging/internal-error")]));
-    await expect(sendPushNotification(input)).resolves.toBeUndefined();
+    await expect(sendPushNotification(input)).resolves.toEqual({ sent: 1, pruned: 0 });
   });
 });

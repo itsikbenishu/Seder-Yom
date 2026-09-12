@@ -1,4 +1,4 @@
-import { pgTable, uuid, smallint, varchar, time, boolean, pgEnum, index, check, pgPolicy } from "drizzle-orm/pg-core";
+import { pgTable, uuid, smallint, varchar, time, timestamp, boolean, pgEnum, index, check, pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { authUsers, authenticatedRole, authUid } from "drizzle-orm/supabase";
 
@@ -22,10 +22,11 @@ export const events = pgTable("events", {
   reminderTime: time(),
   googleCalendarSynced: boolean().notNull().default(false),
   mutedUntilArchive: boolean().notNull().default(false),
+  // reminder instant the worker last delivered a push for — dedups stale/fresh jobs after a timing edit
+  reminderSentFor: timestamp({ withTimezone: true }),
 }, (t) => [
   index("events_user_day_idx").on(t.userId, t.dayOfWeek),
   check("events_day_of_week_range", sql`${t.dayOfWeek} >= 0 AND ${t.dayOfWeek} <= 6`),
-  check("events_all_day_frequency", sql`${t.allDay} = false OR ${t.frequency} <> 'once'`),
   check("events_all_day_reminder_mode", sql`${t.allDay} = false OR ${t.reminderMode} IS NULL OR ${t.reminderMode} = 'time'`),
   check("events_all_day_muted", sql`${t.allDay} = false OR ${t.mutedUntilArchive} = false`),
   pgPolicy("events_crud_own_rows", {

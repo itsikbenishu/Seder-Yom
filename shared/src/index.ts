@@ -9,3 +9,4 @@ export * from "./schemas/reminderJob.schema.js";
 export * from "./schemas/googleCalendar.schema.js";
 export * from "./schemas/pushDevice.schema.js";
 export * from "./utils/weekDates.js";
+export * from "./utils/reminderTime.js";

@@ -24,7 +24,7 @@ export async function postEvent(req: Request, res: Response): Promise<void> {
 
 export async function patchEvent(req: Request<{ id: string }>, res: Response): Promise<void> {
   const patch = req.body as UpdateEventInput;
-  const result = await updateEvent(req.userId, req.params.id, patch);
+  const result = await updateEvent(req.userId, req.params.id, patch, req.correlationId);
   sendSuccess(res, result);
 }
 

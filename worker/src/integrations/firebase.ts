@@ -30,30 +30,36 @@ interface SendPushNotificationInput {
   channels: string[];
 }
 
-export async function sendPushNotification(input: SendPushNotificationInput): Promise<void> {
+export interface SendPushResult {
+  sent: number;
+  pruned: number;
+}
+
+export async function sendPushNotification(input: SendPushNotificationInput): Promise<SendPushResult> {
   const tokens = await findDeviceTokens(input.userId, input.channels);
   if (tokens.length === 0) {
-    logger.info({ userId: input.userId, channels: input.channels }, "Push skipped: no registered devices");
-    return;
+    return { sent: 0, pruned: 0 };
   }
 
   const messaging = admin.messaging(getApp());
   const notification = { title: input.title, body: input.body };
+  // Keep the notification on screen until dismissed — it auto-dismisses after a few seconds by default otherwise.
+  const webpush: admin.messaging.WebpushConfig = { notification: { ...notification, requireInteraction: true } };
 
   let successCount = 0;
   const deadTokens: string[] = [];
-  let transientFailure = false;
+  const failures: string[] = [];
 
   for (let i = 0; i < tokens.length; i += MULTICAST_LIMIT) {
     const batch = tokens.slice(i, i + MULTICAST_LIMIT);
-    const res = await messaging.sendEachForMulticast({ tokens: batch, notification });
+    const res = await messaging.sendEachForMulticast({ tokens: batch, notification, webpush });
     successCount += res.successCount;
 
     res.responses.forEach((r, idx) => {
       if (r.success) return;
       const code = r.error?.code ?? "";
       if (PRUNE_CODES.has(code)) deadTokens.push(batch[idx]);
-      else transientFailure = true;
+      else failures.push(`${code}: ${r.error?.message ?? "unknown"}`);
     });
   }
 
@@ -62,9 +68,16 @@ export async function sendPushNotification(input: SendPushNotificationInput): Pr
     logger.info({ userId: input.userId, pruned: deadTokens.length }, "Pruned unregistered device tokens");
   }
 
+  // Surface the real FCM reason (credential/project mismatch, bad payload, etc.) — otherwise a failed send is opaque.
+  if (failures.length > 0) {
+    logger.warn({ userId: input.userId, failures: [...new Set(failures)] }, "FCM rejected one or more sends");
+  }
+
   // Nothing got through and the failures weren't just dead tokens — let the
   // consumer retry / DLQ. A partial success counts as delivered.
-  if (successCount === 0 && transientFailure) {
+  if (successCount === 0 && failures.length > 0) {
     throw new Error("All push sends failed with a retryable error");
   }
+
+  return { sent: successCount, pruned: deadTokens.length };
 }

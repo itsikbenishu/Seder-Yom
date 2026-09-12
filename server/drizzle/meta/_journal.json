@@ -57,6 +57,20 @@
       "when": 1788875649468,
       "tag": "0007_wooden_maria_hill",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789050472051,
+      "tag": "0008_chief_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789163588879,
+      "tag": "0009_optimal_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

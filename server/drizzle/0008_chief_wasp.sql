@@ -1,0 +1,1 @@
+ALTER TABLE "events" ADD COLUMN "reminder_sent_for" timestamp with time zone;
