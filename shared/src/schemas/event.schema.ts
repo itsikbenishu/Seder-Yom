@@ -2,7 +2,8 @@ import { z } from "zod";
 import { dayOfWeekSchema, eventFilesSchema, MAX_FILES_PER_EVENT, timeStringSchema } from "./common.schema.js";
 
 export const eventFrequencySchema = z.enum(["once", "daily", "weekly"]);
-export const allDayEventFrequencySchema = z.enum(["daily", "weekly"]);
+// All-day events default to "once" (a holiday, a one-off day off) but can still repeat.
+export const allDayEventFrequencySchema = z.enum(["once", "daily", "weekly"]);
 
 export const reminderModeSchema = z.enum(["15m", "30m", "1h", "1d", "time"]);
 

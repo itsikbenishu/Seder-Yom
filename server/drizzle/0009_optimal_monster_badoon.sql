@@ -1,0 +1,1 @@
+ALTER TABLE "events" DROP CONSTRAINT "events_all_day_frequency";

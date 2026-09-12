@@ -34,9 +34,10 @@ describe("createEventSchema — discriminated union on allDay", () => {
     expect(parsed).toMatchObject({ allDay: true, reminderMode: "time" });
   });
 
-  it("rejects frequency 'once' for an all-day event", () => {
-    const result = createEventSchema.safeParse({ ...allDay, frequency: "once" });
-    expect(result.success).toBe(false);
+  it("accepts frequency once/daily/weekly for an all-day event", () => {
+    for (const frequency of ["once", "daily", "weekly"] as const) {
+      expect(createEventSchema.safeParse({ ...allDay, frequency }).success).toBe(true);
+    }
   });
 
   it("accepts frequency once/daily/weekly for a timed event", () => {

@@ -14,7 +14,7 @@ export interface EventFormDialogProps {
   onSaved: () => void;
 }
 
-/** `allDay` narrows the option set: timed offers once|daily|weekly, all-day drops "once". */
+/** Both timed and all-day events offer once|daily|weekly. */
 export interface FrequencyFieldProps {
   allDay: boolean;
   value: EventFrequency;

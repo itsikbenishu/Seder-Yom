@@ -16,7 +16,7 @@ export function createDefaultEventFormValues(dayOfWeek: number, allDay: boolean)
   };
 
   if (allDay) {
-    return { ...shared, allDay: true, frequency: "daily", reminderMode: "time", reminderTime: undefined };
+    return { ...shared, allDay: true, frequency: "once", reminderMode: "time", reminderTime: undefined };
   }
 
   return { ...shared, allDay: false, frequency: "once", reminderMode: undefined, reminderTime: undefined };
