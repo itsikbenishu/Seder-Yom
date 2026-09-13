@@ -45,9 +45,11 @@ export function AllDayEventDetail({ event, onClose, onEdit, onDelete }: AllDayEv
             {t("day.allDay.reminderAt", { time: event.reminderTime })}
           </span>
         )}
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-          {t(event.frequency === "daily" ? "day.allDay.repeatDaily" : "day.allDay.repeatWeekly")}
-        </span>
+        {event.frequency !== "once" && (
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            {t(event.frequency === "daily" ? "day.allDay.repeatDaily" : "day.allDay.repeatWeekly")}
+          </span>
+        )}
       </div>
 
       {event.description && (
