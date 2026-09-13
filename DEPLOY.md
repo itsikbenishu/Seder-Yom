@@ -77,7 +77,28 @@ docker compose up -d --build
 5. Revoke the notification permission (or delete the `push_devices` row) and
    create another reminder — the next send should log a prune, not an error.
 
+## 5. Alternative: split hosting (Vercel + Render + CloudAMQP)
+
+A lighter path that avoids running docker-compose yourself, at the cost of tying the
+worker's fate to the server's:
+
+| Service | Where | Notes |
+|---|---|---|
+| `client` | Vercel | Root Directory = `client`, framework preset Vite. Env vars are the `VITE_*` block above, with `VITE_API_URL` set to the Render server's public URL + `/api/v1` (no nginx proxy here, so it must be an absolute URL). |
+| `server` + worker (inline) | Render (Web Service) | Env vars are the full `server/.env` block above, **plus** `RUN_WORKER_INLINE=true` and every var from `worker/.env.example` (notably `FIREBASE_SERVICE_ACCOUNT_JSON`) — required because the worker's consumer + cron now run inside this same process (`server/src/index.ts`). `CORS_ORIGIN` and `GOOGLE_OAUTH_REDIRECT_URI` must match this Render service's own public URL, with no trailing slash. `AUTH_COOKIE_SAME_SITE=none` is also required — client and server are on different sites here, so the default `lax` auth cookie never comes back on cross-site requests. |
+| RabbitMQ | CloudAMQP (managed, free "Little Lemur" plan works) | `RABBITMQ_URL` is the `amqps://` connection string CloudAMQP gives you — same value goes on the Render service. |
+
+Render's free tier spins a Web Service down after 15 minutes without incoming HTTP
+traffic, which would silently kill the inline worker's RabbitMQ connection along with
+the API. Point an external uptime monitor (e.g. UptimeRobot's free tier) at
+`https://<render-service>/healthz` on a ~10-minute interval to keep it warm.
+
+This trades process isolation for zero extra infra: a crash in the reminder consumer
+can now take the API down with it and vice versa, unlike the docker-compose path above
+where `server` and `worker` are independent containers. Migration (§2) still runs the
+same way, pointed at the same Supabase project — it doesn't care which topology serves
+traffic afterward.
+
 ## Not covered here
 
 - No CI. Run `npm test` and `npm run check-types` before pushing.
-- No managed-PaaS config (Fly/Render/etc.) — this is the self-host path only.

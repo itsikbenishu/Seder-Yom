@@ -25,6 +25,13 @@ const envSchema = z.object({
   GOOGLE_OAUTH_CLIENT_ID: z.string().min(1),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string().min(1),
   GOOGLE_OAUTH_REDIRECT_URI: z.string().min(1),
+  // True only where no separate worker deployment exists (see src/index.ts); also requires worker's env vars.
+  RUN_WORKER_INLINE: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
+  // "none" when client and server are on different sites (e.g. Vercel + Render) — otherwise the auth cookie never comes back on cross-site requests.
+  AUTH_COOKIE_SAME_SITE: z.enum(["lax", "none"]).default("lax"),
 });
 
 export const env = envSchema.parse(process.env);

@@ -4,11 +4,11 @@ import { ACCESS_TOKEN_COOKIE, login, verify } from "../services/auth.service.js"
 import { sendSuccess } from "../utils/apiResponse.js";
 import { env } from "../config/env.js";
 
-// SameSite=None without Secure gets silently dropped by browsers; Lax works fine here.
+// SameSite=None requires Secure or browsers silently drop the cookie — force it whenever cross-site cookies are on.
 const authCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: env.NODE_ENV === "production" || env.AUTH_COOKIE_SAME_SITE === "none",
+  sameSite: env.AUTH_COOKIE_SAME_SITE,
   path: "/",
 };
 

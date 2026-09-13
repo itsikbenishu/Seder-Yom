@@ -9,9 +9,10 @@ COPY shared/package.json ./shared/
 COPY server/package.json ./server/
 COPY client/package.json ./client/
 COPY worker/package.json ./worker/
-RUN npm ci --include-workspace-root --workspace=shared --workspace=server
+RUN npm ci --include-workspace-root --workspace=shared --workspace=worker --workspace=server
 
 COPY shared/ ./shared/
+COPY worker/ ./worker/
 COPY server/ ./server/
 
 WORKDIR /app/server
