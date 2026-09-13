@@ -17,7 +17,10 @@ export function usePushRegistration(): { permission: PushPermission; enable: () 
 
   const enable = useCallback(() => {
     syncPushRegistration(true)
-      .then(setPermission)
+      .then((result) => {
+        setPermission(result);
+        if (result === "denied") showToast(t("settings.notifications.blocked"), "error");
+      })
       .catch(() => showToast(t("settings.notifications.enableError"), "error"));
   }, [showToast, t]);
 
