@@ -71,7 +71,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           permission={pushPermission}
           onChange={(channel) => {
             updatePreferencesMutation.mutate({ channels: [channel] });
-            enablePush();
+            if (channel === "browser") enablePush();
           }}
           isPending={updatePreferencesMutation.isPending}
         />

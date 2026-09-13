@@ -88,6 +88,7 @@
       "daily": "Daily",
       "weekly": "Weekly"
     },
+    "reminderPushSetupHint": "To receive this reminder, set up notifications in Settings.",
     "reminder": {
       "toggleLabel": "Reminder",
       "off": "Off",

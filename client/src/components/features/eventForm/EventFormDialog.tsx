@@ -8,6 +8,9 @@ import { Button, Input, Modal, Spinner, Textarea } from "../../ui";
 import { useCreateEventMutation } from "../../../hooks/useCreateEventMutation";
 import { useUpdateEventMutation } from "../../../hooks/useUpdateEventMutation";
 import { useEventFileUpload } from "../../../hooks/useEventFileUpload";
+import { usePushRegistration } from "../../../hooks/usePushRegistration";
+import { useUserPreferences } from "../../../hooks/useUserPreferences";
+import { useToast } from "../../../hooks/useToast";
 import { createDefaultEventFormValues, eventToFormValues } from "../../../utils/eventFormDefaults";
 import type { EventFormDialogProps, EventFormValues } from "../../../types/eventForm";
 import { AttachmentChip } from "./AttachmentChip";
@@ -27,6 +30,9 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   const createMutation = useCreateEventMutation();
   const updateMutation = useUpdateEventMutation();
   const [removedFileIds, setRemovedFileIds] = useState<Set<string>>(new Set());
+  const { permission: pushPermission } = usePushRegistration();
+  const { data: userPreferences } = useUserPreferences();
+  const { showToast } = useToast();
 
   // Fixed for the dialog's lifetime — chosen by which "+" opened it (create) or by the
   // event being edited; there's no in-form toggle (matches the reference design).
@@ -63,11 +69,18 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
     // touched by setValue/register, since there's no in-form toggle to change it.
     const payload = { ...values, fileIds: [...existingFiles.map((file) => file.id), ...uploadedIds] };
 
+    function onSaveSuccess() {
+      const channel = userPreferences?.channels[0] ?? "browser";
+      const needsPushSetup = channel === "browser" && pushPermission !== "granted" && pushPermission !== "unsupported";
+      if (values.reminder && needsPushSetup) showToast(t("eventForm.reminderPushSetupHint"), "success");
+      onSaved();
+    }
+
     if (mode.kind === "create") {
-      createMutation.mutate(payload, { onSuccess: onSaved });
+      createMutation.mutate(payload, { onSuccess: onSaveSuccess });
       return;
     }
-    updateMutation.mutate({ id: mode.event.id, input: payload }, { onSuccess: onSaved });
+    updateMutation.mutate({ id: mode.event.id, input: payload }, { onSuccess: onSaveSuccess });
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending;
