@@ -5,6 +5,18 @@ SederYom self-hosts with Docker Compose. Two things stay external and managed:
 - **Supabase** — Postgres, Storage, and Auth.
 - **Firebase** — Cloud Messaging (push).
 
+Auth OTP emails are sent via **Resend** (Custom SMTP configured in Supabase
+Dashboard → Authentication → Emails → SMTP Settings), using the verified
+sending domain `sederyom.site`. Without a verified domain, Resend restricts
+delivery to only the account owner's own email — that was the cause of an
+earlier `AUTH_LOGIN_FAILED` / "Error sending confirmation email" bug for new
+users, fixed by verifying `sederyom.site` in Resend (Resend Dashboard →
+Domains → add DNS records at the registrar → Verify). If the sender address
+or domain ever needs to change: verify the new domain in Resend first, then
+update the "From" address in Supabase's SMTP settings — no app code involved,
+since the app never touches email delivery directly (it only calls
+`supabase.auth.signInWithOtp`).
+
 `docker compose` builds and runs four app containers plus RabbitMQ and Redis:
 
 | Service | Port | Notes |
