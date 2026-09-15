@@ -14,15 +14,15 @@ metadata:
 # SederYom - Technical Standards & Code Quality Skills
 
 ## 0. Required Reading (in this order)
-1. `SPEC.md` (project root) — functional/technical spec: data models, validation
+1. `SPEC.md` (project root) - functional/technical spec: data models, validation
    rules, API contract, screens list. This is the source of truth for *what* to build.
-2. `design_handoff_sederyom/README.md` — visual spec: design tokens (colors,
+2. `design_handoff_sederyom/README.md` - visual spec: design tokens (colors,
    spacing, typography), per-screen layout, state shape, copy (he/en). This is
    the source of truth for *how it looks*.
 
    **Do NOT read** `design_handoff_sederyom/SederYom.dc.html` or
    `design_handoff_sederyom/support.js`. These are a non-runnable prototype
-   (proprietary template runtime) kept for human reference only — reading them
+   (proprietary template runtime) kept for human reference only - reading them
    wastes context and they are not valid target-stack code. The README is
    self-contained and sufficient.
 
@@ -34,7 +34,7 @@ metadata:
 
 ## 2. Frontend Guidelines (React 19 + Vite + Tailwind)
 * **No external design system.** Do not use or reference the Nocturne/Classical
-  design systems even if present anywhere in the repo history — the product
+  design systems even if present anywhere in the repo history - the product
   decision is plain Tailwind with a native `dark:` variant theme, per the
   design README's "Design Tokens" section.
 * **Atomic UI Architecture:** Reusable UI primitives (e.g., `Button`, `Input`, `Modal`, `SegmentedControl`) reside in `client/src/components/ui/`. Build these **first**, from the design README's token section, before building any screen. Every feature component must compose these base primitives rather than writing raw HTML tags or one-off styling.
@@ -68,15 +68,15 @@ metadata:
 ├── docker-compose.yml
 ├── CLAUDE.md
 ├── SPEC.md                     # functional/technical spec (source of truth)
-├── design_handoff_sederyom/    # design reference — read README.md ONLY (see §0)
+├── design_handoff_sederyom/    # design reference - read README.md ONLY (see §0)
 │   ├── README.md
-│   ├── SederYom.dc.html        # do not read — non-runnable prototype
-│   └── support.js              # do not read — prototype runtime
+│   ├── SederYom.dc.html        # do not read - non-runnable prototype
+│   └── support.js              # do not read - prototype runtime
 ├── shared/                     # Shared Zod schemas & TypeScript types
 ├── client/                     # Vite + React Frontend
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ui/             # Reusable base UI primitives (Button, Modal, Input) — build first
+│   │   │   ├── ui/             # Reusable base UI primitives (Button, Modal, Input) - build first
 │   │   │   └── features/       # Domain-specific components (Week, Day, Archive, Settings)
 │   │   ├── hooks/               # Custom hooks (useScheduleDnd, useAuth, etc.)
 │   │   ├── services/            # API client & TanStack Query definitions
@@ -104,4 +104,4 @@ metadata:
 
    When asked to build a screen, read only `SPEC.md` (relevant section) +
    the design README's matching screen section + the already-built `ui/`
-   primitives — not the whole repo.
+   primitives - not the whole repo.

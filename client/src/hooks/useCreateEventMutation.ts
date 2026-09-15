@@ -8,7 +8,7 @@ interface CreateEventContext {
   previousEvents: CalendarEvent[] | undefined;
 }
 
-// Placeholder shown until the server response replaces it on refetch — id/files/sync are unknowable client-side.
+// Placeholder shown until the server response replaces it on refetch - id/files/sync are unknowable client-side.
 function toOptimisticEvent(input: CreateEventInput, tempId: string): CalendarEvent {
   const { fileIds: _fileIds, ...rest } = input;
   return { ...rest, id: tempId, googleCalendarSynced: false, files: [] } as CalendarEvent;

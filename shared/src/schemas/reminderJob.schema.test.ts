@@ -23,7 +23,7 @@ describe("reminderJobSchema", () => {
     expect(reminderJobSchema.safeParse({ ...job, status: "queued" }).success).toBe(false);
   });
 
-  it("accepts an empty channels array — the worker, not the schema, guards this", () => {
+  it("accepts an empty channels array - the worker, not the schema, guards this", () => {
     // Documents why worker/src/db/pushDevicesRepository.ts needs its own length check.
     expect(reminderJobSchema.safeParse({ ...job, channels: [] }).success).toBe(true);
   });

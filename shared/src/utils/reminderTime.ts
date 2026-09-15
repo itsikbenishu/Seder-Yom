@@ -1,7 +1,7 @@
 import type { ReminderMode } from "../schemas/event.schema.js";
 import { dateForDayOfWeek } from "./weekDates.js";
 
-// Resolves an event's reminder instant — shared so server (enqueue) and worker (send) agree.
+// Resolves an event's reminder instant - shared so server (enqueue) and worker (send) agree.
 
 const OFFSET_MINUTES: Record<Exclude<ReminderMode, "time">, number> = {
   "15m": 15,

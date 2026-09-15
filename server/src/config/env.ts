@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { z } from "zod";
 
-// Product is Israel-only — pin the process's timezone unconditionally so every
+// Product is Israel-only - pin the process's timezone unconditionally so every
 // Date/Intl call (dateForDayOfWeek, currentWeekRange, archive.service.ts, the
 // Google Calendar day-range lookup) resolves "today"/day-boundaries the same
 // way regardless of the host's own OS timezone (many hosts/containers default
@@ -30,7 +30,7 @@ const envSchema = z.object({
     .enum(["true", "false"])
     .default("false")
     .transform((value) => value === "true"),
-  // "none" when client and server are on different sites (e.g. Vercel + Render) — otherwise the auth cookie never comes back on cross-site requests.
+  // "none" when client and server are on different sites (e.g. Vercel + Render) - otherwise the auth cookie never comes back on cross-site requests.
   AUTH_COOKIE_SAME_SITE: z.enum(["lax", "none"]).default("lax"),
 });
 

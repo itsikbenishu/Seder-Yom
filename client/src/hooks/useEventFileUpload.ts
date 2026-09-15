@@ -61,7 +61,7 @@ export interface UseEventFileUploadResult {
   removeFile: (localId: string) => void;
 }
 
-/** Transient per-form upload state, not TanStack Query cache — there's no server cache to invalidate here. */
+/** Transient per-form upload state, not TanStack Query cache - there's no server cache to invalidate here. */
 export function useEventFileUpload(existingFiles: ExistingAttachment[] = []): UseEventFileUploadResult {
   const { t } = useTranslation();
   const [attachments, setAttachments] = useState<AttachmentUploadState[]>([]);

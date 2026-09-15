@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { env } from "../config/env.js";
 import { logger } from "../config/logger.js";
 
-// Mirrors server/src/config/supabaseClient.ts's supabaseStorageClient — service-role
+// Mirrors server/src/config/supabaseClient.ts's supabaseStorageClient - service-role
 // client for server-side Storage writes/deletes, kept separate here since the worker
 // can't import server's TS sources (see worker/src/db/client.ts for the same reasoning).
 const supabaseStorageClient = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {

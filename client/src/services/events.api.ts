@@ -1,4 +1,4 @@
-import type { CreateEventInput, UpdateEventInput } from "@project/shared";
+import type { ArchiveConflictResolution, CreateEventInput, UpdateEventInput } from "@project/shared";
 import type { CalendarEvent } from "../types/calendarEvent";
 import { apiRequest } from "./apiClient";
 
@@ -35,6 +35,7 @@ export async function clearDay(dayOfWeek: number): Promise<void> {
   await apiRequest<null>(`/events/day/${dayOfWeek}`, { method: "DELETE" });
 }
 
-export async function archiveDay(dayOfWeek: number): Promise<void> {
-  await apiRequest<null>(`/archive/${dayOfWeek}`, { method: "POST" });
+export async function archiveDay(dayOfWeek: number, onConflict?: ArchiveConflictResolution): Promise<void> {
+  const query = onConflict ? `?onConflict=${onConflict}` : "";
+  await apiRequest<null>(`/archive/${dayOfWeek}${query}`, { method: "POST" });
 }

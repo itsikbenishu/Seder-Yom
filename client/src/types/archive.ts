@@ -9,6 +9,8 @@ export interface ArchiveViewData {
   days: ArchivedDay[];
   hasMore: boolean;
   isLoadingMore: boolean;
+  /** True only on the first-ever load (no cached page yet) - drives the list skeleton. */
+  isPending: boolean;
 }
 
 export interface ArchiveHeaderProps {

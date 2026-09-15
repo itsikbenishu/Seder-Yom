@@ -8,7 +8,7 @@ function formatArchiveDayDate(year: number, month: number, dayOfMonth: number, d
   return `${dayName}, ${formatter.format(new Date(year, month, dayOfMonth))}`;
 }
 
-export function ArchiveDayHeader({ day, onBackToArchive }: ArchiveDayHeaderProps) {
+export function ArchiveDayHeader({ day, onBackToArchive, onDelete }: ArchiveDayHeaderProps) {
   const { t, i18n } = useTranslation();
   const dayNames = t("week.dayNames", { returnObjects: true }) as string[];
 
@@ -30,6 +30,10 @@ export function ArchiveDayHeader({ day, onBackToArchive }: ArchiveDayHeaderProps
       <span className="shrink-0 rounded-full border border-slate-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700 dark:text-slate-400">
         {t("archiveDay.archivedTag")}
       </span>
+
+      <Button variant="ghost" size="icon" onClick={onDelete} aria-label={t("archiveDay.deleteAria")}>
+        🗑️
+      </Button>
     </header>
   );
 }

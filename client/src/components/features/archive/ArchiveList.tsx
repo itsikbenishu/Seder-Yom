@@ -30,7 +30,7 @@ export function ArchiveList({ data, onSelect, onReachEnd }: ArchiveListProps) {
       ) : (
         <ul className="divide-y divide-slate-100 dark:divide-slate-800">
           {data.days.map((day) => (
-            <li key={`${day.dayOfWeek}-${day.year}-${day.month}-${day.dayOfMonth}`}>
+            <li key={day.id}>
               <ArchiveRow day={day} onSelect={onSelect} />
             </li>
           ))}

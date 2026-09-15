@@ -39,7 +39,7 @@ export async function toApiEvent(row: EventRow): Promise<Event> {
   return toApiEventFromRow(row, fileRows);
 }
 
-// Batched variant of toApiEvent — issues a single eventFiles query for all rows instead of
+// Batched variant of toApiEvent - issues a single eventFiles query for all rows instead of
 export async function toApiEvents(rows: EventRow[]): Promise<Event[]> {
   if (rows.length === 0) {
     return [];
@@ -66,7 +66,7 @@ export async function toApiEvents(rows: EventRow[]): Promise<Event[]> {
   return rows.map((row) => toApiEventFromRow(row, filesByEventId.get(row.id) ?? []));
 }
 
-// Only files owned by this user, unattached or already on this event, are eligible — keeps
+// Only files owned by this user, unattached or already on this event, are eligible - keeps
 // PATCHes idempotent and blocks hijacking another event's files. Size/duplicate are checked
 // up front so violations report as validation.* messages, not a later 500.
 async function attachFiles(dbExecutor: DbExecutor, userId: string, eventId: string, fileIds: string[]): Promise<void> {
@@ -209,7 +209,7 @@ export async function updateEvent(
 
   const instantChanged = REMINDER_INSTANT_FIELDS.some((field) => existingWritable[field] !== mergedFields[field]);
   // Turning reminder back on (with the instant unchanged) needs a fresh job too, but must NOT
-  // clear reminderSentFor — an already-delivered past instant would otherwise re-send.
+  // clear reminderSentFor - an already-delivered past instant would otherwise re-send.
   const reminderFlagChanged = existingWritable.reminder !== mergedFields.reminder;
 
   const row = await db.transaction(async (tx) => {
@@ -306,6 +306,6 @@ export async function clearDayEvents(userId: string, dayOfWeek: number): Promise
     return files.map((file) => file.storagePath);
   });
 
-  // Runs after the DB transaction commits — Storage isn't part of it — as one batched call.
+  // Runs after the DB transaction commits - Storage isn't part of it - as one batched call.
   await removeStorageObjects(storagePaths);
 }

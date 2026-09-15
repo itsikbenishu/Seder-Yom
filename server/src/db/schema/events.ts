@@ -12,7 +12,7 @@ export const events = pgTable("events", {
   title: varchar({ length: 80 }).notNull(),
   description: varchar({ length: 200 }),
   note: varchar({ length: 500 }),
-  // stored as native `time`; round-trips as "HH:mm:ss" via postgres-js — repository layer must trim to HH:mm for the API/Zod contract
+  // stored as native `time`; round-trips as "HH:mm:ss" via postgres-js - repository layer must trim to HH:mm for the API/Zod contract
   start: time().notNull(),
   end: time().notNull(),
   allDay: boolean().notNull().default(false),
@@ -22,7 +22,7 @@ export const events = pgTable("events", {
   reminderTime: time(),
   googleCalendarSynced: boolean().notNull().default(false),
   mutedUntilArchive: boolean().notNull().default(false),
-  // reminder instant the worker last delivered a push for — dedups stale/fresh jobs after a timing edit
+  // reminder instant the worker last delivered a push for - dedups stale/fresh jobs after a timing edit
   reminderSentFor: timestamp({ withTimezone: true }),
 }, (t) => [
   index("events_user_day_idx").on(t.userId, t.dayOfWeek),

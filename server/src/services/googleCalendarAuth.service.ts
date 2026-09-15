@@ -17,7 +17,7 @@ export function buildConnectUrl(state: string): string {
   return client.generateAuthUrl({
     access_type: "offline",
     // Forces Google to always re-issue a refresh token, not just on the user's
-    // very first-ever consent — required for "reconnect" to work reliably.
+    // very first-ever consent - required for "reconnect" to work reliably.
     prompt: "consent",
     scope: [GOOGLE_CALENDAR_READONLY_SCOPE],
     state,
@@ -51,7 +51,7 @@ export async function upsertGoogleCalendarTokens(userId: string, tokens: Exchang
   const [existing] = await db.select().from(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
 
   // Google omits refresh_token on a re-consent where one was already issued for this
-  // client+user — never overwrite a previously-stored one with undefined.
+  // client+user - never overwrite a previously-stored one with undefined.
   const refreshToken = tokens.refreshToken ?? existing?.refreshToken;
   if (!refreshToken) {
     throw new AppError(502, "GOOGLE_CALENDAR_API_ERROR", "Google did not return a refresh token");

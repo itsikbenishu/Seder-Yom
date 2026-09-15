@@ -9,7 +9,7 @@ export const supabaseAuthClient = createClient(env.SUPABASE_URL, env.SUPABASE_AN
   },
 });
 
-// Service-role client for server-side Storage writes — the app enforces file
+// Service-role client for server-side Storage writes - the app enforces file
 // ownership itself (storage paths are prefixed with userId), the same way it
 // enforces row ownership on direct Postgres queries rather than relying on RLS.
 export const supabaseStorageClient = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {

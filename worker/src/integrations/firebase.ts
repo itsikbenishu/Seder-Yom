@@ -13,7 +13,7 @@ function getApp(): admin.app.App {
   return app;
 }
 
-// FCM error codes that mean this specific token is permanently dead — safe to
+// FCM error codes that mean this specific token is permanently dead - safe to
 // delete. Deliberately excludes messaging/invalid-argument: that's a payload
 // error, and pruning on it would wipe every token the moment a bad payload ships.
 const PRUNE_CODES = new Set([
@@ -43,7 +43,7 @@ export async function sendPushNotification(input: SendPushNotificationInput): Pr
 
   const messaging = admin.messaging(getApp());
   const notification = { title: input.title, body: input.body };
-  // Keep the notification on screen until dismissed — it auto-dismisses after a few seconds by default otherwise.
+  // Keep the notification on screen until dismissed - it auto-dismisses after a few seconds by default otherwise.
   const webpush: admin.messaging.WebpushConfig = { notification: { ...notification, requireInteraction: true } };
 
   let successCount = 0;
@@ -68,12 +68,12 @@ export async function sendPushNotification(input: SendPushNotificationInput): Pr
     logger.info({ userId: input.userId, pruned: deadTokens.length }, "Pruned unregistered device tokens");
   }
 
-  // Surface the real FCM reason (credential/project mismatch, bad payload, etc.) — otherwise a failed send is opaque.
+  // Surface the real FCM reason (credential/project mismatch, bad payload, etc.) - otherwise a failed send is opaque.
   if (failures.length > 0) {
     logger.warn({ userId: input.userId, failures: [...new Set(failures)] }, "FCM rejected one or more sends");
   }
 
-  // Nothing got through and the failures weren't just dead tokens — let the
+  // Nothing got through and the failures weren't just dead tokens - let the
   // consumer retry / DLQ. A partial success counts as delivered.
   if (successCount === 0 && failures.length > 0) {
     throw new Error("All push sends failed with a retryable error");

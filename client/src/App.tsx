@@ -35,7 +35,7 @@ function App() {
   // Refresh an already-granted push token and listen for foreground messages.
   usePushLifecycle();
 
-  // No upfront auth check — Login only appears once a mutation 401s.
+  // No upfront auth check - Login only appears once a mutation 401s.
   useEffect(() => onSessionEnd(() => startTransition(() => setScreen({ screen: "login" }))), [startTransition]);
 
   // Archive has no query of its own to catch a missing session, so check first.

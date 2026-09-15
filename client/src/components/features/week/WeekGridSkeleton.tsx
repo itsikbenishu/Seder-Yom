@@ -13,7 +13,7 @@ function DayCardSkeleton() {
   );
 }
 
-/** Shown while the week's events load for the first time — avoids a flash of empty cards. */
+/** Shown while the week's events load for the first time - avoids a flash of empty cards. */
 export function WeekGridSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">

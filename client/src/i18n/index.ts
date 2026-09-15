@@ -5,7 +5,7 @@ import he from "./he.json";
 
 // Pre-auth fallback (SPEC.md §3): detect the browser's own language, defaulting to
 // "he" when undetected or unsupported. Once signed in, `useAppLanguage` syncs this to
-// the account's stored `UserPreferences.language` instead — language is no longer
+// the account's stored `UserPreferences.language` instead - language is no longer
 // `localStorage`-only, so there's nothing to persist here pre-auth.
 function detectBrowserLanguage(): "he" | "en" {
   return navigator.language?.slice(0, 2) === "en" ? "en" : "he";

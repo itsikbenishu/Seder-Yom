@@ -7,7 +7,7 @@ function isSessionExpired(error: unknown): boolean {
   return !error.path.startsWith("/auth/login") && !error.path.startsWith("/auth/verify");
 }
 
-// Set when a query 401s, cleared on success. Not a redirect by itself — just lets
+// Set when a query 401s, cleared on success. Not a redirect by itself - just lets
 // Settings/Archive check "am I logged in?" before navigating (queries fail silently).
 let sessionKnownMissing = false;
 
@@ -19,7 +19,7 @@ export function hasNoSession(): boolean {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // A 401 won't succeed on retry — skip the default backoff for it.
+      // A 401 won't succeed on retry - skip the default backoff for it.
       retry: (failureCount, error) => !isSessionExpired(error) && failureCount < 3,
     },
   },
@@ -41,7 +41,7 @@ export const queryClient = new QueryClient({
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
-/** Session is gone — mutation 401 or sign-out. Clears the cache, notifies App.tsx. */
+/** Session is gone - mutation 401 or sign-out. Clears the cache, notifies App.tsx. */
 export function endSession(): void {
   queryClient.clear();
   listeners.forEach((listener) => listener());

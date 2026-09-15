@@ -7,7 +7,7 @@ export type { PushPermission };
 
 // Settings-screen view of push registration: the current permission and an
 // `enable()` for the segmented-control gesture (it may prompt). The ambient
-// concerns — silent refresh, foreground listener — live in usePushLifecycle.
+// concerns - silent refresh, foreground listener - live in usePushLifecycle.
 export function usePushRegistration(): { permission: PushPermission; enable: () => void } {
   const { t } = useTranslation();
   const { showToast } = useToast();

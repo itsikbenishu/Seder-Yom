@@ -23,7 +23,7 @@ interface EventRow {
   reminder_sent_for: Date | null;
 }
 
-// Raw SQL (worker has no Drizzle access) — the fields the consumer needs to re-derive the due instant.
+// Raw SQL (worker has no Drizzle access) - the fields the consumer needs to re-derive the due instant.
 export async function findEventReminderState(eventId: string): Promise<EventReminderState | null> {
   const rows = await sql<EventRow[]>`
     SELECT id, muted_until_archive, reminder, day_of_week, start, reminder_mode, reminder_time, reminder_sent_for

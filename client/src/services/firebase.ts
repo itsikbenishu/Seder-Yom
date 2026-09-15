@@ -23,7 +23,7 @@ let app: FirebaseApp | undefined;
 let messaging: Messaging | null | undefined;
 
 // Resolves to null where the browser can't do web push (old Safari, no SW support)
-// or Firebase config is missing — callers treat that as "notifications unavailable".
+// or Firebase config is missing - callers treat that as "notifications unavailable".
 export async function getMessagingIfSupported(): Promise<Messaging | null> {
   if (messaging !== undefined) return messaging;
 

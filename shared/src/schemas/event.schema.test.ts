@@ -23,7 +23,7 @@ function firstError(result: { success: false; error: { issues: { message: string
   return result.error.issues[0]?.message ?? "";
 }
 
-describe("createEventSchema — discriminated union on allDay", () => {
+describe("createEventSchema - discriminated union on allDay", () => {
   it("accepts a minimal timed event and defaults reminder/muted/fileIds", () => {
     const parsed = createEventSchema.parse(timed);
     expect(parsed).toMatchObject({ allDay: false, reminder: false, mutedUntilArchive: false, fileIds: [] });
@@ -47,7 +47,7 @@ describe("createEventSchema — discriminated union on allDay", () => {
   });
 });
 
-describe("createEventSchema — business rules", () => {
+describe("createEventSchema - business rules", () => {
   it("rejects a timed event whose end is not after start", () => {
     const result = createEventSchema.safeParse({ ...timed, start: "10:00", end: "10:00" });
     expect(result.success).toBe(false);
@@ -71,7 +71,7 @@ describe("createEventSchema — business rules", () => {
   });
 });
 
-describe("createEventSchema — title bounds", () => {
+describe("createEventSchema - title bounds", () => {
   it("rejects an empty title", () => {
     const result = createEventSchema.safeParse({ ...timed, title: "" });
     expect(result.success).toBe(false);
@@ -85,7 +85,7 @@ describe("createEventSchema — title bounds", () => {
   });
 });
 
-describe("updateEventSchema — partial patch", () => {
+describe("updateEventSchema - partial patch", () => {
   it("accepts a single-field patch", () => {
     expect(updateEventSchema.safeParse({ title: "Renamed" }).success).toBe(true);
   });

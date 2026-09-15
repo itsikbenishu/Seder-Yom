@@ -10,7 +10,7 @@ import { currentWeekRange, dayOfWeekForDate, type WeekRange } from "./weekDates.
 const REFRESH_MARGIN_MS = 60_000;
 const CALENDAR_EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
-// The raw wire shape Google's REST API returns — distinct from `GoogleCalendarEvent`
+// The raw wire shape Google's REST API returns - distinct from `GoogleCalendarEvent`
 // (the shared/normalized shape our own API returns), which `mapToGoogleCalendarEvent`
 // below maps this into.
 interface GoogleCalendarApiEvent {
@@ -23,10 +23,10 @@ interface GoogleCalendarApiEvent {
 }
 
 // Refreshes the stored access token when it's missing/expiring soon. Returns undefined
-// when the user has never connected (not an error — callers should treat that as "no
+// when the user has never connected (not an error - callers should treat that as "no
 // gcal events" rather than surfacing a failure). Throws GOOGLE_CALENDAR_RECONNECT_REQUIRED
 // when a stored refresh token is no longer valid (revoked access, or Google's 7-day
-// expiry in OAuth consent-screen "Testing" mode) — the row is deleted so /gcal/status
+// expiry in OAuth consent-screen "Testing" mode) - the row is deleted so /gcal/status
 // immereconnectdiately reflects "disconnected".
 async function getValidAccessToken(userId: string): Promise<string | undefined> {
   const [row] = await db.select().from(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
@@ -60,9 +60,9 @@ async function getValidAccessToken(userId: string): Promise<string | undefined> 
 
     return credentials.access_token;
   } catch (error) {
-    logger.warn({ userId, err: error }, "Google Calendar token refresh failed — disconnecting");
+    logger.warn({ userId, err: error }, "Google Calendar token refresh failed - disconnecting");
     await db.delete(googleCalendarTokens).where(eq(googleCalendarTokens.userId, userId));
-    throw new AppError(409, "GOOGLE_CALENDAR_RECONNECT_REQUIRED", "Google Calendar connection expired — please reconnect");
+    throw new AppError(409, "GOOGLE_CALENDAR_RECONNECT_REQUIRED", "Google Calendar connection expired - please reconnect");
   }
 }
 
@@ -89,7 +89,7 @@ function timeStringFromDate(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
-// Pure — no I/O — so it's directly testable with hand-built fixtures.
+// Pure - no I/O - so it's directly testable with hand-built fixtures.
 export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleCalendarEvent {
   if (event.start.date && !event.start.dateTime) {
     const startDate = new Date(`${event.start.date}T00:00:00`);

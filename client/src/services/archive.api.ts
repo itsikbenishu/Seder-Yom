@@ -19,3 +19,7 @@ export function getArchive(params: GetArchiveParams): Promise<ArchiveResponseDat
 
   return apiRequest<ArchiveResponseData>(`/archive?${query.toString()}`);
 }
+
+export async function deleteArchivedDay(id: string): Promise<void> {
+  await apiRequest<null>(`/archive/${id}`, { method: "DELETE" });
+}

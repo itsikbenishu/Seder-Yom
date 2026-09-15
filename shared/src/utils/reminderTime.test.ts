@@ -9,7 +9,7 @@ function at(dayOfWeek: number, time: string): number {
   return d.getTime();
 }
 
-describe("computeReminderTime — offset modes", () => {
+describe("computeReminderTime - offset modes", () => {
   const base = { dayOfWeek: 3, start: "09:00" as const };
 
   it.each([
@@ -23,7 +23,7 @@ describe("computeReminderTime — offset modes", () => {
   });
 });
 
-describe("computeReminderTime — 'time' mode", () => {
+describe("computeReminderTime - 'time' mode", () => {
   it("fires at the given clock time on the event's day", () => {
     const result = computeReminderTime({ dayOfWeek: 2, start: "00:00", reminderMode: "time", reminderTime: "08:30" });
     expect(result.getTime()).toBe(at(2, "08:30"));

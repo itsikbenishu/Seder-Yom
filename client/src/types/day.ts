@@ -13,15 +13,15 @@ export interface DayViewData {
   allDayEvents: AllDayCalendarEvent[];
   /** Derived: true only when every timed event for this day has mutedUntilArchive === true. */
   isMuted: boolean;
-  /** The nearest upcoming timed event, if any — drives the "Next up" tag. */
+  /** The nearest upcoming timed event, if any - drives the "Next up" tag. */
   nextUpEventId: string | null;
 }
 
 /** ⋯ menu items. "openArchive" navigates; the rest act on this day's events. */
 export type DayMenuAction = "toggleMute" | "archiveDay" | "clearDay" | "openArchive";
 
-/** Pending destructive action awaiting the generic confirm dialog. */
-export type DayConfirmTarget = { kind: "archiveDay" } | { kind: "clearDay" } | { kind: "deleteEvent"; eventId: string };
+/** Pending destructive action for the generic confirm dialog - archiving has its own flow (useArchiveDayFlow). */
+export type DayConfirmTarget = { kind: "clearDay" } | { kind: "deleteEvent"; eventId: string };
 
 export interface DayHeaderProps {
   dayOfWeek: number;
@@ -38,7 +38,7 @@ export interface EventRowProps {
   isNextUp: boolean;
   /** desc/note "show more"/"show less" state, only relevant when combined length > 80 chars. */
   isExpanded: boolean;
-  /** false for Google-synced events — never draggable, no edit/delete.*/
+  /** false for Google-synced events - never draggable, no edit/delete.*/
   isDraggable: boolean;
   onToggleExpand: (eventId: string) => void;
   onMuteToggle: (eventId: string) => void;
@@ -73,7 +73,7 @@ export interface EventListProps {
 
 /**
  * Top-level Day screen. Navigation (back/prev/next/archive) is owned by the parent
- * (App-level screen switcher) — DayScreen itself derives DayViewData from the shared
+ * (App-level screen switcher) - DayScreen itself derives DayViewData from the shared
  * week-events cache via buildDayViewData, and owns the event form dialog locally
  * (same pattern as its ConfirmDialog/AllDayEventDetail overlays).
  */

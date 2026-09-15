@@ -19,7 +19,7 @@ import { pushDevicesRouter } from "./routes/pushDevices.routes.js";
 // pino-http ships as CommonJS without an "exports" map; under real Node ESM (this
 // package has "type": "module"), `import pinoHttp from "pino-http"` resolves to the
 // module namespace object, not the callable function, and TS's `import x = require()`
-// only type-checks — it doesn't polyfill `require` at runtime here. `createRequire`
+// only type-checks - it doesn't polyfill `require` at runtime here. `createRequire`
 // is the actual working escape hatch for this CJS-interop gap.
 const require = createRequire(import.meta.url);
 const pinoHttp: typeof import("pino-http").default = require("pino-http");

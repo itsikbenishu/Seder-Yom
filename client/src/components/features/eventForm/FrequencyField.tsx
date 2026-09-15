@@ -9,7 +9,7 @@ const LABEL_KEYS: Record<EventFrequency, string> = {
   weekly: "eventForm.frequency.weekly",
 };
 
-/** Frequency segmented control — both timed and all-day events offer once/daily/weekly. */
+/** Frequency segmented control - both timed and all-day events offer once/daily/weekly. */
 export function FrequencyField({ allDay, value, onChange }: FrequencyFieldProps) {
   const { t } = useTranslation();
   const allowedValues = allDay ? allDayEventFrequencySchema.options : eventFrequencySchema.options;

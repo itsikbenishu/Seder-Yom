@@ -16,7 +16,7 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   SUPABASE_STORAGE_BUCKET: z.string().min(1).default("event-files"),
   // Firebase Admin SDK service-account credentials, as a single JSON string (not a file
-  // path) — simplest to inject as one env var across local/.env and container secrets.
+  // path) - simplest to inject as one env var across local/.env and container secrets.
   FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(1),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });

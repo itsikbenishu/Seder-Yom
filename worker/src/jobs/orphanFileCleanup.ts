@@ -22,7 +22,7 @@ export async function runOrphanFileCleanup(): Promise<void> {
   logger.info({ count: rows.length }, "Orphan file cleanup: removed files");
 }
 
-// Runs once daily at 3am (Asia/Jerusalem, per env.ts's process.env.TZ pin) — low-traffic
+// Runs once daily at 3am (Asia/Jerusalem, per env.ts's process.env.TZ pin) - low-traffic
 // hour, and the exact time isn't spec'd beyond "run daily".
 export function startOrphanCleanupJob(): void {
   cron.schedule("0 3 * * *", () => {

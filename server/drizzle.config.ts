@@ -6,7 +6,7 @@ export default defineConfig({
   schema: "./src/db/schema/index.ts",
   out: "./drizzle",
   casing: "snake_case",
-  schemaFilter: ["public"], // exclude auth.* — Supabase-managed, not ours to migrate
+  schemaFilter: ["public"], // exclude auth.* - Supabase-managed, not ours to migrate
   dbCredentials: {
     host: env.POSTGRES_HOST,
     port: env.POSTGRES_PORT,

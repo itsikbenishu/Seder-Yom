@@ -15,7 +15,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("NotificationsSection — hint selection", () => {
+describe("NotificationsSection - hint selection", () => {
   it("shows the blocked hint when permission is denied", () => {
     isMobileUserAgent.mockReturnValue(false);
     render(<NotificationsSection channel="browser" onChange={noop} permission="denied" />);

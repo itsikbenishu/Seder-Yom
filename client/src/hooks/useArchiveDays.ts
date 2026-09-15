@@ -26,7 +26,7 @@ export function useArchiveDays(search: string): UseArchiveDaysResult {
 
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
-  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, hasNextPage, isFetchingNextPage, isPending, isFetching, isPlaceholderData, fetchNextPage } = useInfiniteQuery({
     queryKey: archiveKeys.list(debouncedSearch),
     queryFn: ({ pageParam }) => getArchive({ offset: pageParam, search: debouncedSearch }),
     initialPageParam: 0,
@@ -47,6 +47,9 @@ export function useArchiveDays(search: string): UseArchiveDaysResult {
 
   const revealedDays = filteredDays.slice(0, revealCount);
 
+  // Fetching this key means cached data may be stale; isPlaceholderData excludes keepPreviousData's cross-search case.
+  const isResolvingFirstPage = isPending || (isFetching && !isFetchingNextPage && !isPlaceholderData);
+
   function revealMore(): void {
     const nextRevealCount = revealCount + REVEAL_STEP;
     setRevealCount(nextRevealCount);
@@ -63,6 +66,7 @@ export function useArchiveDays(search: string): UseArchiveDaysResult {
       days: revealedDays,
       hasMore: revealCount < filteredDays.length || Boolean(hasNextPage),
       isLoadingMore: isFetchingNextPage,
+      isPending: isResolvingFirstPage,
     },
     revealMore,
   };

@@ -9,6 +9,14 @@ export const archiveQuerySchema = z.object({
   search: z.string().optional(),
 });
 
+// Set only to resolve a day that was already archived for this calendar date: "merge" adds the
+// newly archived events to the existing snapshot, "overwrite" replaces it entirely. Omitted, the
+// request fails with ARCHIVE_ALREADY_EXISTS so the client can ask the user which one they want.
+export const archiveConflictResolutionSchema = z.enum(["merge", "overwrite"]);
+export const archiveDayQuerySchema = z.object({
+  onConflict: archiveConflictResolutionSchema.optional(),
+});
+
 export const archiveResponseDataSchema = z.object({
   days: z.array(archivedDaySchema),
   total_count: z.number().int().nonnegative(),
@@ -16,4 +24,6 @@ export const archiveResponseDataSchema = z.object({
 });
 
 export type ArchiveQuery = z.infer<typeof archiveQuerySchema>;
+export type ArchiveConflictResolution = z.infer<typeof archiveConflictResolutionSchema>;
+export type ArchiveDayQuery = z.infer<typeof archiveDayQuerySchema>;
 export type ArchiveResponseData = z.infer<typeof archiveResponseDataSchema>;

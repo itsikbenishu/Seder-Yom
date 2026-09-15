@@ -7,7 +7,7 @@ interface UpsertPushDeviceInput extends RegisterPushDeviceInput {
   userAgent?: string;
 }
 
-// A token can move between users (same browser, different login) — conflict on the
+// A token can move between users (same browser, different login) - conflict on the
 // token PK and re-point it at the current user rather than erroring.
 export async function upsertPushDevice(userId: string, input: UpsertPushDeviceInput): Promise<void> {
   const { token, platform, userAgent } = input;

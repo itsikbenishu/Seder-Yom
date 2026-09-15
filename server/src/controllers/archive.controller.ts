@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import type { ArchiveQuery } from "@project/shared";
-import { archiveDay, listArchivedDays } from "../services/archive.service.js";
+import type { ArchiveDayQuery, ArchiveQuery } from "@project/shared";
+import { archiveDay, deleteArchivedDay as deleteArchivedDayService, listArchivedDays } from "../services/archive.service.js";
 import { sendSuccess } from "../utils/apiResponse.js";
 
 export async function getArchive(req: Request, res: Response): Promise<void> {
@@ -10,6 +10,12 @@ export async function getArchive(req: Request, res: Response): Promise<void> {
 }
 
 export async function postArchiveDay(req: Request, res: Response): Promise<void> {
-  const result = await archiveDay(req.userId, Number(req.params.dayOfWeek));
+  const { onConflict } = req.query as unknown as ArchiveDayQuery;
+  const result = await archiveDay(req.userId, Number(req.params.dayOfWeek), onConflict);
   sendSuccess(res, result, 201);
+}
+
+export async function deleteArchivedDay(req: Request<{ id: string }>, res: Response): Promise<void> {
+  await deleteArchivedDayService(req.userId, req.params.id);
+  sendSuccess(res, null);
 }

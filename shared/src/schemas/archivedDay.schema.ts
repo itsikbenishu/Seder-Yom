@@ -3,6 +3,7 @@ import { dayOfWeekSchema } from "./common.schema.js";
 import { eventSchema } from "./event.schema.js";
 
 export const archivedDaySchema = z.object({
+  id: z.uuid(),
   dayOfWeek: dayOfWeekSchema,
   month: z.number().int().min(0).max(11),
   dayOfMonth: z.number().int().min(1).max(31),

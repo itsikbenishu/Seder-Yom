@@ -16,7 +16,7 @@ import { sendPushNotification } from "../integrations/firebase.js";
 
 // REMINDER_RETRY_QUEUE is reused for two paths: "not yet due" reschedules (x-retry-count unchanged) and send-failure backoff (x-retry-count incremented, then DLQ). Delivery is at-least-once.
 
-// Caps each reschedule hop — classic-queue per-message TTL only expires at the head, so an uncapped multi-day delay would block every shorter-delay message queued behind it.
+// Caps each reschedule hop - classic-queue per-message TTL only expires at the head, so an uncapped multi-day delay would block every shorter-delay message queued behind it.
 const NEAR_RESCHEDULE_DELAY_MS = 5 * 60_000;
 const FAR_RESCHEDULE_DELAY_MS = 30 * 60_000;
 const NEAR_THRESHOLD_MS = 60 * 60_000;
@@ -57,7 +57,7 @@ async function handleMessage(channel: Channel, msg: ConsumeMessage): Promise<voi
     const rawBody: unknown = JSON.parse(msg.content.toString());
     job = reminderJobSchema.parse(rawBody);
   } catch (err) {
-    // Genuinely unparseable — no job to retry, so this one really is poison.
+    // Genuinely unparseable - no job to retry, so this one really is poison.
     logger.error({ err }, "Reminder message failed to parse, dropping");
     channel.ack(msg);
     return;
@@ -93,7 +93,7 @@ async function handleMessage(channel: Channel, msg: ConsumeMessage): Promise<voi
       return;
     }
 
-    // Stale + fresh job resolve to the same dueAtMs — first delivery stamps it, the rest skip here.
+    // Stale + fresh job resolve to the same dueAtMs - first delivery stamps it, the rest skip here.
     if (event.reminderSentFor && event.reminderSentFor.getTime() === dueAtMs) {
       logger.info(logCtx, "Reminder skipped: already delivered for this slot");
       channel.ack(msg);
@@ -122,7 +122,7 @@ async function handleMessage(channel: Channel, msg: ConsumeMessage): Promise<voi
     }
     channel.ack(msg);
   } catch (err) {
-    // job parsed fine, so treat this as transient (DB/network blip) and retry instead of dropping — a real bug still surfaces, just after MAX_SEND_RETRIES instead of immediately.
+    // job parsed fine, so treat this as transient (DB/network blip) and retry instead of dropping - a real bug still surfaces, just after MAX_SEND_RETRIES instead of immediately.
     if (retryCount < MAX_SEND_RETRIES) {
       const delayMs = RETRY_BACKOFF_MS[retryCount];
       scheduleRetry(channel, job, delayMs, retryCount + 1);

@@ -58,6 +58,10 @@
       "archiveDayTitle": "Archive day",
       "archiveDayBody": "All of today's events will be moved to the archive and removed from the active calendar. This can't be undone.",
       "archiveDayConfirm": "Archive day",
+      "archiveDayOverwriteTitle": "This day is already archived",
+      "archiveDayOverwriteBody": "This day was already archived earlier. You can merge the new events into the existing archive, or overwrite it entirely - that can't be undone and discards the previous data.",
+      "archiveDayOverwriteConfirm": "Overwrite archive",
+      "archiveDayMergeConfirm": "Merge with archive",
       "clearDayTitle": "Clear day",
       "clearDayBody": "All events on this day will be permanently deleted. This can't be undone.",
       "clearDayConfirm": "Clear all",
@@ -149,7 +153,13 @@
   },
   "archiveDay": {
     "backAria": "Back to archive",
-    "archivedTag": "Archived"
+    "archivedTag": "Archived",
+    "deleteAria": "Delete this day from the archive",
+    "confirm": {
+      "deleteDayTitle": "Delete day from archive",
+      "deleteDayBody": "This day will be permanently deleted from the archive, including any attached files. This can't be undone.",
+      "deleteDayConfirm": "Delete from archive"
+    }
   },
   "login": {
     "appName": "SederYom",

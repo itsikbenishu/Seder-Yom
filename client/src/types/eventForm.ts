@@ -1,7 +1,7 @@
 import type { CreateEventInput, EventFile, EventFrequency, ReminderMode } from "@project/shared";
 import type { CalendarEvent } from "./calendarEvent";
 
-/** Reused as-is for both create and edit — only the submit handler differs, not the shape. */
+/** Reused as-is for both create and edit - only the submit handler differs, not the shape. */
 export type EventFormValues = CreateEventInput;
 
 export type EventFormMode =
@@ -21,7 +21,7 @@ export interface FrequencyFieldProps {
   onChange: (value: EventFrequency) => void;
 }
 
-/** All-day events force `reminderMode: "time"` and hide the offset menu — only `reminderTime` applies. */
+/** All-day events force `reminderMode: "time"` and hide the offset menu - only `reminderTime` applies. */
 export interface ReminderFieldProps {
   allDay: boolean;
   reminder: boolean;
@@ -34,7 +34,7 @@ export interface ReminderFieldProps {
 
 export type AttachmentUploadStatus = "uploading" | "uploaded" | "error";
 
-/** Files upload immediately on picking, not deferred to save — this tracks per-file progress. */
+/** Files upload immediately on picking, not deferred to save - this tracks per-file progress. */
 export interface AttachmentUploadState {
   localId: string;
   file: File;

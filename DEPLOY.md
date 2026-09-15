@@ -2,18 +2,18 @@
 
 SederYom self-hosts with Docker Compose. Two things stay external and managed:
 
-- **Supabase** — Postgres, Storage, and Auth.
-- **Firebase** — Cloud Messaging (push).
+- **Supabase** - Postgres, Storage, and Auth.
+- **Firebase** - Cloud Messaging (push).
 
 Auth OTP emails are sent via **Resend** (Custom SMTP configured in Supabase
 Dashboard → Authentication → Emails → SMTP Settings), using the verified
 sending domain `sederyom.site`. Without a verified domain, Resend restricts
-delivery to only the account owner's own email — that was the cause of an
+delivery to only the account owner's own email - that was the cause of an
 earlier `AUTH_LOGIN_FAILED` / "Error sending confirmation email" bug for new
 users, fixed by verifying `sederyom.site` in Resend (Resend Dashboard →
 Domains → add DNS records at the registrar → Verify). If the sender address
 or domain ever needs to change: verify the new domain in Resend first, then
-update the "From" address in Supabase's SMTP settings — no app code involved,
+update the "From" address in Supabase's SMTP settings - no app code involved,
 since the app never touches email delivery directly (it only calls
 `supabase.auth.signInWithOtp`).
 
@@ -23,7 +23,7 @@ since the app never touches email delivery directly (it only calls
 |---|---|---|
 | `client` | `8080` → 80 | nginx serving the built SPA; proxies `/api/v1` to `server` |
 | `server` | `3000` | Express API (`tsx`, no build step); `/healthz` liveness, `/readyz` checks Supabase DB + RabbitMQ |
-| `worker` | — | RabbitMQ consumer + daily cleanup cron |
+| `worker` | - | RabbitMQ consumer + daily cleanup cron |
 | `rabbitmq` | `5672`, `15672` | management UI on 15672 (guest/guest) |
 | `redis` | `6379` | present in compose; not currently used by app code |
 
@@ -31,18 +31,18 @@ since the app never touches email delivery directly (it only calls
 
 Three files, none committed (all `.env*` are gitignored except `.env.example`).
 
-### `server/.env` — from `server/.env.example`
+### `server/.env` - from `server/.env.example`
 Supabase Postgres connection, `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`,
 Google OAuth creds, and **`CORS_ORIGIN=http://localhost:8080`** (the client
-origin). `RABBITMQ_URL` here is ignored under compose — the compose file points
+origin). `RABBITMQ_URL` here is ignored under compose - the compose file points
 the container at `amqp://guest:guest@rabbitmq:5672`.
 
-### `worker/.env` — from `worker/.env.example`
+### `worker/.env` - from `worker/.env.example`
 Same Supabase Postgres block, `SUPABASE_*` for Storage cleanup, and
 `FIREBASE_SERVICE_ACCOUNT_JSON` (the Admin SDK service-account JSON minified to
 one line). `RABBITMQ_URL` is likewise overridden by compose.
 
-### `.env` at the repo root — for `docker compose` build args
+### `.env` at the repo root - for `docker compose` build args
 Vite inlines `VITE_*` at **build** time, so the client image needs them as build
 args. Compose reads them from this file:
 
@@ -87,7 +87,7 @@ docker compose up -d --build
 4. `docker compose logs -f worker` should show `Reminder push sent`, and the
    OS notification should fire.
 5. Revoke the notification permission (or delete the `push_devices` row) and
-   create another reminder — the next send should log a prune, not an error.
+   create another reminder - the next send should log a prune, not an error.
 
 ## 5. Alternative: split hosting (Vercel + Render + CloudAMQP)
 
@@ -97,8 +97,8 @@ worker's fate to the server's:
 | Service | Where | Notes |
 |---|---|---|
 | `client` | Vercel | Root Directory = `client`, framework preset Vite. Env vars are the `VITE_*` block above, with `VITE_API_URL` set to the Render server's public URL + `/api/v1` (no nginx proxy here, so it must be an absolute URL). |
-| `server` + worker (inline) | Render (Web Service) | Env vars are the full `server/.env` block above, **plus** `RUN_WORKER_INLINE=true` and every var from `worker/.env.example` (notably `FIREBASE_SERVICE_ACCOUNT_JSON`) — required because the worker's consumer + cron now run inside this same process (`server/src/index.ts`). `CORS_ORIGIN` and `GOOGLE_OAUTH_REDIRECT_URI` must match this Render service's own public URL, with no trailing slash. `AUTH_COOKIE_SAME_SITE=none` is also required — client and server are on different sites here, so the default `lax` auth cookie never comes back on cross-site requests. |
-| RabbitMQ | CloudAMQP (managed, free "Little Lemur" plan works) | `RABBITMQ_URL` is the `amqps://` connection string CloudAMQP gives you — same value goes on the Render service. |
+| `server` + worker (inline) | Render (Web Service) | Env vars are the full `server/.env` block above, **plus** `RUN_WORKER_INLINE=true` and every var from `worker/.env.example` (notably `FIREBASE_SERVICE_ACCOUNT_JSON`) - required because the worker's consumer + cron now run inside this same process (`server/src/index.ts`). `CORS_ORIGIN` and `GOOGLE_OAUTH_REDIRECT_URI` must match this Render service's own public URL, with no trailing slash. `AUTH_COOKIE_SAME_SITE=none` is also required - client and server are on different sites here, so the default `lax` auth cookie never comes back on cross-site requests. |
+| RabbitMQ | CloudAMQP (managed, free "Little Lemur" plan works) | `RABBITMQ_URL` is the `amqps://` connection string CloudAMQP gives you - same value goes on the Render service. |
 
 Render's free tier spins a Web Service down after 15 minutes without incoming HTTP
 traffic, which would silently kill the inline worker's RabbitMQ connection along with
@@ -108,7 +108,7 @@ the API. Point an external uptime monitor (e.g. UptimeRobot's free tier) at
 This trades process isolation for zero extra infra: a crash in the reminder consumer
 can now take the API down with it and vice versa, unlike the docker-compose path above
 where `server` and `worker` are independent containers. Migration (§2) still runs the
-same way, pointed at the same Supabase project — it doesn't care which topology serves
+same way, pointed at the same Supabase project - it doesn't care which topology serves
 traffic afterward.
 
 ## Not covered here

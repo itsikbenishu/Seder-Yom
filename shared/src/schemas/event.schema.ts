@@ -64,7 +64,7 @@ export const eventWriteSchema = z
 
 export const createEventSchema = eventWriteSchema;
 
-// PATCH: field-level only — a partial payload can't enforce the allDay/frequency/reminderMode
+// PATCH: field-level only - a partial payload can't enforce the allDay/frequency/reminderMode
 // cross-rule, so the service layer must merge onto the current row and re-validate with eventWriteSchema.
 export const updateEventSchema = z
   .object({

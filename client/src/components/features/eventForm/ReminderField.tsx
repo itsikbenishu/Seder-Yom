@@ -11,7 +11,7 @@ type ReminderEnabled = "off" | "on";
 /**
  * Reminder on/off + mode control. Timed events pick an offset (dropdown, since a 5-way
  * segmented control doesn't fit next to Frequency) or a fixed clock-time ("time");
- * all-day events are always effectively "time" — only the clock-time input is shown.
+ * all-day events are always effectively "time" - only the clock-time input is shown.
  * Mirrors FrequencyField's visible-label-above-control pattern, not a self-labeling toggle.
  */
 export function ReminderField({

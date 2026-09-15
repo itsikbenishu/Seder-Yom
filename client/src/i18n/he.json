@@ -58,6 +58,10 @@
       "archiveDayTitle": "העברה לארכיון",
       "archiveDayBody": "כל אירועי היום יועברו לארכיון ויוסרו מהיומן הפעיל. פעולה זו אינה הפיכה.",
       "archiveDayConfirm": "העבר לארכיון",
+      "archiveDayOverwriteTitle": "היום כבר קיים בארכיון",
+      "archiveDayOverwriteBody": "היום הזה כבר אורכב בעבר. ניתן למזג את האירועים החדשים לתוך הארכיון הקיים, או להחליף אותו לגמרי - פעולה שאינה הפיכה ומוחקת את הנתונים הקודמים.",
+      "archiveDayOverwriteConfirm": "החלף בארכיון",
+      "archiveDayMergeConfirm": "מזג עם הארכיון",
       "clearDayTitle": "ניקוי היום",
       "clearDayBody": "כל האירועים ביום זה יימחקו לצמיתות. פעולה זו אינה הפיכה.",
       "clearDayConfirm": "נקה הכל",
@@ -149,7 +153,13 @@
   },
   "archiveDay": {
     "backAria": "חזרה לארכיון",
-    "archivedTag": "בארכיון"
+    "archivedTag": "בארכיון",
+    "deleteAria": "מחיקת היום מהארכיון",
+    "confirm": {
+      "deleteDayTitle": "מחיקת יום מהארכיון",
+      "deleteDayBody": "היום יימחק לצמיתות מהארכיון, כולל כל הקבצים המצורפים שלו. פעולה זו אינה הפיכה.",
+      "deleteDayConfirm": "מחק מהארכיון"
+    }
   },
   "login": {
     "appName": "סדר יום",

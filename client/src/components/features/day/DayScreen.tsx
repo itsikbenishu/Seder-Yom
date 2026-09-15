@@ -9,7 +9,7 @@ import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
 import { useMuteEventMutation } from "../../../hooks/useMuteEventMutation";
 import { useUpdateEventMutation } from "../../../hooks/useUpdateEventMutation";
 import { useDeleteEventMutation } from "../../../hooks/useDeleteEventMutation";
-import { useArchiveDayMutation } from "../../../hooks/useArchiveDayMutation";
+import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
 import { useClearDayMutation } from "../../../hooks/useClearDayMutation";
 import { buildDayViewData } from "../../../utils/buildDayViewData";
 import { computeRescheduledEnd } from "../../../utils/rescheduleEvent";
@@ -22,13 +22,6 @@ import { EventList } from "./EventList";
 import type { DayConfirmTarget, DayMenuAction, DayScreenProps } from "../../../types/day";
 
 function getConfirmDialogContent(target: DayConfirmTarget, t: TFunction) {
-  if (target.kind === "archiveDay") {
-    return {
-      title: t("day.confirm.archiveDayTitle"),
-      body: t("day.confirm.archiveDayBody"),
-      confirmLabel: t("day.confirm.archiveDayConfirm"),
-    };
-  }
   if (target.kind === "clearDay") {
     return {
       title: t("day.confirm.clearDayTitle"),
@@ -52,7 +45,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<DayConfirmTarget | null>(null);
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
-  // Tracked locally rather than read off muteEventMutation.variables — a shared mutation's
+  // Tracked locally rather than read off muteEventMutation.variables - a shared mutation's
   // .variables only reflects the single most recent call, which misreports pending state
   // if the user toggles mute on more than one event before the first request settles.
   const [pendingMuteEventIds, setPendingMuteEventIds] = useState<Set<string>>(new Set());
@@ -63,7 +56,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const muteEventMutation = useMuteEventMutation();
   const updateEventMutation = useUpdateEventMutation();
   const deleteEventMutation = useDeleteEventMutation();
-  const archiveDayMutation = useArchiveDayMutation();
+  const archiveDayFlow = useArchiveDayFlow();
   const clearDayMutation = useClearDayMutation();
 
   function handleToggleMuteDay() {
@@ -76,7 +69,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
 
   function handleMenuAction(action: DayMenuAction) {
     if (action === "toggleMute") return handleToggleMuteDay();
-    if (action === "archiveDay") return requireSession(() => setConfirmTarget({ kind: "archiveDay" }));
+    if (action === "archiveDay") return requireSession(() => archiveDayFlow.requestArchiveDay(dayOfWeek));
     if (action === "clearDay") return requireSession(() => setConfirmTarget({ kind: "clearDay" }));
     onOpenArchive();
   }
@@ -99,13 +92,11 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
     // and replaced) can't clear a newer, unrelated confirm dialog.
     const target = confirmTarget;
     const close = () => setConfirmTarget((current) => (current === target ? null : current));
-    if (target.kind === "archiveDay") archiveDayMutation.mutate(dayOfWeek, { onSuccess: close });
     if (target.kind === "clearDay") clearDayMutation.mutate(dayOfWeek, { onSuccess: close });
     if (target.kind === "deleteEvent") deleteEventMutation.mutate(target.eventId, { onSuccess: close });
   }
 
   const pendingByKind: Record<DayConfirmTarget["kind"], boolean> = {
-    archiveDay: archiveDayMutation.isPending,
     clearDay: clearDayMutation.isPending,
     deleteEvent: deleteEventMutation.isPending,
   };
@@ -211,6 +202,8 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           ? getConfirmDialogContent(confirmTarget, t)
           : { title: "", body: "", confirmLabel: "" })}
       />
+
+      {archiveDayFlow.dialog && <ConfirmDialog {...archiveDayFlow.dialog} />}
     </div>
   );
 }

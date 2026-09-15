@@ -13,7 +13,7 @@ COPY shared/ ./shared/
 COPY client/ ./client/
 
 # Vite inlines VITE_* at build time, so they must be passed as build args
-# (compose reads them from the repo-root .env — see DEPLOY.md).
+# (compose reads them from the repo-root .env - see DEPLOY.md).
 ARG VITE_API_URL=/api/v1
 ARG VITE_FIREBASE_API_KEY
 ARG VITE_FIREBASE_PROJECT_ID

@@ -4,7 +4,7 @@ export const appLanguageSchema = z.enum(["he", "en"]);
 export const appThemeSchema = z.enum(["light", "dark", "system"]);
 export const notificationChannelSchema = z.enum(["browser", "mobile"]);
 
-// Full read shape — every field has a default, so a row that doesn't exist yet
+// Full read shape - every field has a default, so a row that doesn't exist yet
 // (user never touched Settings) can still be parsed from just `{ user_id }`.
 export const userPreferencesSchema = z.object({
   user_id: z.uuid(),
@@ -18,7 +18,7 @@ export const userPreferencesSchema = z.object({
     .default(["browser"]),
 });
 
-// Write shape — deliberately NOT `userPreferencesSchema.partial()`: that would keep
+// Write shape - deliberately NOT `userPreferencesSchema.partial()`: that would keep
 // each field's `.default()`, which fills in a value for every omitted key (Zod applies
 // `.default()` whenever a key is `undefined`, missing or not) and defeat "any subset"
 // partial updates. Every field here is a plain `.optional()` with no

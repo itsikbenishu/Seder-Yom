@@ -24,7 +24,7 @@ export interface GoogleCalendarSectionProps {
 
 /**
  * UI picks one channel via a 2-way segmented control (design README §7); the
- * schema's `channels` field is an array capped at length 1 — wrapping/unwrapping
+ * schema's `channels` field is an array capped at length 1 - wrapping/unwrapping
  * that array is the mutation hook's concern, not this component's.
  */
 export interface NotificationsSectionProps {

@@ -2,6 +2,12 @@ import { Button } from "./Button";
 import { Modal } from "./Modal";
 import { Spinner } from "./Spinner";
 
+export interface ConfirmDialogSecondaryAction {
+  label: string;
+  pending?: boolean;
+  onClick: () => void;
+}
+
 export interface ConfirmDialogProps {
   open: boolean;
   title: string;
@@ -12,6 +18,8 @@ export interface ConfirmDialogProps {
   confirmPending?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  /** Optional alternative resolution rendered between Cancel and the primary confirm button. */
+  secondaryAction?: ConfirmDialogSecondaryAction;
 }
 
 export function ConfirmDialog({
@@ -24,10 +32,13 @@ export function ConfirmDialog({
   confirmPending,
   onConfirm,
   onCancel,
+  secondaryAction,
 }: ConfirmDialogProps) {
+  const anyActionPending = confirmPending || secondaryAction?.pending;
+
   // Don't let Escape/backdrop/header-X close the dialog while confirming is in flight.
   function handleClose() {
-    if (!confirmPending) onCancel();
+    if (!anyActionPending) onCancel();
   }
 
   return (
@@ -37,10 +48,16 @@ export function ConfirmDialog({
       title={title}
       footer={
         <>
-          <Button variant="ghost" onClick={handleClose} disabled={confirmPending}>
+          <Button variant="ghost" onClick={handleClose} disabled={anyActionPending}>
             {cancelLabel}
           </Button>
-          <Button variant={danger ? "danger" : "primary"} onClick={onConfirm} disabled={confirmPending}>
+          {secondaryAction && (
+            <Button variant="secondary" onClick={secondaryAction.onClick} disabled={anyActionPending}>
+              {secondaryAction.pending && <Spinner className="h-3.5 w-3.5" />}
+              {secondaryAction.label}
+            </Button>
+          )}
+          <Button variant={danger ? "danger" : "primary"} onClick={onConfirm} disabled={anyActionPending}>
             {confirmPending && <Spinner className="h-3.5 w-3.5 border-white/40 border-t-white" />}
             {confirmLabel}
           </Button>

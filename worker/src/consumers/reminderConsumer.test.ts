@@ -41,7 +41,7 @@ const { RETRY_BACKOFF_MS } = await import("../services/reminderQueues.js");
 
 const EVENT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 
-// reminderMode null keeps the due gate on the job's reminderTime (no recompute) —
+// reminderMode null keeps the due gate on the job's reminderTime (no recompute) -
 // individual tests set a mode to exercise the re-derivation path.
 function makeEvent(overrides: Record<string, unknown> = {}) {
   return {
@@ -165,7 +165,7 @@ describe("reminder consumer", () => {
 
   it("uses the user's current channel preference, not the job's stale snapshot", async () => {
     // Job was enqueued while the channel was "mobile"; the user has since switched back
-    // to "browser" — the send must go by the current preference, not the frozen job value.
+    // to "browser" - the send must go by the current preference, not the frozen job value.
     findNotificationChannels.mockResolvedValue(["browser"]);
     const job = makeJob({ channels: ["mobile"] });
     await deliver(job);

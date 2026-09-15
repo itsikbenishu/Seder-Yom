@@ -7,7 +7,7 @@ interface ClearDayContext {
   previousEvents: CalendarEvent[] | undefined;
 }
 
-// Google-synced events are excluded server-side (same as archiveDay) — they
+// Google-synced events are excluded server-side (same as archiveDay) - they
 // stay in the cache untouched, only local events for this dayOfWeek are optimistically removed.
 export function useClearDayMutation() {
   const queryClient = useQueryClient();

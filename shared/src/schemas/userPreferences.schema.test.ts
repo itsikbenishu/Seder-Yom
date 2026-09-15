@@ -3,7 +3,7 @@ import { updateUserPreferencesSchema, userPreferencesSchema } from "./userPrefer
 
 const USER_ID = "11111111-1111-4111-8111-111111111111";
 
-describe("userPreferencesSchema — read shape", () => {
+describe("userPreferencesSchema - read shape", () => {
   it("fills every default from just a user_id", () => {
     expect(userPreferencesSchema.parse({ user_id: USER_ID })).toEqual({
       user_id: USER_ID,
@@ -15,7 +15,7 @@ describe("userPreferencesSchema — read shape", () => {
   });
 });
 
-describe("updateUserPreferencesSchema — write shape", () => {
+describe("updateUserPreferencesSchema - write shape", () => {
   it("keeps omitted keys absent (not a .partial() with defaults)", () => {
     expect(updateUserPreferencesSchema.parse({ language: "en" })).toEqual({ language: "en" });
     expect(updateUserPreferencesSchema.parse({})).toEqual({});

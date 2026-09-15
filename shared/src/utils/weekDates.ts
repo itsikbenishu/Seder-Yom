@@ -1,4 +1,4 @@
-// Events only carry a day-of-week, not an absolute date — the app only
+// Events only carry a day-of-week, not an absolute date - the app only
 // ever holds the current week's live events (older days move to the archive). These
 // helpers resolve dayOfWeek <-> a concrete date in the current week, using JS's own
 // Date.getDay() convention (0 = Sunday .. 6 = Saturday), which is what SPEC's

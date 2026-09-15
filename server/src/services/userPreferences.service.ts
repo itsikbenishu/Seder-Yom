@@ -16,7 +16,7 @@ function toApiUserPreferences(row: typeof userPreferences.$inferSelect): UserPre
 export async function getUserPreferences(userId: string): Promise<UserPreferences> {
   const [row] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
 
-  // No row yet (user never touched Settings) — fall back to the schema's own
+  // No row yet (user never touched Settings) - fall back to the schema's own
   // defaults rather than a 404: preferences always "exist" logically.
   if (!row) {
     return userPreferencesSchema.parse({ user_id: userId });
@@ -29,7 +29,7 @@ export async function upsertUserPreferences(
   userId: string,
   input: UpdateUserPreferencesInput,
 ): Promise<UserPreferences> {
-  // `input` only carries the keys the caller actually sent —
+  // `input` only carries the keys the caller actually sent -
   // spreading it into both `.values()` and `.set()` means an insert falls back to the
   // column defaults for anything omitted, and an update patches only what was provided.
   const [row] = await db

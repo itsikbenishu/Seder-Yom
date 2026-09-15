@@ -7,7 +7,7 @@ export function SignOutSection({ onSignOut, isPending }: SignOutSectionProps) {
   const { t } = useTranslation();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  // Dialog stays open (showing the pending spinner) until sign-out settles — ConfirmDialog
+  // Dialog stays open (showing the pending spinner) until sign-out settles - ConfirmDialog
   // itself now blocks Escape/backdrop/X while confirmPending, so nothing can dismiss it early.
   function handleConfirm() {
     onSignOut();

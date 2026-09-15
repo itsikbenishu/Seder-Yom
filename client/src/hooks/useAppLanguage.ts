@@ -25,7 +25,7 @@ export function useAppLanguage(): {
     language: (data?.language ?? i18n.language) as AppLanguage,
     setLanguage: (language) => {
       void i18n.changeLanguage(language);
-      if (hasNoSession()) return; // no account to save it to yet — applied locally only
+      if (hasNoSession()) return; // no account to save it to yet - applied locally only
       updateMutation.mutate({ language });
     },
     isPending: updateMutation.isPending,

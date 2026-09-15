@@ -1,7 +1,7 @@
 import type { DevicePlatform } from "@project/shared";
 import { apiRequest } from "./apiClient";
 
-// Last token we successfully registered with the backend — lets the hook skip a
+// Last token we successfully registered with the backend - lets the hook skip a
 // redundant POST on every load, and the sign-out flow know what to remove.
 export const PUSH_TOKEN_STORAGE_KEY = "sy.push.token";
 

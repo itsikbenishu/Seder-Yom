@@ -6,7 +6,7 @@ import { WeekGridSkeleton } from "./WeekGridSkeleton";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
-import { useArchiveDayMutation } from "../../../hooks/useArchiveDayMutation";
+import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
 import { useRequireSession } from "../../../hooks/useRequireSession";
 import { buildWeekViewData } from "../../../utils/buildWeekViewData";
 import { EventFormDialog } from "../eventForm";
@@ -29,13 +29,9 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
   const { data: events, isPending: isEventsPending } = useWeekEvents();
   const muteDayMutation = useMuteDayMutation();
   const unmuteDayMutation = useUnmuteDayMutation();
-  const archiveDayMutation = useArchiveDayMutation();
+  const archiveDayFlow = useArchiveDayFlow();
   const requireSession = useRequireSession();
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
-  const [confirmArchiveDay, setConfirmArchiveDay] = useState<number | null>(null);
-  // Tracked locally rather than read off mutation.variables — the mute/unmute mutations
-  // are shared across every day card, so .variables only ever reflects the single most
-  // recent call and would misreport pending state under concurrent per-day toggles.
   const [pendingMuteDayIds, setPendingMuteDayIds] = useState<Set<number>>(new Set());
 
   const weekViewData = buildWeekViewData(events ?? [], new Date());
@@ -54,11 +50,6 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
         });
       },
     });
-  }
-
-  function handleConfirmArchiveDay() {
-    if (confirmArchiveDay === null) return;
-    archiveDayMutation.mutate(confirmArchiveDay, { onSuccess: () => setConfirmArchiveDay(null) });
   }
 
   function isMutePending(dayOfWeek: number): boolean {
@@ -93,7 +84,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
           onSelectDay={onSelectDay}
           onMuteDay={handleToggleMuteDay}
           onAddEvent={(dayOfWeek) => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
-          onArchiveDay={(dayOfWeek) => requireSession(() => setConfirmArchiveDay(dayOfWeek))}
+          onArchiveDay={(dayOfWeek) => requireSession(() => archiveDayFlow.requestArchiveDay(dayOfWeek))}
           isMutePending={isMutePending}
         />
       )}
@@ -102,17 +93,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
         <EventFormDialog mode={formTarget} onClose={() => setFormTarget(null)} onSaved={() => setFormTarget(null)} />
       )}
 
-      <ConfirmDialog
-        open={confirmArchiveDay !== null}
-        title={t("day.confirm.archiveDayTitle")}
-        body={t("day.confirm.archiveDayBody")}
-        confirmLabel={t("day.confirm.archiveDayConfirm")}
-        cancelLabel={t("common.cancel")}
-        danger
-        confirmPending={archiveDayMutation.isPending}
-        onConfirm={handleConfirmArchiveDay}
-        onCancel={() => setConfirmArchiveDay(null)}
-      />
+      {archiveDayFlow.dialog && <ConfirmDialog {...archiveDayFlow.dialog} />}
     </div>
   );
 }

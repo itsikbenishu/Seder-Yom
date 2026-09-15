@@ -5,14 +5,14 @@ import type { AttachmentUploadStatus } from "../../../types/eventForm";
 
 export interface AttachmentChipProps {
   filename: string;
-  /** "existing" is a previously-saved attachment (edit mode) — no upload state to show. */
+  /** "existing" is a previously-saved attachment (edit mode) - no upload state to show. */
   status: AttachmentUploadStatus | "existing";
   errorMessage?: string;
   onRemove: () => void;
 }
 
 /**
- * Shared attachment chip for the event form — covers both a file mid-upload in this
+ * Shared attachment chip for the event form - covers both a file mid-upload in this
  * session (`uploading`/`uploaded`/`error`) and an already-saved file shown in edit mode
  * (`existing`). Kept decoupled from `File`/`EventFile` so both `AttachmentsField` (new
  * uploads) and `EventFormDialog` (existing attachments) can reuse the same chip instead

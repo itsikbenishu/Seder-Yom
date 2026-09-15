@@ -20,7 +20,7 @@ import { ReminderField } from "./ReminderField";
 
 // react-hook-form's TFieldValues must be the schema's pre-parse *input* type: fields with
 // a Zod `.default()` (reminder, mutedUntilArchive, fileIds) are optional going in and only
-// become required after zodResolver runs the schema — using the *output* type here (as
+// become required after zodResolver runs the schema - using the *output* type here (as
 // EventFormValues is, for the submitted payload) makes those fields wrongly required on
 // the form/register/watch side and fails to type-check against zodResolver/handleSubmit.
 type EventFormInput = z.input<typeof createEventSchema>;
@@ -34,7 +34,7 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   const { data: userPreferences } = useUserPreferences();
   const { showToast } = useToast();
 
-  // Fixed for the dialog's lifetime — chosen by which "+" opened it (create) or by the
+  // Fixed for the dialog's lifetime - chosen by which "+" opened it (create) or by the
   // event being edited; there's no in-form toggle (matches the reference design).
   const isAllDay = mode.kind === "create" ? mode.allDay : mode.event.allDay;
 
@@ -65,7 +65,7 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
     const uploadedIds = attachments
       .filter((attachment) => attachment.status === "uploaded")
       .map((attachment) => attachment.uploadedFile!.id);
-    // values.allDay is already correct — seeded once via defaultValues and never
+    // values.allDay is already correct - seeded once via defaultValues and never
     // touched by setValue/register, since there's no in-form toggle to change it.
     const payload = { ...values, fileIds: [...existingFiles.map((file) => file.id), ...uploadedIds] };
 

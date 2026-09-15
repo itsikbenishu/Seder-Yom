@@ -67,7 +67,7 @@
             <div class="h-12 w-12 rounded-xl flex items-center justify-center {{ ac.softText }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
             <div><h3 class="text-xl font-semibold m-0">{{ t.twofaTitle }}</h3><p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{{ t.codeSent }} <span class="font-semibold text-slate-700 dark:text-slate-200">{{ email }}</span></p></div>
             <div class="w-[320px] max-w-full flex flex-col gap-3">
-              <input class="{{ inputCls }} text-center text-xl tracking-[0.5em]" value="{{ code }}" onInput="{{ onCode }}" placeholder="——————" maxlength="6">
+              <input class="{{ inputCls }} text-center text-xl tracking-[0.5em]" value="{{ code }}" onInput="{{ onCode }}" placeholder="------" maxlength="6">
               <button class="{{ btnPrimary }} w-full" onClick="{{ verify }}">{{ t.verify }}</button>
             </div>
           </div>
@@ -411,7 +411,7 @@ class Component extends DCLogic {
         E(2,0,'13:00','14:00','צהריים עם דנה','Lunch with Dana',{}),
         E(3,1,'','','יום הולדת אמא','Mom\u2019s birthday',{allDay:true,gcal:true}),
         E(4,1,'08:30','09:15','אימון בוקר','Morning workout',{freq:'daily',reminder:true,lead:'1h'}),
-        E(5,1,'17:00','18:30','קורס React','React course',{gcal:true,dh:'שיעור 7 — hooks',de:'Lesson 7 — hooks'}),
+        E(5,1,'17:00','18:30','קורס React','React course',{gcal:true,dh:'שיעור 7 - hooks',de:'Lesson 7 - hooks'}),
         E(6,2,'10:00','11:00','שיחת לקוח','Client call',{reminder:true,lead:'1h',dh:'הצגת אבטיפוס',de:'Present the prototype'}),
         E(7,2,'15:00','15:30','רופא שיניים','Dentist',{reminder:true,lead:'1d'}),
         E(8,3,'','','יום עיון חברה','Company offsite',{allDay:true,gcal:true}),
@@ -482,7 +482,7 @@ class Component extends DCLogic {
       reminder:he?'תזכורת':'Reminder', on:he?'פעיל':'On', off:he?'כבוי':'Off', m15:he?'רבע שעה לפני':'15 min before', m30:he?'חצי שעה לפני':'30 min before', h1:he?'שעה לפני':'1 hour before', d1:he?'יום לפני':'1 day before', sameday:he?'שעה מוגדרת':'Specific time', leadAt:he?'התראה בשעה':'Alert at', allDayEvent:he?'אירוע יום שלם':'All-day event',
       desc:he?'תיאור':'Description', note:he?'הערה':'Note', attach:he?'קבצים (תמונה / PDF / Office)':'Files (image / PDF / Office)', chooseFile:he?'בחירת קובץ':'Choose file', save:he?'שמירה':'Save', delete:he?'מחיקה':'Delete', cancel:he?'ביטול':'Cancel',
       editEvent:he?'עריכת אירוע':'Edit event', newEvent:he?'אירוע חדש':'New event', edit:he?'עריכה':'Edit', details:he?'פרטים':'Details',
-      addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום — עד 5 קבצים / 25MB':'Maximum reached — up to 5 files / 25MB',
+      addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום - עד 5 קבצים / 25MB':'Maximum reached - up to 5 files / 25MB',
       showMore:he?'הצג עוד':'Show more', showLess:he?'הצג פחות':'Show less',
       attachN:he?'קבצים':'files',
       timeErr:he?'שעת הסיום חייבת להיות אחרי שעת ההתחלה':'End time must be after start time',
@@ -500,9 +500,9 @@ class Component extends DCLogic {
       more:he?'עוד':'More', unmuteDay:he?'ביטול השתקת תזכורות':'Unmute alerts',
       alertsMuted:he?'התראות מושתקות':'Alerts muted', alertsOn:he?'התראות פעילות':'Alerts on',
       language:he?'שפה':'Language', appearance:he?'מראה':'Appearance', light:he?'בהיר':'Light', dark:he?'כהה':'Dark',
-      gcalSync:he?'סנכרון Google Calendar':'Google Calendar sync', reauth:he?'אימות מחדש':'Re-authenticate', gcalNote: he?'אירועים מ‑Google מסומנים ומוצגים לקריאה בלבד — לא ניתן לערוך אותם כאן.':'Events from Google are marked and shown read-only — they can\u2019t be edited here.',
+      gcalSync:he?'סנכרון Google Calendar':'Google Calendar sync', reauth:he?'אימות מחדש':'Re-authenticate', gcalNote: he?'אירועים מ‑Google מסומנים ומוצגים לקריאה בלבד - לא ניתן לערוך אותם כאן.':'Events from Google are marked and shown read-only - they can\u2019t be edited here.',
       notif:he?'התראות':'Notifications', browserN:he?'דפדפן':'Browser', mobileN:he?'נייד':'Mobile',
-      notifNote:he?'ההתראות נשלחות כ‑Push (Firebase). בחרו היכן לקבל אותן — התראות לא יופיעו בתוך האפליקציה עצמה.':'Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear inside the app itself.',
+      notifNote:he?'ההתראות נשלחות כ‑Push (Firebase). בחרו היכן לקבל אותן - התראות לא יופיעו בתוך האפליקציה עצמה.':'Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear inside the app itself.',
       saved:he?'האירוע נשמר':'Event saved', deleted:he?'האירוע נמחק':'Event deleted', signOut:he?'התנתקות':'Sign out',
       dragHint:he?'גררו אירוע כדי לשנות את השעה':'Drag an event to change its time', noArchive:he?'לא נמצאו ימים בארכיון':'No archived days found',
       loadingMore:he?'טוען עוד…':'Loading more…',
