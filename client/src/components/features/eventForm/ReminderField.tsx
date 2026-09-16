@@ -40,6 +40,14 @@ export function ReminderField({
 
   const showTimeInput = reminder && (allDay || reminderMode === "time");
 
+  // Turning the reminder on shows "15 minutes before" as the dropdown's label (DEFAULT_MODE
+  // fallback) - commit that same value to the form so what's displayed is what gets saved,
+  // not just a visual placeholder that leaves reminderMode unset.
+  function handleReminderChange(value: boolean) {
+    onReminderChange(value);
+    if (value && !allDay && !reminderMode) onReminderModeChange(DEFAULT_MODE);
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
@@ -51,7 +59,7 @@ export function ReminderField({
               { value: "on", label: t("eventForm.reminder.on") },
             ]}
             value={reminder ? "on" : "off"}
-            onChange={(value) => onReminderChange(value === "on")}
+            onChange={(value) => handleReminderChange(value === "on")}
             aria-label={t("eventForm.reminder.toggleLabel")}
           />
 
@@ -64,7 +72,9 @@ export function ReminderField({
               trigger={
                 <Button variant="secondary" className="justify-between gap-2 whitespace-nowrap">
                   {modeLabels[reminderMode ?? DEFAULT_MODE]}
-                  <span aria-hidden="true">⌄</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </Button>
               }
             />
