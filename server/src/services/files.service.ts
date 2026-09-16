@@ -11,6 +11,13 @@ type EventFileRow = typeof eventFiles.$inferSelect;
 
 const uploadedFileMetaSchema = eventFileSchema.pick({ filename: true, size: true, mimeType: true });
 
+// Storage keys need ASCII-safe names - original filenames (WhatsApp exports especially) can carry
+// bidi-control or other characters S3-compatible keys reject; the display `filename` stays untouched.
+function toSafeStorageSegment(originalName: string): string {
+  const safe = originalName.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  return safe || "file";
+}
+
 export function toApiEventFile(row: EventFileRow): EventFile {
   return eventFileSchema.parse({
     id: row.id,
@@ -35,8 +42,12 @@ export async function removeStorageObjects(storagePaths: string[]): Promise<void
 }
 
 export async function uploadEventFile(userId: string, file: Express.Multer.File): Promise<EventFile> {
+  // Busboy (Multer's parser) decodes multipart header fields as latin1 by default, so a UTF-8
+  // filename (Hebrew, emoji, etc.) arrives byte-mangled - re-decode it back to the real UTF-8 text.
+  const filename = Buffer.from(file.originalname, "latin1").toString("utf8");
+
   const parsed = uploadedFileMetaSchema.safeParse({
-    filename: file.originalname,
+    filename,
     size: file.size,
     mimeType: file.mimetype,
   });
@@ -44,7 +55,7 @@ export async function uploadEventFile(userId: string, file: Express.Multer.File)
     throw new ValidationError(parsed.error.issues[0]?.message ?? "validation.invalid");
   }
 
-  const storagePath = `${userId}/${randomUUID()}-${file.originalname}`;
+  const storagePath = `${userId}/${randomUUID()}-${toSafeStorageSegment(filename)}`;
 
   const { error: uploadError } = await supabaseStorageClient.storage
     .from(env.SUPABASE_STORAGE_BUCKET)
@@ -57,7 +68,7 @@ export async function uploadEventFile(userId: string, file: Express.Multer.File)
   try {
     const [row] = await db
       .insert(eventFiles)
-      .values({ userId, storagePath, filename: file.originalname, size: file.size, mimeType: file.mimetype })
+      .values({ userId, storagePath, filename, size: file.size, mimeType: file.mimetype })
       .returning();
 
     return toApiEventFile(row);

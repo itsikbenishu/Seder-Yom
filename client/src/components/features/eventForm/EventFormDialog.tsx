@@ -62,12 +62,13 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
   const reminderTime = useWatch({ control, name: "reminderTime" });
 
   function onSubmit(values: EventFormValues) {
-    const uploadedIds = attachments
+    const uploadedFiles = attachments
       .filter((attachment) => attachment.status === "uploaded")
-      .map((attachment) => attachment.uploadedFile!.id);
+      .map((attachment) => attachment.uploadedFile!);
+    const files = [...existingFiles, ...uploadedFiles];
     // values.allDay is already correct - seeded once via defaultValues and never
     // touched by setValue/register, since there's no in-form toggle to change it.
-    const payload = { ...values, fileIds: [...existingFiles.map((file) => file.id), ...uploadedIds] };
+    const payload = { ...values, fileIds: files.map((file) => file.id) };
 
     function onSaveSuccess() {
       const channel = userPreferences?.channels[0] ?? "browser";
@@ -77,10 +78,10 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
     }
 
     if (mode.kind === "create") {
-      createMutation.mutate(payload, { onSuccess: onSaveSuccess });
+      createMutation.mutate({ input: payload, files }, { onSuccess: onSaveSuccess });
       return;
     }
-    updateMutation.mutate({ id: mode.event.id, input: payload }, { onSuccess: onSaveSuccess });
+    updateMutation.mutate({ id: mode.event.id, input: payload, files }, { onSuccess: onSaveSuccess });
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending;

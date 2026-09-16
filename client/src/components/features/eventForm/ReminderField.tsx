@@ -44,7 +44,7 @@ export function ReminderField({
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{t("eventForm.reminder.toggleLabel")}</p>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
           <SegmentedControl<ReminderEnabled>
             options={[
               { value: "off", label: t("eventForm.reminder.off") },
@@ -62,7 +62,7 @@ export function ReminderField({
               align="start"
               aria-label={t("eventForm.reminder.leadLabel")}
               trigger={
-                <Button variant="secondary" className="justify-between gap-2">
+                <Button variant="secondary" className="justify-between gap-2 whitespace-nowrap">
                   {modeLabels[reminderMode ?? DEFAULT_MODE]}
                   <span aria-hidden="true">⌄</span>
                 </Button>

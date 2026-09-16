@@ -83,7 +83,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
     const event = data.timedEvents.find((item) => item.id === eventId);
     if (!event) return;
     const newEnd = computeRescheduledEnd(event.start, event.end, newStart);
-    updateEventMutation.mutate({ id: eventId, input: { start: newStart, end: newEnd } });
+    updateEventMutation.mutate({ id: eventId, input: { start: newStart, end: newEnd }, files: event.files });
   }
 
   function handleConfirm() {
