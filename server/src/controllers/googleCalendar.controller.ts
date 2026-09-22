@@ -16,8 +16,11 @@ import { logger } from "../config/logger.js";
 
 const STATE_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: (env.NODE_ENV === "production" ? "lax" : "none") as "lax" | "none",
+  // Must mirror the auth cookie's derivation (auth.controller.ts) - SameSite=None without
+  // Secure is rejected outright by browsers, so `secure` has to account for the same-site
+  // override, not just NODE_ENV, or the cookie silently never gets stored.
+  secure: env.NODE_ENV === "production" || env.AUTH_COOKIE_SAME_SITE === "none",
+  sameSite: env.AUTH_COOKIE_SAME_SITE,
   path: "/api/v1/gcal",
   maxAge: 5 * 60 * 1000,
 };
