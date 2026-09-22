@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { AppTheme } from "@project/shared";
 import { hasNoSession } from "../services/queryClient";
+import { writeCachedTheme } from "../utils/themeStorage";
 import { useUserPreferences } from "./useUserPreferences";
 import { useUpdateUserPreferencesMutation } from "./useUpdateUserPreferencesMutation";
 
@@ -28,6 +29,12 @@ export function useAppTheme(): { theme: AppTheme; setTheme: (theme: AppTheme) =>
     media.addEventListener("change", applyResolvedTheme);
     return () => media.removeEventListener("change", applyResolvedTheme);
   }, [theme]);
+
+  // Only cache once the server's real value has loaded - never the "system" fallback
+  // used while it's still in flight, which would clobber a good cached value with a guess.
+  useEffect(() => {
+    if (data?.theme) writeCachedTheme(data.theme);
+  }, [data?.theme]);
 
   return {
     theme,

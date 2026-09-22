@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Runs before any paint - sets the theme class from the last-known account value
+         (cached by useAppTheme) so there's no light/dark flash while the app boots and
+         re-fetches the real preference. Must stay a plain blocking script, not a module
+         bundled with the app, or it'd run too late to prevent the first paint. -->
+    <script>
+      (function () {
+        var cached = null;
+        try {
+          cached = localStorage.getItem("sy-theme");
+        } catch (e) {}
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var isDark = cached === "dark" || (cached !== "light" && prefersDark);
+        document.documentElement.classList.toggle("dark", isDark);
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

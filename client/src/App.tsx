@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useState, useTransition } from "react";
 import type { ArchivedDay } from "@project/shared";
 import { GlobalLoadingBar } from "./components/ui";
+import { useAppLanguage } from "./hooks/useAppLanguage";
+import { useAppTheme } from "./hooks/useAppTheme";
 import { usePushLifecycle } from "./hooks/usePushLifecycle";
 import { syncPushRegistration } from "./services/pushRegistration";
 import { hasNoSession, onSessionEnd } from "./services/queryClient";
@@ -34,6 +36,11 @@ function App() {
 
   // Refresh an already-granted push token and listen for foreground messages.
   usePushLifecycle();
+
+  // Hoisted to the app root (not just SettingsScreen) so the account's real language/theme
+  // apply as soon as they load, everywhere - not only after the user happens to visit Settings.
+  const { language, setLanguage, isPending: isLanguagePending } = useAppLanguage();
+  const { theme, setTheme, isPending: isThemePending } = useAppTheme();
 
   // No upfront auth check - Login only appears once a mutation 401s.
   useEffect(() => onSessionEnd(() => startTransition(() => setScreen({ screen: "login" }))), [startTransition]);
@@ -70,7 +77,15 @@ function App() {
         )}
 
         {screen.screen === "settings" && (
-          <SettingsScreen onBack={() => startTransition(() => setScreen({ screen: "week" }))} />
+          <SettingsScreen
+            onBack={() => startTransition(() => setScreen({ screen: "week" }))}
+            language={language}
+            onLanguageChange={setLanguage}
+            isLanguagePending={isLanguagePending}
+            theme={theme}
+            onThemeChange={setTheme}
+            isThemePending={isThemePending}
+          />
         )}
 
         {screen.screen === "archiveDay" && (

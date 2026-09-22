@@ -41,4 +41,10 @@ export interface SignOutSectionProps {
 
 export interface SettingsScreenProps {
   onBack: () => void;
+  language: AppLanguage;
+  onLanguageChange: (language: AppLanguage) => void;
+  isLanguagePending: boolean;
+  theme: AppTheme;
+  onThemeChange: (theme: AppTheme) => void;
+  isThemePending: boolean;
 }

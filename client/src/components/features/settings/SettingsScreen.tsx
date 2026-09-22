@@ -1,9 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui";
 import { hasNoSession } from "../../../services/queryClient";
-import { useAppLanguage } from "../../../hooks/useAppLanguage";
 import { useRequireSession } from "../../../hooks/useRequireSession";
-import { useAppTheme } from "../../../hooks/useAppTheme";
 import { useGoogleCalendarStatus } from "../../../hooks/useGoogleCalendarStatus";
 import { useDisconnectGoogleCalendarMutation } from "../../../hooks/useDisconnectGoogleCalendarMutation";
 import { useUserPreferences } from "../../../hooks/useUserPreferences";
@@ -19,10 +17,16 @@ import { SignOutSection } from "./SignOutSection";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api/v1";
 
-export function SettingsScreen({ onBack }: SettingsScreenProps) {
+export function SettingsScreen({
+  onBack,
+  language,
+  onLanguageChange,
+  isLanguagePending,
+  theme,
+  onThemeChange,
+  isThemePending,
+}: SettingsScreenProps) {
   const { t } = useTranslation();
-  const { language, setLanguage, isPending: isLanguagePending } = useAppLanguage();
-  const { theme, setTheme, isPending: isThemePending } = useAppTheme();
 
   const { data: googleStatus } = useGoogleCalendarStatus();
   const disconnectGoogleCalendarMutation = useDisconnectGoogleCalendarMutation();
@@ -58,8 +62,8 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       </header>
 
       <div className="sy-scroll me-auto flex w-full max-w-[540px] flex-1 flex-col gap-6 overflow-y-auto p-4">
-        <LanguageSection language={language} onChange={setLanguage} isPending={isLanguagePending} />
-        <AppearanceSection theme={theme} onChange={setTheme} isPending={isThemePending} />
+        <LanguageSection language={language} onChange={onLanguageChange} isPending={isLanguagePending} />
+        <AppearanceSection theme={theme} onChange={onThemeChange} isPending={isThemePending} />
         <GoogleCalendarSection
           status={googleStatus ?? { connected: false }}
           onToggleConnected={handleToggleGoogleCalendarConnected}
