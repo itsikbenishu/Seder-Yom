@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Button, Modal } from "../../ui";
+import { Button, GoogleSyncedBadge, Modal } from "../../ui";
 import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import type { AllDayEventDetailProps } from "../../../types/day";
 import { AttachmentsSection } from "./AttachmentsSection";
@@ -38,16 +38,10 @@ export function AllDayEventDetail({ event, onClose, onEdit, onDelete }: AllDayEv
 
       <div className="mb-4 flex flex-wrap items-center gap-1.5">
         {isGoogle ? (
-          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
-            {t("day.allDay.googleSynced")}
-          </span>
+          <GoogleSyncedBadge />
         ) : (
           <>
-            {event.googleCalendarSynced && (
-              <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
-                {t("day.allDay.googleSynced")}
-              </span>
-            )}
+            {event.googleCalendarSynced && <GoogleSyncedBadge />}
             {event.reminder && event.reminderTime && (
               <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">
                 {t("day.allDay.reminderAt", { time: event.reminderTime })}

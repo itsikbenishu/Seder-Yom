@@ -39,7 +39,8 @@
       "unmuteAria": "בטל השתקת תזכורת",
       "editAria": "ערוך אירוע",
       "deleteAria": "מחק אירוע",
-      "googleSynced": "מסונכרן מ-Google"
+      "googleSynced": "Google",
+      "dragHint": "גררו אירוע כדי לשנות את השעה"
     },
     "allDay": {
       "detailKicker": "אירוע יום שלם",
@@ -49,7 +50,6 @@
       "attachments": "קבצים מצורפים",
       "delete": "מחיקה",
       "edit": "עריכה",
-      "googleSynced": "מסונכרן מגוגל",
       "repeatDaily": "חוזר מדי יום",
       "repeatWeekly": "חוזר מדי שבוע",
       "reminderAt": "תזכורת בשעה {{time}}"

@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
-import { Button, Spinner } from "../../ui";
+import { Button, GoogleSyncedBadge, Spinner } from "../../ui";
 import { cn } from "../../../utils/cn";
 import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import type { EventRowProps } from "../../../types/day";
@@ -60,11 +60,7 @@ export function EventRow({
               {t("day.event.nextUp")}
             </span>
           )}
-          {isGoogleSynced && (
-            <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-              {t("day.event.googleSynced")}
-            </span>
-          )}
+          {isGoogleSynced && <GoogleSyncedBadge />}
         </div>
 
         <ClampableDetails

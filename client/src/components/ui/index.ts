@@ -3,6 +3,7 @@ export * from "./Button";
 export * from "./ConfirmDialog";
 export * from "./DropdownMenu";
 export * from "./GlobalLoadingBar";
+export * from "./GoogleSyncedBadge";
 export * from "./Input";
 export * from "./Modal";
 export * from "./SegmentedControl";

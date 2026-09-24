@@ -1,11 +1,10 @@
-import { useTranslation } from "react-i18next";
+import { GoogleSyncedBadge } from "../../ui";
 import { cn } from "../../../utils/cn";
 import { isGoogleCalendarEvent, type ArchiveDayEventRowProps } from "../../../types/archiveDay";
 import { ClampableDetails } from "../day/ClampableDetails";
 import { FileChip } from "../day/FileChip";
 
 export function ArchiveDayEventRow({ event, isExpanded, onToggleExpand }: ArchiveDayEventRowProps) {
-  const { t } = useTranslation();
   const isGoogle = isGoogleCalendarEvent(event);
   const isGoogleSynced = isGoogle || event.googleCalendarSynced;
 
@@ -26,11 +25,7 @@ export function ArchiveDayEventRow({ event, isExpanded, onToggleExpand }: Archiv
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-[16px] font-semibold break-words [overflow-wrap:anywhere]">{event.title}</span>
-          {isGoogleSynced && (
-            <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-              {t("day.event.googleSynced")}
-            </span>
-          )}
+          {isGoogleSynced && <GoogleSyncedBadge />}
         </div>
 
         <ClampableDetails

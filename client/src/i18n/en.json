@@ -39,7 +39,8 @@
       "unmuteAria": "Unmute reminder",
       "editAria": "Edit event",
       "deleteAria": "Delete event",
-      "googleSynced": "Google-synced"
+      "googleSynced": "Google",
+      "dragHint": "Drag an event to change its time"
     },
     "allDay": {
       "detailKicker": "All-day event",
@@ -49,7 +50,6 @@
       "attachments": "Attachments",
       "delete": "Delete",
       "edit": "Edit",
-      "googleSynced": "Google-synced",
       "repeatDaily": "Repeats daily",
       "repeatWeekly": "Repeats weekly",
       "reminderAt": "Reminder at {{time}}"

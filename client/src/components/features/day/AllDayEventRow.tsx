@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Button } from "../../ui";
+import { Button, GoogleSyncedBadge } from "../../ui";
 import { cn } from "../../../utils/cn";
 import type { AllDayEventRowProps } from "../../../types/day";
 
@@ -19,11 +19,7 @@ export function AllDayEventRow({ title, isSynced, onOpenDetail }: AllDayEventRow
       <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800 dark:text-slate-100">
         {title}
       </span>
-      {isSynced && (
-        <span className="shrink-0 rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
-          {t("day.allDay.googleSynced")}
-        </span>
-      )}
+      {isSynced && <GoogleSyncedBadge />}
       <Button variant="ghost" size="icon" className="shrink-0" onClick={onOpenDetail} aria-label={t("day.allDay.infoAria")}>
         ⓘ
       </Button>
