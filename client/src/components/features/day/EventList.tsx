@@ -1,6 +1,7 @@
 import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useScheduleDnd } from "../../../hooks/useScheduleDnd";
+import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import type { EventListProps } from "../../../types/day";
 import { EventRow } from "./EventRow";
 
@@ -26,7 +27,7 @@ export function EventList({
               event={event}
               isNextUp={event.id === data.nextUpEventId}
               isExpanded={Boolean(expandedEventIds[event.id])}
-              isDraggable={!event.googleCalendarSynced}
+              isDraggable={!isGoogleCalendarEvent(event) && !event.googleCalendarSynced}
               onToggleExpand={onToggleExpand}
               onMuteToggle={onMuteToggleEvent}
               isMuteTogglePending={isMuteTogglePending(event.id)}

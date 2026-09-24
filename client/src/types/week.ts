@@ -1,3 +1,4 @@
+import type { GoogleCalendarEvent } from "@project/shared";
 import type { CalendarEvent } from "./calendarEvent";
 
 export interface WeekDayDate {
@@ -12,8 +13,8 @@ export interface WeekDay {
   isToday: boolean;
   /** Derived: true only when every timed event for this day has mutedUntilArchive === true. */
   isMuted: boolean;
-  events: CalendarEvent[];
-  nearestEvent: CalendarEvent | null;
+  events: CalendarEvent[]; // local-only by design - no renderer consumes this today
+  nearestEvent: CalendarEvent | GoogleCalendarEvent | null;
 }
 
 export interface WeekRange {

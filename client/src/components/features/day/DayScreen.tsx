@@ -3,6 +3,7 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Button, ConfirmDialog } from "../../ui";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
+import { useGoogleCalendarWeekEvents } from "../../../hooks/useGoogleCalendarWeekEvents";
 import { useRequireSession } from "../../../hooks/useRequireSession";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
@@ -13,6 +14,7 @@ import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
 import { useClearDayMutation } from "../../../hooks/useClearDayMutation";
 import { buildDayViewData } from "../../../utils/buildDayViewData";
 import { computeRescheduledEnd } from "../../../utils/rescheduleEvent";
+import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import { EventFormDialog } from "../eventForm";
 import type { EventFormMode } from "../../../types/eventForm";
 import { AllDayEventDetail } from "./AllDayEventDetail";
@@ -39,7 +41,8 @@ function getConfirmDialogContent(target: DayConfirmTarget, t: TFunction) {
 export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchive }: DayScreenProps) {
   const { t } = useTranslation();
   const { data: events } = useWeekEvents();
-  const data = buildDayViewData(events ?? [], dayOfWeek);
+  const { data: googleEvents } = useGoogleCalendarWeekEvents();
+  const data = buildDayViewData(events ?? [], dayOfWeek, new Date(), googleEvents ?? []);
 
   const [expandedEventIds, setExpandedEventIds] = useState<Record<string, boolean>>({});
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
@@ -76,12 +79,12 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
 
   function handleEditEvent(eventId: string) {
     const event = data.timedEvents.find((item) => item.id === eventId) ?? data.allDayEvents.find((item) => item.id === eventId);
-    if (event) requireSession(() => setFormTarget({ kind: "edit", event }));
+    if (event && !isGoogleCalendarEvent(event)) requireSession(() => setFormTarget({ kind: "edit", event }));
   }
 
   function handleReorder(eventId: string, newStart: string) {
     const event = data.timedEvents.find((item) => item.id === eventId);
-    if (!event) return;
+    if (!event || isGoogleCalendarEvent(event)) return;
     const newEnd = computeRescheduledEnd(event.start, event.end, newStart);
     updateEventMutation.mutate({ id: eventId, input: { start: newStart, end: newEnd }, files: event.files });
   }
@@ -135,7 +138,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           <AllDayEventRow
             key={event.id}
             title={event.title}
-            isSynced={event.googleCalendarSynced}
+            isSynced={isGoogleCalendarEvent(event) || event.googleCalendarSynced}
             onOpenDetail={() => setOpenAllDayId(event.id)}
           />
         ))}
@@ -146,7 +149,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           onToggleExpand={(eventId) => setExpandedEventIds((prev) => ({ ...prev, [eventId]: !prev[eventId] }))}
           onMuteToggleEvent={(eventId) => {
             const event = data.timedEvents.find((item) => item.id === eventId);
-            if (!event) return;
+            if (!event || isGoogleCalendarEvent(event)) return;
             setPendingMuteEventIds((current) => new Set(current).add(eventId));
             muteEventMutation.mutate(
               { id: eventId, muted: !event.mutedUntilArchive },

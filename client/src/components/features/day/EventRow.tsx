@@ -3,6 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
 import { Button, Spinner } from "../../ui";
 import { cn } from "../../../utils/cn";
+import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import type { EventRowProps } from "../../../types/day";
 import { ClampableDetails } from "./ClampableDetails";
 import { FileChip } from "./FileChip";
@@ -19,6 +20,8 @@ export function EventRow({
   onDelete,
 }: EventRowProps) {
   const { t } = useTranslation();
+  const isGoogle = isGoogleCalendarEvent(event);
+  const isGoogleSynced = isGoogle || event.googleCalendarSynced;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: event.id,
     disabled: !isDraggable,
@@ -34,7 +37,7 @@ export function EventRow({
       {...dragProps}
       className={cn(
         "flex items-start gap-3 rounded-xl border p-3.5",
-        event.googleCalendarSynced
+        isGoogleSynced
           ? "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40"
           : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900",
         // dnd-kit's PointerSensor needs touch gestures on the drag source itself, not the
@@ -57,7 +60,7 @@ export function EventRow({
               {t("day.event.nextUp")}
             </span>
           )}
-          {event.googleCalendarSynced && (
+          {isGoogleSynced && (
             <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-600 dark:bg-slate-700 dark:text-slate-300">
               {t("day.event.googleSynced")}
             </span>
@@ -66,12 +69,12 @@ export function EventRow({
 
         <ClampableDetails
           description={event.description ?? ""}
-          note={event.note ?? ""}
+          note={isGoogle ? "" : (event.note ?? "")}
           isExpanded={isExpanded}
           onToggleExpand={() => onToggleExpand(event.id)}
         />
 
-        {event.files.length > 0 && (
+        {!isGoogle && event.files.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {event.files.map((file) => (
               <FileChip key={file.id} file={file} />
@@ -80,7 +83,7 @@ export function EventRow({
         )}
       </div>
 
-      {!event.googleCalendarSynced && (
+      {!isGoogle && !event.googleCalendarSynced && (
         <div className="flex shrink-0 items-center gap-1">
           <Button
             variant="ghost"

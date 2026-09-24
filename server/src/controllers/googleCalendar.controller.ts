@@ -16,9 +16,7 @@ import { logger } from "../config/logger.js";
 
 const STATE_COOKIE_OPTIONS = {
   httpOnly: true,
-  // Must mirror the auth cookie's derivation (auth.controller.ts) - SameSite=None without
-  // Secure is rejected outright by browsers, so `secure` has to account for the same-site
-  // override, not just NODE_ENV, or the cookie silently never gets stored.
+  // Mirrors the auth cookie's derivation (auth.controller.ts) - SameSite=None without Secure is rejected by browsers.
   secure: env.NODE_ENV === "production" || env.AUTH_COOKIE_SAME_SITE === "none",
   sameSite: env.AUTH_COOKIE_SAME_SITE,
   path: "/api/v1/gcal",

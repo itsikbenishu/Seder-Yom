@@ -11,6 +11,10 @@ export function getGoogleCalendarEventsForDate(day: ArchivedDay): Promise<Google
   return apiRequest<GoogleCalendarEvent[]>(`/gcal/events?${query.toString()}`);
 }
 
+export function getGoogleCalendarWeekEvents(): Promise<GoogleCalendarEvent[]> {
+  return apiRequest<GoogleCalendarEvent[]>("/gcal/events");
+}
+
 export function getGoogleCalendarStatus(): Promise<GoogleCalendarConnectionStatus> {
   return apiRequest<GoogleCalendarConnectionStatus>("/gcal/status");
 }

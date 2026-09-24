@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { GoogleCalendarEvent } from "@project/shared";
 import type { CalendarEvent } from "../types/calendarEvent";
 import { buildWeekViewData } from "./buildWeekViewData";
 
@@ -14,6 +15,18 @@ function ev(partial: {
     allDay: partial.allDay ?? false,
     mutedUntilArchive: partial.mutedUntilArchive ?? false,
   } as unknown as CalendarEvent;
+}
+
+function gev(partial: { dayOfWeek: number; start?: string; allDay?: boolean }): GoogleCalendarEvent {
+  return {
+    id: `gcal_${Math.random()}`,
+    dayOfWeek: partial.dayOfWeek,
+    title: "Google event",
+    start: partial.start ?? "09:00",
+    end: "10:00",
+    allDay: partial.allDay ?? false,
+    gcal: true,
+  };
 }
 
 const MONDAY = new Date(2026, 8, 7); // 2026-09-07 is a Monday (dayOfWeek 1)
@@ -63,5 +76,25 @@ describe("buildWeekViewData", () => {
   it("has no nearestEvent when a day holds only all-day events", () => {
     const { days } = buildWeekViewData([ev({ dayOfWeek: 6, allDay: true })], MONDAY);
     expect(days[6].nearestEvent).toBeNull();
+  });
+
+  it("picks the earliest event as nearestEvent across local and google events", () => {
+    const { days } = buildWeekViewData(
+      [ev({ dayOfWeek: 5, start: "14:00" })],
+      MONDAY,
+      [gev({ dayOfWeek: 5, start: "08:30" })],
+    );
+    expect(days[5].nearestEvent?.start).toBe("08:30");
+  });
+
+  it("ignores google events for isMuted - a google-only day is never muted", () => {
+    const { days } = buildWeekViewData([], MONDAY, [gev({ dayOfWeek: 2 }), gev({ dayOfWeek: 2 })]);
+    expect(days[2].isMuted).toBe(false);
+  });
+
+  it("keeps WeekDay.events local-only even when nearestEvent is a google event", () => {
+    const { days } = buildWeekViewData([], MONDAY, [gev({ dayOfWeek: 3, start: "08:30" })]);
+    expect(days[3].events).toHaveLength(0);
+    expect(days[3].nearestEvent?.start).toBe("08:30");
   });
 });

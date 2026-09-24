@@ -4,6 +4,7 @@ import { ArchiveIcon, Button, ConfirmDialog } from "../../ui";
 import { WeekGrid } from "./WeekGrid";
 import { WeekGridSkeleton } from "./WeekGridSkeleton";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
+import { useGoogleCalendarWeekEvents } from "../../../hooks/useGoogleCalendarWeekEvents";
 import { useMuteDayMutation } from "../../../hooks/useMuteDayMutation";
 import { useUnmuteDayMutation } from "../../../hooks/useUnmuteDayMutation";
 import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
@@ -27,6 +28,7 @@ export interface WeekScreenProps {
 export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekScreenProps) {
   const { t, i18n } = useTranslation();
   const { data: events, isPending: isEventsPending } = useWeekEvents();
+  const { data: googleEvents } = useGoogleCalendarWeekEvents();
   const muteDayMutation = useMuteDayMutation();
   const unmuteDayMutation = useUnmuteDayMutation();
   const archiveDayFlow = useArchiveDayFlow();
@@ -34,7 +36,7 @@ export function WeekScreen({ onSelectDay, onOpenArchive, onOpenSettings }: WeekS
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
   const [pendingMuteDayIds, setPendingMuteDayIds] = useState<Set<number>>(new Set());
 
-  const weekViewData = buildWeekViewData(events ?? [], new Date());
+  const weekViewData = buildWeekViewData(events ?? [], new Date(), googleEvents ?? []);
 
   function handleToggleMuteDay(dayOfWeek: number) {
     const day = weekViewData.days.find((item) => item.dayOfWeek === dayOfWeek);

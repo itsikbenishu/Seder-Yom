@@ -1,4 +1,8 @@
+import type { GoogleCalendarEvent } from "@project/shared";
 import type { AllDayCalendarEvent, TimedCalendarEvent } from "./calendarEvent";
+
+export type DayTimedEvent = TimedCalendarEvent | GoogleCalendarEvent;
+export type DayAllDayEvent = AllDayCalendarEvent | GoogleCalendarEvent;
 
 export interface DayDate {
   yr: number;
@@ -9,8 +13,8 @@ export interface DayDate {
 export interface DayViewData {
   dayOfWeek: number; // 0-6
   date: DayDate;
-  timedEvents: TimedCalendarEvent[]; // sorted by start
-  allDayEvents: AllDayCalendarEvent[];
+  timedEvents: DayTimedEvent[]; // local + live-fetched gcal, merged, sorted by start
+  allDayEvents: DayAllDayEvent[];
   /** Derived: true only when every timed event for this day has mutedUntilArchive === true. */
   isMuted: boolean;
   /** The nearest upcoming timed event, if any - drives the "Next up" tag. */
@@ -34,7 +38,7 @@ export interface DayHeaderProps {
 }
 
 export interface EventRowProps {
-  event: TimedCalendarEvent;
+  event: DayTimedEvent;
   isNextUp: boolean;
   /** desc/note "show more"/"show less" state, only relevant when combined length > 80 chars. */
   isExpanded: boolean;
@@ -54,7 +58,7 @@ export interface AllDayEventRowProps {
 }
 
 export interface AllDayEventDetailProps {
-  event: AllDayCalendarEvent;
+  event: DayAllDayEvent;
   onClose: () => void;
   onEdit: (eventId: string) => void;
   onDelete: (eventId: string) => void;

@@ -10,7 +10,8 @@ import {
   type SensorOptions,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import type { TimedCalendarEvent } from "../types/calendarEvent";
+import { isGoogleCalendarEvent, type TimedCalendarEvent } from "../types/calendarEvent";
+import type { DayTimedEvent } from "../types/day";
 
 /** Fixed increment (minutes) new start times snap to when there's no exact neighbor to align with. */
 const SNAP_MINUTES = 15;
@@ -68,7 +69,7 @@ export interface UseScheduleDndResult {
  * preserving the caller's job of shifting `end` by the same delta to keep duration constant.
  */
 export function useScheduleDnd(
-  events: TimedCalendarEvent[],
+  events: DayTimedEvent[],
   onReorder: (eventId: string, newStart: string) => void,
 ): UseScheduleDndResult {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -78,9 +79,10 @@ export function useScheduleDnd(
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  // Google-synced events are never drag sources - only local events participate
-  // in the sortable list, so reorder math only ever considers positions among each other.
-  const draggableEvents = events.filter((event) => !event.googleCalendarSynced);
+  // Google-synced events are never drag sources - only local, non-synced events are sortable.
+  const draggableEvents = events.filter(
+    (event): event is TimedCalendarEvent => !isGoogleCalendarEvent(event) && !event.googleCalendarSynced,
+  );
   const sortableIds = draggableEvents.map((event) => event.id);
 
   function onDragStart(event: DragStartEvent) {
