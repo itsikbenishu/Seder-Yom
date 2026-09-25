@@ -8,7 +8,7 @@ import { AppError } from "../utils/AppError.js";
 import { currentWeekRange, dayOfWeekForDate, type WeekRange } from "./weekDates.js";
 
 const REFRESH_MARGIN_MS = 60_000;
-const CALENDAR_EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+const CALENDAR_LIST_URL = "https://www.googleapis.com/calendar/v3/users/me/calendarList";
 
 // The raw wire shape Google's REST API returns - distinct from `GoogleCalendarEvent`
 // (the shared/normalized shape our own API returns), which `mapToGoogleCalendarEvent`
@@ -20,6 +20,12 @@ interface GoogleCalendarApiEvent {
   description?: string;
   start: { date?: string; dateTime?: string };
   end: { date?: string; dateTime?: string };
+}
+
+interface GoogleCalendarListEntry {
+  id: string;
+  selected?: boolean;
+  deleted?: boolean;
 }
 
 // Refreshes the stored access token when it's missing/expiring soon. Returns undefined
@@ -66,8 +72,31 @@ async function getValidAccessToken(userId: string): Promise<string | undefined> 
   }
 }
 
-async function fetchGoogleEvents(accessToken: string, range: WeekRange): Promise<GoogleCalendarApiEvent[]> {
-  const url = new URL(CALENDAR_EVENTS_URL);
+// Calendar list entries with no explicit `selected` (e.g. the user's own primary calendar
+// doesn't always set it) are treated as visible - only an explicit `false` excludes one.
+async function listVisibleCalendarIds(accessToken: string): Promise<string[]> {
+  const url = new URL(CALENDAR_LIST_URL);
+  url.searchParams.set("minAccessRole", "reader");
+
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+
+  if (!response.ok) {
+    throw new AppError(502, "GOOGLE_CALENDAR_API_ERROR", `Google Calendar API request failed (${response.status})`);
+  }
+
+  const body = (await response.json()) as { items?: GoogleCalendarListEntry[] };
+  return (body.items ?? []).filter((entry) => entry.selected !== false && !entry.deleted).map((entry) => entry.id);
+}
+
+// encodeURIComponent is required, not cosmetic - subscribed calendar ids (e.g. the
+// "Holidays in Israel" calendar) contain a literal `#`, which truncates the URL as a
+// fragment if left unencoded.
+function calendarEventsUrl(calendarId: string): string {
+  return `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`;
+}
+
+async function fetchGoogleEvents(accessToken: string, calendarId: string, range: WeekRange): Promise<GoogleCalendarApiEvent[]> {
+  const url = new URL(calendarEventsUrl(calendarId));
   url.searchParams.set("timeMin", range.start.toISOString());
   url.searchParams.set("timeMax", range.end.toISOString());
   url.searchParams.set("singleEvents", "true");
@@ -89,12 +118,13 @@ function timeStringFromDate(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
-// Pure - no I/O - so it's directly testable with hand-built fixtures.
-export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleCalendarEvent {
+// Pure - no I/O - so it's directly testable with hand-built fixtures. `calendarId` is used
+// only for the id prefix - two different calendars can independently mint the same raw id.
+export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent, calendarId: string): GoogleCalendarEvent {
   if (event.start.date && !event.start.dateTime) {
     const startDate = new Date(`${event.start.date}T00:00:00`);
     return googleCalendarEventSchema.parse({
-      id: `gcal_${event.id}`,
+      id: `gcal_${calendarId}_${event.id}`,
       dayOfWeek: dayOfWeekForDate(startDate),
       title: event.summary ?? "",
       description: event.description,
@@ -115,7 +145,7 @@ export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleC
   const endDate = new Date(endDateTime);
 
   return googleCalendarEventSchema.parse({
-    id: `gcal_${event.id}`,
+    id: `gcal_${calendarId}_${event.id}`,
     dayOfWeek: dayOfWeekForDate(startDate),
     title: event.summary ?? "",
     description: event.description,
@@ -127,8 +157,26 @@ export function mapToGoogleCalendarEvent(event: GoogleCalendarApiEvent): GoogleC
 }
 
 async function fetchAndMapGoogleEvents(accessToken: string, range: WeekRange): Promise<GoogleCalendarEvent[]> {
-  const googleEvents = await fetchGoogleEvents(accessToken, range);
-  return googleEvents.filter((event) => event.status !== "cancelled").map(mapToGoogleCalendarEvent);
+  const calendarIds = await listVisibleCalendarIds(accessToken);
+
+  const results = await Promise.allSettled(
+    calendarIds.map((calendarId) =>
+      fetchGoogleEvents(accessToken, calendarId, range).then((events) => ({ calendarId, events })),
+    ),
+  );
+
+  const mapped: GoogleCalendarEvent[] = [];
+  for (const result of results) {
+    if (result.status === "rejected") {
+      logger.warn({ err: result.reason }, "Google Calendar: skipping one calendar after a fetch failure");
+      continue;
+    }
+    const { calendarId, events } = result.value;
+    mapped.push(
+      ...events.filter((event) => event.status !== "cancelled").map((event) => mapToGoogleCalendarEvent(event, calendarId)),
+    );
+  }
+  return mapped;
 }
 
 export async function listGoogleCalendarEvents(userId: string): Promise<GoogleCalendarEvent[]> {
