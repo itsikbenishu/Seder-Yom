@@ -74,6 +74,7 @@ async function deliver(job: ReminderJob, headers: Record<string, unknown> = {}) 
   const channel = {
     prefetch: vi.fn().mockResolvedValue(undefined),
     consume: vi.fn(),
+    once: vi.fn(),
     ack: vi.fn(),
     sendToQueue: vi.fn(),
   } as unknown as Channel;
@@ -214,6 +215,7 @@ describe("reminder consumer", () => {
     const channel = {
       prefetch: vi.fn().mockResolvedValue(undefined),
       consume: vi.fn(),
+      once: vi.fn(),
       ack: vi.fn(),
       sendToQueue: vi.fn(),
     } as unknown as Channel;
@@ -233,5 +235,63 @@ describe("reminder consumer", () => {
     expect(sendToDeadLetter).toHaveBeenCalledWith(channel, job);
     expect(scheduleRetry).not.toHaveBeenCalled();
     expect(channel.ack).toHaveBeenCalledOnce();
+  });
+
+  function makeChannel(): Channel {
+    return {
+      prefetch: vi.fn().mockResolvedValue(undefined),
+      consume: vi.fn(),
+      once: vi.fn(),
+      ack: vi.fn(),
+      sendToQueue: vi.fn(),
+    } as unknown as Channel;
+  }
+
+  function getCloseHandler(channel: Channel): () => void {
+    const call = vi.mocked(channel.once).mock.calls.find(([event]) => event === "close");
+    return call?.[1] as () => void;
+  }
+
+  it("reconnects and re-subscribes when the channel closes", async () => {
+    vi.useFakeTimers();
+    try {
+      const channelA = makeChannel();
+      const channelB = makeChannel();
+      getRabbitMqChannel.mockResolvedValueOnce(channelA).mockResolvedValueOnce(channelB);
+
+      await startReminderConsumer();
+      expect(channelA.consume).toHaveBeenCalledOnce();
+
+      getCloseHandler(channelA)();
+      await vi.advanceTimersByTimeAsync(5_000);
+
+      expect(getRabbitMqChannel).toHaveBeenCalledTimes(2);
+      expect(channelB.consume).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps retrying when a reconnect attempt itself fails", async () => {
+    vi.useFakeTimers();
+    try {
+      const channelA = makeChannel();
+      const channelC = makeChannel();
+      getRabbitMqChannel
+        .mockResolvedValueOnce(channelA)
+        .mockRejectedValueOnce(new Error("connection refused"))
+        .mockResolvedValueOnce(channelC);
+
+      await startReminderConsumer();
+      getCloseHandler(channelA)();
+
+      await vi.advanceTimersByTimeAsync(5_000); // first reconnect attempt - fails
+      await vi.advanceTimersByTimeAsync(5_000); // second reconnect attempt - succeeds
+
+      expect(getRabbitMqChannel).toHaveBeenCalledTimes(3);
+      expect(channelC.consume).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

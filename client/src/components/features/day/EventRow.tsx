@@ -40,9 +40,7 @@ export function EventRow({
         isGoogleSynced
           ? "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800/40"
           : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900",
-        // dnd-kit's PointerSensor needs touch gestures on the drag source itself, not the
-        // browser's native scroll/pan, to reach its activation distance - without this,
-        // touch drags on mobile get swallowed as a page scroll before the drag can start.
+        // Needed for dnd-kit's PointerSensor to see touch gestures instead of the browser's native scroll/pan.
         isDraggable && "touch-none",
         isDragging && "opacity-60",
       )}

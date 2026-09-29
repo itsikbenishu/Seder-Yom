@@ -6,8 +6,10 @@ import { logger } from "./config/logger.js";
 async function startInlineWorker(): Promise<void> {
   const { startReminderConsumer } = await import("worker/src/consumers/reminderConsumer.js");
   const { startOrphanCleanupJob } = await import("worker/src/jobs/orphanFileCleanup.js");
+  const { startRecurringReminderScheduler } = await import("worker/src/jobs/recurringReminderScheduler.js");
   await startReminderConsumer();
   startOrphanCleanupJob();
+  startRecurringReminderScheduler();
   logger.info("Inline worker started");
 }
 

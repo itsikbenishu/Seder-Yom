@@ -48,3 +48,45 @@ export async function findEventReminderState(eventId: string): Promise<EventRemi
 export async function markReminderSent(eventId: string, sentFor: Date): Promise<void> {
   await sql`UPDATE events SET reminder_sent_for = ${sentFor} WHERE id = ${eventId}`;
 }
+
+export interface ActiveReminderEvent {
+  id: string;
+  userId: string;
+  title: string;
+  dayOfWeek: number;
+  start: string;
+  reminderMode: ReminderMode | null;
+  reminderTime: string | null;
+  reminderSentFor: Date | null;
+}
+
+interface ActiveReminderEventRow {
+  id: string;
+  user_id: string;
+  title: string;
+  day_of_week: number;
+  start: string;
+  reminder_mode: ReminderMode | null;
+  reminder_time: string | null;
+  reminder_sent_for: Date | null;
+}
+
+// Candidates for recurringReminderScheduler.ts - "once" events are excluded, they fire at most once by design.
+export async function findActiveReminderEvents(): Promise<ActiveReminderEvent[]> {
+  const rows = await sql<ActiveReminderEventRow[]>`
+    SELECT id, user_id, title, day_of_week, start, reminder_mode, reminder_time, reminder_sent_for
+    FROM events
+    WHERE reminder = true AND muted_until_archive = false AND frequency != 'once'
+  `;
+
+  return rows.map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    title: row.title,
+    dayOfWeek: row.day_of_week,
+    start: row.start,
+    reminderMode: row.reminder_mode,
+    reminderTime: row.reminder_time,
+    reminderSentFor: row.reminder_sent_for,
+  }));
+}

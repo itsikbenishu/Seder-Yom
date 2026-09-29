@@ -135,10 +135,18 @@ async function handleMessage(channel: Channel, msg: ConsumeMessage): Promise<voi
   }
 }
 
-export async function startReminderConsumer(): Promise<void> {
+const RECONNECT_DELAY_MS = 5_000;
+
+async function connectAndConsume(): Promise<void> {
   const channel = await getRabbitMqChannel();
   await assertReminderQueues(channel);
   await channel.prefetch(1);
+
+  // Reconnects on drop (idle timeout, network blip, broker restart) - without this the consumer dies silently and permanently.
+  channel.once("close", () => {
+    logger.warn("Reminder consumer: channel closed - reconnecting");
+    scheduleReconnect();
+  });
 
   await channel.consume(
     REMINDER_QUEUE,
@@ -150,4 +158,17 @@ export async function startReminderConsumer(): Promise<void> {
   );
 
   logger.info("Reminder consumer started");
+}
+
+function scheduleReconnect(): void {
+  setTimeout(() => {
+    connectAndConsume().catch((err: unknown) => {
+      logger.error({ err }, "Reminder consumer: reconnect attempt failed");
+      scheduleReconnect();
+    });
+  }, RECONNECT_DELAY_MS);
+}
+
+export async function startReminderConsumer(): Promise<void> {
+  await connectAndConsume();
 }

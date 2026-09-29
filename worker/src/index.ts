@@ -1,10 +1,12 @@
 import { logger } from "./config/logger.js";
 import { startReminderConsumer } from "./consumers/reminderConsumer.js";
 import { startOrphanCleanupJob } from "./jobs/orphanFileCleanup.js";
+import { startRecurringReminderScheduler } from "./jobs/recurringReminderScheduler.js";
 
 async function main(): Promise<void> {
   await startReminderConsumer();
   startOrphanCleanupJob();
+  startRecurringReminderScheduler();
   logger.info("Worker started");
 }
 
