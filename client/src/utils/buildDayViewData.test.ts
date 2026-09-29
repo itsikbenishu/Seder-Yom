@@ -70,4 +70,11 @@ describe("buildDayViewData", () => {
     const data = buildDayViewData([ev({ dayOfWeek: 1, start: "08:00" })], 1, NOW, [gev({ dayOfWeek: 1, start: "13:00" })]);
     expect(data.nextUpEventId).toBe(data.timedEvents.find((e) => e.start === "13:00")?.id);
   });
+
+  it("never marks a nextUpEventId on a day other than today, even if the clock-time would match", () => {
+    // NOW is Monday (dayOfWeek 1) 12:00 - this event is on Tuesday at 13:00, a time-of-day
+    // that would otherwise look "upcoming", but "next up" only makes sense for today.
+    const data = buildDayViewData([ev({ dayOfWeek: 2, start: "13:00" })], 2, NOW);
+    expect(data.nextUpEventId).toBeNull();
+  });
 });

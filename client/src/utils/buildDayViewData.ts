@@ -1,4 +1,4 @@
-import { dateForDayOfWeek } from "@project/shared";
+import { dateForDayOfWeek, dayOfWeekForDate } from "@project/shared";
 import type { GoogleCalendarEvent } from "@project/shared";
 import type { AllDayCalendarEvent, CalendarEvent, TimedCalendarEvent } from "../types/calendarEvent";
 import type { DayAllDayEvent, DayTimedEvent, DayViewData } from "../types/day";
@@ -37,6 +37,7 @@ export function buildDayViewData(
   const allDayEvents: DayAllDayEvent[] = [...localAllDayEvents, ...googleAllDayEvents];
 
   const date = dateForDayOfWeek(dayOfWeek);
+  const isToday = dayOfWeek === dayOfWeekForDate(now);
 
   return {
     dayOfWeek,
@@ -44,6 +45,8 @@ export function buildDayViewData(
     timedEvents,
     allDayEvents,
     isMuted,
-    nextUpEventId: nextUpEventId(timedEvents, now),
+    // "Next up" is a same-day concept - a future day's first event-after-current-clock-time is
+    // not "next up", it just happens to share a time-of-day with whatever moment "now" is.
+    nextUpEventId: isToday ? nextUpEventId(timedEvents, now) : null,
   };
 }
