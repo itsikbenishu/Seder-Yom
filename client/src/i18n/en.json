@@ -177,7 +177,8 @@
     "resend": "Didn't get a code? Resend",
     "resendCooldown": "Resend in {{seconds}}s",
     "resendSuccess": "A new code was sent",
-    "resendError": "Couldn't resend the code. Please try again."
+    "resendError": "Couldn't resend the code. Please try again.",
+    "resendRateLimited": "Still too soon - try again in a few seconds."
   },
   "archive": {
     "title": "Archive",

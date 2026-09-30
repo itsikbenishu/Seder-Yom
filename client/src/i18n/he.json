@@ -177,7 +177,8 @@
     "resend": "לא קיבלת קוד? שלח שוב",
     "resendCooldown": "שלח שוב בעוד {{seconds}} שניות",
     "resendSuccess": "קוד חדש נשלח",
-    "resendError": "שליחת הקוד נכשלה. נסו שוב."
+    "resendError": "שליחת הקוד נכשלה. נסו שוב.",
+    "resendRateLimited": "עדיין מוקדם מדי - נסו שוב בעוד כמה שניות."
   },
   "archive": {
     "title": "ארכיון",

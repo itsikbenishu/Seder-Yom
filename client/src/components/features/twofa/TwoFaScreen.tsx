@@ -7,9 +7,10 @@ import { Button, Input } from "../../ui";
 import { useVerifyMutation } from "../../../hooks/useVerifyMutation";
 import { useLoginMutation } from "../../../hooks/useLoginMutation";
 import { useToast } from "../../../hooks/useToast";
+import { ApiError } from "../../../services/apiClient";
 import type { TwoFaFormValues, TwoFaScreenProps } from "../../../types/twofa";
 
-const RESEND_COOLDOWN_SECONDS = 30;
+const RESEND_COOLDOWN_SECONDS = 60;
 
 export function TwoFaScreen({ email, onVerifySuccess }: TwoFaScreenProps) {
   const { t } = useTranslation();
@@ -49,7 +50,10 @@ export function TwoFaScreen({ email, onVerifySuccess }: TwoFaScreenProps) {
         showToast(t("twofa.resendSuccess"), "success");
         setResendCooldown(RESEND_COOLDOWN_SECONDS);
       },
-      onError: () => showToast(t("twofa.resendError"), "error"),
+      onError: (error) => {
+        const isRateLimited = error instanceof ApiError && error.status === 429;
+        showToast(t(isRateLimited ? "twofa.resendRateLimited" : "twofa.resendError"), "error");
+      },
     });
   }
 
