@@ -44,7 +44,7 @@ export function ArchiveHeader({ search, onSearchChange, date, onDateChange, onBa
         <GridIcon />
       </Button>
       <h1 className="text-xl font-semibold">{t("archive.title")}</h1>
-      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-1 sm:justify-end">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
         <div className="relative basis-full sm:max-w-xs sm:flex-1">
           <span
             className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-slate-400"

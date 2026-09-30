@@ -24,7 +24,7 @@ export function EventList({
       {sortableIds.length > 0 && (
         <p className="flex items-center gap-1 text-xs text-violet-600 dark:text-violet-400">
           {t("day.event.dragHint")}
-          <span aria-hidden="true">^</span>
+          <span aria-hidden="true">v</span>
         </p>
       )}
 
