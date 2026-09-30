@@ -39,9 +39,9 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex w-full items-center gap-1 sm:w-auto">
         <Input
-          className="min-w-[140px]"
+          className="min-w-[140px] flex-1 sm:flex-none"
           type="date"
           aria-label={t("archive.dateAria")}
           value={date}
