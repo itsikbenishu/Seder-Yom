@@ -12,6 +12,7 @@ import { useUpdateEventMutation } from "../../../hooks/useUpdateEventMutation";
 import { useDeleteEventMutation } from "../../../hooks/useDeleteEventMutation";
 import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
 import { useClearDayMutation } from "../../../hooks/useClearDayMutation";
+import { CopyFromArchivePicker } from "../copyFromArchive/CopyFromArchivePicker";
 import { buildDayViewData } from "../../../utils/buildDayViewData";
 import { computeRescheduledEnd } from "../../../utils/rescheduleEvent";
 import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
@@ -38,7 +39,7 @@ function getConfirmDialogContent(target: DayConfirmTarget, t: TFunction) {
   };
 }
 
-export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchive }: DayScreenProps) {
+export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchive, onOpenSettings }: DayScreenProps) {
   const { t } = useTranslation();
   const { data: events } = useWeekEvents();
   const { data: googleEvents } = useGoogleCalendarWeekEvents();
@@ -48,9 +49,8 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const [openAllDayId, setOpenAllDayId] = useState<string | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<DayConfirmTarget | null>(null);
   const [formTarget, setFormTarget] = useState<EventFormMode | null>(null);
-  // Tracked locally rather than read off muteEventMutation.variables - a shared mutation's
-  // .variables only reflects the single most recent call, which misreports pending state
-  // if the user toggles mute on more than one event before the first request settles.
+  const [isCopyFromArchiveOpen, setIsCopyFromArchiveOpen] = useState(false);
+  // Tracked locally since muteEventMutation.variables only reflects the single most recent call.
   const [pendingMuteEventIds, setPendingMuteEventIds] = useState<Set<string>>(new Set());
   const requireSession = useRequireSession();
 
@@ -74,7 +74,9 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
     if (action === "toggleMute") return handleToggleMuteDay();
     if (action === "archiveDay") return requireSession(() => archiveDayFlow.requestArchiveDay(dayOfWeek));
     if (action === "clearDay") return requireSession(() => setConfirmTarget({ kind: "clearDay" }));
-    onOpenArchive();
+    if (action === "openArchive") return onOpenArchive();
+    if (action === "copyFromArchive") return requireSession(() => setIsCopyFromArchiveOpen(true));
+    onOpenSettings();
   }
 
   function handleEditEvent(eventId: string) {
@@ -91,8 +93,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
 
   function handleConfirm() {
     if (!confirmTarget) return;
-    // Captured by reference so a stale success (from a target the user already dismissed
-    // and replaced) can't clear a newer, unrelated confirm dialog.
+    // Captured by reference so a stale success can't clear a newer, unrelated confirm dialog.
     const target = confirmTarget;
     const close = () => setConfirmTarget((current) => (current === target ? null : current));
     if (target.kind === "clearDay") clearDayMutation.mutate(dayOfWeek, { onSuccess: close });
@@ -207,6 +208,10 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
       />
 
       {archiveDayFlow.dialog && <ConfirmDialog {...archiveDayFlow.dialog} />}
+
+      {isCopyFromArchiveOpen && (
+        <CopyFromArchivePicker dayOfWeek={dayOfWeek} onClose={() => setIsCopyFromArchiveOpen(false)} />
+      )}
     </div>
   );
 }

@@ -29,7 +29,9 @@
       "unmute": "ביטול השתקת תזכורות",
       "archiveDay": "ארכוב יום",
       "clearDay": "מחיקת כל אירועי היום",
-      "openArchive": "פתיחת הארכיון"
+      "openArchive": "פתיחת הארכיון",
+      "copyFromArchive": "העתק מהארכיון",
+      "settings": "הגדרות"
     },
     "event": {
       "nextUp": "הבא בתור",
@@ -67,7 +69,15 @@
       "clearDayConfirm": "נקה הכל",
       "deleteEventTitle": "מחיקת אירוע",
       "deleteEventBody": "האירוע יימחק לצמיתות. פעולה זו אינה הפיכה.",
-      "deleteEventConfirm": "מחק"
+      "deleteEventConfirm": "מחק",
+      "copyFromArchiveTitle": "להחליף את אירועי היום?",
+      "copyFromArchiveBody": "אירועי היום המקומיים יימחקו ויוחלפו בעותקים מהיום המאורכב. אירועים מסונכרנים מ-Google לא יושפעו. פעולה זו אינה הפיכה.",
+      "copyFromArchiveConfirm": "החלף את אירועי היום"
+    },
+    "copyFromArchive": {
+      "hint": "בחרו יום מהארכיון כדי להעתיק את אירועיו להיום. אירועי היום המקומיים יוחלפו.",
+      "successToast": "האירועים הועתקו מהארכיון",
+      "errorToast": "העתקת האירועים מהארכיון נכשלה"
     },
     "addEvent": "+ הוסף אירוע",
     "addAllDayEvent": "הוסף אירוע יום שלם",
@@ -186,6 +196,8 @@
     "backAria": "חזרה לשבוע",
     "searchPlaceholder": "חיפוש...",
     "searchAria": "חיפוש בארכיון",
+    "dateAria": "סינון ארכיון לפי תאריך",
+    "clearDateAria": "ניקוי סינון התאריך",
     "countLabel": "{{count}} אירועים",
     "emptyState": "לא נמצאו ימים בארכיון",
     "loadingMore": "טוען עוד…"

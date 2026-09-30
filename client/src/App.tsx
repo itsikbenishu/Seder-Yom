@@ -108,6 +108,7 @@ function App() {
             onBackToWeek={() => startTransition(() => setScreen({ screen: "week" }))}
             onNavigateDay={(dayOfWeek) => startTransition(() => setScreen({ screen: "day", dayOfWeek }))}
             onOpenArchive={() => goToDataScreen({ screen: "archive" })}
+            onOpenSettings={() => startTransition(() => setScreen({ screen: "settings" }))}
           />
         )}
 

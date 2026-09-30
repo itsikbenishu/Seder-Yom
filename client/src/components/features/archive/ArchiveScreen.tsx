@@ -7,11 +7,18 @@ import { ArchiveListSkeleton } from "./ArchiveListSkeleton";
 
 export function ArchiveScreen({ onBack, onOpenArchivedDay }: ArchiveScreenProps) {
   const [search, setSearch] = useState("");
-  const { data, revealMore } = useArchiveDays(search);
+  const [date, setDate] = useState("");
+  const { data, revealMore } = useArchiveDays(search, date);
 
   return (
     <div className="flex h-dvh flex-col">
-      <ArchiveHeader search={search} onSearchChange={setSearch} onBack={onBack} />
+      <ArchiveHeader
+        search={search}
+        onSearchChange={setSearch}
+        date={date}
+        onDateChange={setDate}
+        onBack={onBack}
+      />
       {data.isPending ? (
         <ArchiveListSkeleton />
       ) : (

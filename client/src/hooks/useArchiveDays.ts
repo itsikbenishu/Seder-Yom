@@ -12,23 +12,22 @@ export interface UseArchiveDaysResult {
   revealMore: () => void;
 }
 
-export function useArchiveDays(search: string): UseArchiveDaysResult {
+export function useArchiveDays(search: string, date: string): UseArchiveDaysResult {
   const [revealCount, setRevealCount] = useState(REVEAL_STEP);
-  const [revealResetKey, setRevealResetKey] = useState(search);
+  const revealResetKeyValue = `${search}|${date}`;
+  const [revealResetKey, setRevealResetKey] = useState(revealResetKeyValue);
 
-  // Reset the reveal window whenever the search text changes. Derived during
-  // render (React's "adjust state during render" pattern) rather than in an effect,
-  // so the reset is not one render late.
-  if (revealResetKey !== search) {
-    setRevealResetKey(search);
+  // Resets the reveal window on search/date change - derived during render so it's not one render late.
+  if (revealResetKey !== revealResetKeyValue) {
+    setRevealResetKey(revealResetKeyValue);
     setRevealCount(REVEAL_STEP);
   }
 
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
   const { data, hasNextPage, isFetchingNextPage, isPending, isFetching, isPlaceholderData, fetchNextPage } = useInfiniteQuery({
-    queryKey: archiveKeys.list(debouncedSearch),
-    queryFn: ({ pageParam }) => getArchive({ offset: pageParam, search: debouncedSearch }),
+    queryKey: archiveKeys.list(debouncedSearch, date),
+    queryFn: ({ pageParam }) => getArchive({ offset: pageParam, search: debouncedSearch, date }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.reduce((sum, page) => sum + page.days.length, 0);

@@ -137,7 +137,8 @@ day: number (1-31)
 yr: number
 sum: string                # 1-line summary, up to 3 event titles
 count: number
-events: Event[]
+events: Event[]            # full snapshot, incl. Google-synced events' data
+                            # at archive time; files are never included - see §6
 ```
 Unique on `(user_id, yr, mon, day)` - one archive per calendar date per user.
 Re-archiving that same date (see §6) either merges into or overwrites this
@@ -190,6 +191,7 @@ matches their chosen channel simply receives no push.
 | File size | ≤10MB/file | גודל הקובץ חייב להיות פחות מ-10 MB | File size must be under 10 MB |
 | File count | ≤5/event, ≤25MB total | מקסימום 5 קבצים לאירוע | Maximum 5 files per event |
 | File dup | same name+size rejected | קובץ זה כבר קיים באירוע זה | This file already exists in this event |
+| Archive | day must have ≥1 event (local or Google-synced) | לא ניתן לארכב יום ללא אירועים | Cannot archive a day with no events |
 
 Description/Note UI: clamp to 2 lines with "show more" **only** when combined
 length > 80 chars. Titles never clamp - always full, wrapping.
@@ -202,8 +204,13 @@ Allowed file types: PNG, JPG, WebP, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, CSV, TXT.
 3. **Week** (home) - 7-day grid, today highlighted, nearest event per day,
    per-day mute-all button (mutes all timed events for that day)
 4. **Day** - full event list, drag-to-reschedule, per-event mute toggle on
-   each timed event, ⋯ menu (mute-day/archive/clear/open archive)
-5. **Archive** - searchable list, lazy-loaded (12/page in design, 50/page per API - see §9 note)
+   each timed event, ⋯ menu (mute/unmute day, open archive, copy from
+   archive, archive day, clear all events, a divider, then settings - the
+   same **Settings** screen as item 7 below is reachable from here as well
+   as from Week)
+5. **Archive** - searchable list, lazy-loaded (12/page in design, 50/page per
+   API - see §9 note), filterable by date as well as by text - the two
+   combine (AND), not either/or; see §6
 6. **Archive Day** - read-only event view, with one action: delete the
    archived day itself (header icon button, confirm dialog, see §6)
 7. **Settings** - language, theme, Google sync, notification channel, sign
@@ -218,35 +225,60 @@ Overlays:
   all-day row (all-day rows show only icon + title in the day list itself).
   Shows description/note/attachments in full. Footer has Delete + Edit for
   local events only; Google-synced events show no footer.
-- **Confirm dialog (generic)** - reused for archive/delete/clear/sign-out.
+- **Copy-from-archive picker** - opened from the Day ⋯ menu; lists archived
+  days the same way the Archive screen does (lazy-loaded, text+date
+  filterable), for picking one to copy onto the current day - see §6.
+- **Confirm dialog (generic)** - reused for archive/delete/clear/sign-out/
+  copy-from-archive-overwrite.
 
 Attachments render as clickable download links (`<a download>`) wherever
 shown - day list file chips and the detail popup's attachment rows alike.
 
-## 6. Archive - Lazy Loading & Creating an Archived Day
+## 6. Archive - Lazy Loading, Creating an Archived Day & Copying From It
 **Reading (lazy load):**
-- Backend page size: 50 days/request (`GET /archive?limit=50&offset=0&search=`)
+- Backend page size: 50 days/request (`GET /archive?limit=50&offset=0&search=&date=`)
+- `search` matches against the day's `sum`/event titles; `date` narrows to
+  one calendar date; the two combine with AND when both are present, rather
+  than acting as alternatives
 - Response: `{ days: ArchivedDay[], total_count: number, has_more: bool }`
 - Frontend caches loaded pages in React state - no refetch on scroll up/down
-- Search filters client-side on cached results before hitting backend
+- Text search filters client-side on the cached pages first; changing the
+  date filter resets the cache and re-queries the backend, since it's a
+  different result set rather than a narrowing of what's already loaded
 - Index: `CREATE INDEX ON archived_days(user_id DESC, yr DESC, mon DESC, day DESC)`
 - Target query time: < 50ms
+- Built for accounts with hundreds of archived days accumulating over time -
+  the server-paginated, indexed approach above (not a client-side fetch of
+  full history) is what keeps this screen fast as that history grows
 
-**Creating an archived day** (triggered by the archive button on Week/Day):
-`POST /archive/:dayOfWeek` copies that day's events into a new `ArchivedDay`
-row (`sum`, `count`, and a full `events` snapshot), then deletes the original
-rows from the active `events` table - copy-then-delete, not a soft-delete
-flag. Both steps run inside a single DB transaction: if the delete fails, the
-archive insert rolls back too, so the day is never left half-archived.
+**Creating an archived day** (triggered by the archive action on Week/Day):
+`POST /archive/:dayOfWeek` snapshots **every** event currently on that day -
+local and Google-synced alike, each with its full detail (title,
+description, note, times, `freq`, reminder/`lead` settings) - into a new
+`ArchivedDay` row's `events` array, along with `sum` and `count`. It then
+deletes only the **local** (`gcal: false`) rows from the live `events`
+table and their `event_files` rows, the same way clearing a day does (§7) -
+Google-synced events stay live, since they aren't owned by this app to
+delete; they keep syncing from Google and simply reappear on whatever day
+their own calendar entry falls on next. The snapshot insert, the local
+events' delete, and their `event_files` rows' delete all run inside a
+single DB transaction, followed by a batched Storage cleanup for those
+files' objects (same two-step shape as §7) - if any DB step fails, the
+whole operation rolls back, so a day is never left half-archived.
 
 Keeping `events` limited to the current week (rather than flagging old rows
 in place) keeps the hot path - `GET /events`, hit on every home-screen load -
 fast regardless of how much archive history a user accumulates, and lets
 `archived_days` be indexed/partitioned independently for scale.
 
-Google-synced events (`gcal: true`) are not included in the snapshot - they
-remain live in Google Calendar and are re-fetched from there when an archived
-day is viewed, rather than being duplicated into the archive.
+Attached files are **not** part of the snapshot - `ArchivedDay.events` is
+text/settings data only. Since archiving a local event also deletes its
+files (previous paragraph), an archived record never has files to show;
+Google-synced events never had files stored in this app to begin with.
+
+An empty day - no events at all, local or Google-synced - cannot be
+archived: the action returns `400 ARCHIVE_EMPTY_DAY` and the client shows no
+confirm dialog in that case, since there's nothing to snapshot.
 
 > Note: design prototype uses a page size of 12 for its own demo pacing - build
 > against the API contract above (50), not the prototype's demo constant.
@@ -266,11 +298,30 @@ the user pick merge or overwrite (never silently applies either).
 
 **Deleting an archived day** (triggered from the Archive Day screen, §5):
 `DELETE /archive/:id` removes the `ArchivedDay` row (ownership-scoped by
-`user_id`, `404` if missing/not owned), then batch-deletes every attached
-file's Storage object using the `storagePath`s recorded in the row's
-`events` snapshot - the only remaining record of them, since archiving
-already deleted the live `event_files` rows. Same "delete row, then clean up
-Storage after" shape as clearing a day (§7).
+`user_id`, `404` if missing/not owned). No Storage cleanup is needed here -
+an archived day never has files attached to it (previous section), so
+deleting the row is the whole operation.
+
+**Copying an archived day onto the current day** (the "Copy from archive"
+action in the Day ⋯ menu, §5): opens a picker overlay listing archived days
+the same way the Archive screen does - lazy-loaded 20 at a time (the load
+resets on open and on every filter change), filterable by the same
+text+date combination described above. Picking a day shows a danger-styled
+confirm ("Overwrite this day?") before anything happens - selecting alone
+copies nothing.
+
+On confirm, `POST /archive/:id/copy-to/:dayOfWeek` (§9) deletes every
+**local** event currently on the target day, then inserts a fresh local
+event row for each entry in the picked `ArchivedDay`'s `events` snapshot -
+including ones that were Google-synced (`gcal: true`) at archive time,
+since the snapshot only ever held their data, not a live link back to
+Google; every copy is created as an ordinary local, editable event
+(`gcal: false`). The target day's own **Google-synced** events are left
+untouched - only its local events are replaced. Copied events start with no
+files, since none were ever in the snapshot to copy (previous section).
+Runs as one transaction, same all-or-nothing shape as archiving/clearing a
+day: if inserting the copies fails, the delete of the target day's local
+events rolls back too.
 
 ## 7. Clearing a Day (bulk delete)
 `DELETE /events/day/:dayOfWeek` - this is the "Clear" action in the Day
@@ -315,10 +366,15 @@ PATCH  /events/mute-day/:dayOfWeek    bulk-mute all timed events for that day (o
 PATCH  /events/unmute-day/:dayOfWeek  bulk-unmute - symmetric, one query, no Storage involved
 DELETE /events/:id
 DELETE /events/day/:dayOfWeek         clear a day - deletes all its events + files (transactional, batched, see §7)
-GET    /archive?limit=50&offset=0&search=
-POST   /archive/:dayOfWeek            archive a day - copies events, then deletes originals (transactional)
+GET    /archive?limit=50&offset=0&search=&date=
+POST   /archive/:dayOfWeek            archive a day - snapshots all events (local + gcal), deletes local
+                                       originals + their files (transactional, see §6)
                                        ?onConflict=merge|overwrite resolves a same-date conflict (see §6)
-DELETE /archive/:id                   delete an archived day - row + its attached files' Storage objects (see §6)
+DELETE /archive/:id                   delete an archived day - row only, no files reference it (see §6)
+POST   /archive/:id/copy-to/:dayOfWeek copy an archived day onto the current day - deletes the target
+                                       day's local events, inserts fresh local copies of every archived
+                                       event (gcal or not); the target day's own gcal events are untouched,
+                                       files are never copied (transactional, see §6)
 GET    /gcal/events                   read-only
 POST   /files/upload                  upload a file, returns id; eventId set later via fileIds on events
 POST   /preferences                   sets language/theme/reminderEnabled/channels (any subset)
@@ -363,7 +419,9 @@ Job format:
   UI updates before the server confirms, via TanStack Query `onMutate` cache
   updates or `useOptimistic` (implementer's choice).
 - Archive lazy-loading (§6): loaded pages cached in React state, no refetch
-  on scroll up/down; search filters the client-side cache first.
+  on scroll up/down; search filters the client-side cache first. The
+  copy-from-archive picker (§5, §6) uses the same lazy-load/filter pattern
+  at its own page size.
 
 **Backend:**
 - DB indexing on every filtered/sorted path: `archived_days` composite index

@@ -7,6 +7,8 @@ export const archiveQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(ARCHIVE_PAGE_SIZE).default(ARCHIVE_PAGE_SIZE),
   offset: z.coerce.number().int().nonnegative().default(0),
   search: z.string().optional(),
+  // "YYYY-MM-DD", matching an HTML <input type="date"> value directly.
+  date: z.iso.date().optional(),
 });
 
 // Set only to resolve a day that was already archived for this calendar date: "merge" adds the

@@ -16,7 +16,7 @@ function ArchiveRowSkeleton() {
 /** Shown while the archive list loads for the first time - avoids a flash of the empty state. */
 export function ArchiveListSkeleton() {
   return (
-    <div className="flex-1 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
+    <div className="sy-scroll flex-1 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
       {Array.from({ length: 8 }, (_, i) => (
         <ArchiveRowSkeleton key={i} />
       ))}

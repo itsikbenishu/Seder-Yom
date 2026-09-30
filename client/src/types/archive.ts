@@ -16,6 +16,8 @@ export interface ArchiveViewData {
 export interface ArchiveHeaderProps {
   search: string;
   onSearchChange: (value: string) => void;
+  date: string;
+  onDateChange: (date: string) => void;
   onBack: () => void;
 }
 

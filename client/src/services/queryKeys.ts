@@ -7,7 +7,12 @@ export const eventKeys = {
 
 export const archiveKeys = {
   all: ["archive"] as const,
-  list: (search = "") => [...archiveKeys.all, "list", search] as const,
+  list: (search = "", date = "") => [...archiveKeys.all, "list", search, date] as const,
+};
+
+export const copyFromArchiveKeys = {
+  all: ["copyFromArchive"] as const,
+  list: (search = "", date = "") => [...copyFromArchiveKeys.all, "list", search, date] as const,
 };
 
 export const googleCalendarKeys = {

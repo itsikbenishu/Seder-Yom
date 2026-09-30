@@ -67,7 +67,7 @@
             <div class="h-12 w-12 rounded-xl flex items-center justify-center {{ ac.softText }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
             <div><h3 class="text-xl font-semibold m-0">{{ t.twofaTitle }}</h3><p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">{{ t.codeSent }} <span class="font-semibold text-slate-700 dark:text-slate-200">{{ email }}</span></p></div>
             <div class="w-[320px] max-w-full flex flex-col gap-3">
-              <input class="{{ inputCls }} text-center text-xl tracking-[0.5em]" value="{{ code }}" onInput="{{ onCode }}" placeholder="------" maxlength="6">
+              <input class="{{ inputCls }} text-center text-xl tracking-[0.5em]" value="{{ code }}" onInput="{{ onCode }}" placeholder="——————" maxlength="6">
               <button class="{{ btnPrimary }} w-full" onClick="{{ verify }}">{{ t.verify }}</button>
             </div>
           </div>
@@ -121,14 +121,17 @@
                   <div class="absolute top-full mt-1.5 end-0 z-40 min-w-[200px] flex flex-col p-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl" onClick="{{ stop }}">
                     <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onMuteMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>{{ curDay.muteLabel }}</button>
                     <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onOpenArchive }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg>{{ t.openArchive }}</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onCopyMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>{{ t.copyFromArchive }}</button>
                     <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onArchiveMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/></svg>{{ t.archiveDay }}</button>
                     <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition" onClick="{{ curDay.onClearAllMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6M10 11v6M14 11v6"/></svg>{{ t.clearDay }}</button>
+                    <div class="h-px my-1 bg-slate-100 dark:bg-slate-800"></div>
+                    <button class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-start hover:bg-slate-100 dark:hover:bg-slate-800 transition" onClick="{{ curDay.onSettingsMenu }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>{{ t.settings }}</button>
                   </div>
                 </sc-if>
               </div>
             </div>
 
-            <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+            <div class="flex-1 min-h-0 overflow-auto sy-scroll px-5 py-4">
               <div class="flex flex-col gap-2 mb-2.5">
               <sc-for list="{{ curDay.allDay }}" as="a" hint-placeholder-count="0">
                 <div class="{{ a.rowClass }}">
@@ -186,21 +189,27 @@
         <!-- ===== ARCHIVE ===== -->
         <sc-if value="{{ isArchive }}" hint-placeholder-val="{{ false }}">
           <div class="flex flex-col h-full">
-            <div class="px-6 pt-4 pb-2.5 flex items-center gap-2.5 border-b border-slate-200 dark:border-slate-800">
-              <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
-              <h3 class="text-xl font-semibold m-0 flex-none">{{ t.archive }}</h3>
-              <div class="flex-1 relative">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="absolute top-1/2 -translate-y-1/2 start-3 opacity-50"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-                <input class="{{ inputCls }} ps-9" value="{{ search }}" onInput="{{ onSearch }}" placeholder="{{ t.search }}">
+            <div class="{{ archHeadCls }}">
+              <button class="{{ btnSecondary }} {{ iconBtn }} flex-none" onClick="{{ backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
+              <h3 class="{{ archTitleCls }}">{{ t.archive }}</h3>
+              <div class="{{ archSearchRowCls }}">
+              <div class="flex-1 min-w-0 relative">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="absolute top-1/2 -translate-y-1/2 start-2.5 opacity-50"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+                <input class="{{ inputCls }} ps-8" value="{{ search }}" onInput="{{ onSearch }}" placeholder="{{ t.search }}">
+              </div>
+              <div class="flex items-center gap-1 flex-none">
+                <input type="date" class="{{ archDateFullCls }}" value="{{ archDate }}" onChange="{{ onArchDate }}" title="{{ t.byDate }}">
+                <sc-if value="{{ hasArchDate }}" hint-placeholder-val="{{ false }}"><button class="{{ archClearFullCls }}" onClick="{{ clearArchDate }}" title="{{ t.clearDate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 6L6 18M6 6l12 12"/></svg></button></sc-if>
+              </div>
               </div>
             </div>
-            <div class="flex-1 min-h-0 overflow-auto px-6 py-3.5 flex flex-col gap-2" onScroll="{{ onArchScroll }}">
+            <div class="flex-1 min-h-0 overflow-auto sy-scroll px-6 py-3.5 flex flex-col gap-2" onScroll="{{ onArchScroll }}">
               <sc-for list="{{ archiveList }}" as="a" hint-placeholder-count="4">
                 <div class="{{ archiveRowClass }}" onClick="{{ a.onOpen }}">
                   <div class="text-center flex-none w-[46px]"><div class="font-semibold text-[22px] tabular-nums leading-none">{{ a.day }}</div><div class="text-[10px] uppercase tracking-[0.06em] text-slate-500 dark:text-slate-300">{{ a.mon }}</div><div class="text-[10px] tabular-nums text-slate-500 dark:text-slate-400 mt-0.5">{{ a.yr }}</div></div>
                   <div class="w-px self-stretch bg-slate-200 dark:bg-slate-700"></div>
-                  <div class="flex-1 min-w-0"><div class="font-semibold text-[15px]">{{ a.dow }}</div><div class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ a.summary }}</div></div>
-                  <span class="{{ tagOutline }} flex-none">{{ a.count }}</span>
+                  <div class="flex-1 min-w-0"><div class="font-semibold text-[15px]">{{ a.dow }}</div><div class="text-xs text-slate-500 dark:text-slate-400 break-words">{{ a.summary }}</div></div>
+                  <span class="{{ tagOutline }} flex-none whitespace-nowrap">{{ a.count }}</span>
                 </div>
               </sc-for>
               <sc-if value="{{ archiveEmpty }}" hint-placeholder-val="{{ false }}"><p class="text-center text-slate-400 dark:text-slate-500 py-8">{{ t.noArchive }}</p></sc-if>
@@ -216,7 +225,7 @@
               <button class="{{ btnSecondary }} {{ iconBtn }}" onClick="{{ backWeek }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ backIconStyle }}"><path d="M15 6l-6 6 6 6"/></svg></button>
               <h3 class="text-xl font-semibold m-0">{{ t.settings }}</h3>
             </div>
-            <div class="flex-1 min-h-0 overflow-auto px-6 py-5 flex flex-col gap-6 max-w-[540px]">
+            <div class="flex-1 min-h-0 overflow-auto sy-scroll px-6 py-5 flex flex-col gap-6 max-w-[540px]">
               <div><h6 class="text-[11px] uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500 font-semibold mb-2">{{ t.language }}</h6>
                 <div class="{{ segWrap }}"><button class="{{ clsHe }}" onClick="{{ setHe }}">עברית</button><button class="{{ clsEn }}" onClick="{{ setEn }}">English</button></div>
               </div>
@@ -250,7 +259,7 @@
               <div class="flex-1"><div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold">{{ archCur.dow }}</div><h3 class="text-xl font-semibold m-0">{{ archCur.full }}</h3></div>
               <span class="{{ tagOutline }}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.readOnly }}</span>
             </div>
-            <div class="flex-1 min-h-0 overflow-auto px-5 py-4">
+            <div class="flex-1 min-h-0 overflow-auto sy-scroll px-5 py-4">
               <sc-for list="{{ archCur.allDay }}" as="a" hint-placeholder-count="0">
                 <div class="{{ a.rowClass }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="flex-none"><path d="M4 7l16 0M4 12l16 0M4 17l10 0"/></svg><span class="flex-1">{{ a.title }}</span><sc-if value="{{ a.gcal }}" hint-placeholder-val="{{ false }}"><span class="{{ tagOutline }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>{{ t.fromGoogle }}</span></sc-if></div>
               </sc-for>
@@ -338,7 +347,7 @@
 
         <!-- ===== DETAIL POPUP ===== -->
         <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
-          <div class="absolute inset-0 z-40 grid place-items-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeDetail }}">
+          <div class="absolute inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeDetail }}">
             <div class="w-[440px] max-w-[94%] max-h-[86%] flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl" onClick="{{ stop }}">
               <div class="flex items-start justify-between gap-3 mb-3 flex-none">
                 <div class="min-w-0"><div class="text-[10px] uppercase tracking-[0.12em] {{ ac.text }} font-semibold mb-1">{{ detail.time }}</div><span class="text-lg font-semibold break-words [overflow-wrap:anywhere]">{{ detail.title }}</span></div>
@@ -364,6 +373,34 @@
                   <button class="{{ btnSecondary }}" onClick="{{ detail.onEdit }}">{{ t.edit }}</button>
                 </div>
               </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== COPY FROM ARCHIVE PICKER ===== -->
+        <sc-if value="{{ copyOpen }}" hint-placeholder-val="{{ false }}">
+          <div class="absolute inset-0 z-40 flex items-center justify-center p-4 bg-slate-900/50 dark:bg-black/60" onClick="{{ closeCopy }}">
+            <div class="w-[460px] max-w-[94%] max-h-[86%] flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl" onClick="{{ stop }}">
+              <div class="flex items-start justify-between gap-3 mb-1 flex-none">
+                <span class="text-lg font-semibold">{{ t.copyFromArchive }}</span>
+                <button class="{{ btnGhost }} {{ iconBtn }}" onClick="{{ closeCopy }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0 mb-3 flex-none">{{ t.copyPickHint }}</p>
+              <div class="flex items-center gap-2 mb-3 flex-none">
+                <input class="{{ inputCls }} flex-1 min-w-0" value="{{ copySearch }}" onInput="{{ onCopySearch }}" placeholder="{{ t.search }}">
+                <input type="date" class="{{ inputCls }} w-auto min-w-[140px]" value="{{ copyDate }}" onChange="{{ onCopyDate }}" title="{{ t.byDate }}">
+                <sc-if value="{{ hasCopyDate }}" hint-placeholder-val="{{ false }}"><button class="{{ btnGhost }} h-9 w-9 justify-center flex-none" onClick="{{ clearCopyDate }}" title="{{ t.clearDate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 6L6 18M6 6l12 12"/></svg></button></sc-if>
+              </div>
+              <div class="flex-1 min-h-0 overflow-auto sy-scroll flex flex-col gap-1.5" onScroll="{{ onCopyScroll }}">
+                <sc-for list="{{ copyList }}" as="c" hint-placeholder-count="3">
+                  <button class="flex-none flex items-center gap-3 px-3 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-start hover:bg-slate-50 dark:hover:bg-slate-800 transition" onClick="{{ c.onPick }}">
+                    <div class="flex-none w-11 text-center"><div class="text-[10px] uppercase text-slate-400 dark:text-slate-500">{{ c.mon }}</div><div class="text-lg font-semibold leading-none">{{ c.day }}</div></div>
+                    <div class="flex-1 min-w-0"><div class="text-sm font-medium">{{ c.dow }} · {{ c.yr }}</div><div class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ c.summary }}</div></div>
+                    <span class="flex-none text-[11px] text-slate-400 dark:text-slate-500">{{ c.count }}</span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{ copyEmpty }}" hint-placeholder-val="{{ false }}"><p class="text-center text-sm text-slate-400 dark:text-slate-500 py-6">{{ t.noArchive }}</p></sc-if>
+              </div>
             </div>
           </div>
         </sc-if>
@@ -411,7 +448,7 @@ class Component extends DCLogic {
         E(2,0,'13:00','14:00','צהריים עם דנה','Lunch with Dana',{}),
         E(3,1,'','','יום הולדת אמא','Mom\u2019s birthday',{allDay:true,gcal:true}),
         E(4,1,'08:30','09:15','אימון בוקר','Morning workout',{freq:'daily',reminder:true,lead:'1h'}),
-        E(5,1,'17:00','18:30','קורס React','React course',{gcal:true,dh:'שיעור 7 - hooks',de:'Lesson 7 - hooks'}),
+        E(5,1,'17:00','18:30','קורס React','React course',{gcal:true,dh:'שיעור 7 — hooks',de:'Lesson 7 — hooks'}),
         E(6,2,'10:00','11:00','שיחת לקוח','Client call',{reminder:true,lead:'1h',dh:'הצגת אבטיפוס',de:'Present the prototype'}),
         E(7,2,'15:00','15:30','רופא שיניים','Dentist',{reminder:true,lead:'1d'}),
         E(8,3,'','','יום עיון חברה','Company offsite',{allDay:true,gcal:true}),
@@ -448,6 +485,19 @@ class Component extends DCLogic {
       {dow_he:'רביעי',dow_en:'Wednesday',day:24,yr:2025,mon_he:'דצמבר',mon_en:'DEC',sumHe:'ערב חג, ארוחה משפחתית',sumEn:'Holiday eve, family meal',count:2,
         events:[AE('','','ערב חג','Holiday eve',{allDay:true,gcal:true}),AE('19:00','22:00','ארוחה משפחתית','Family dinner',{reminder:true,lead:'1d'})]},
     ];
+    { // generated history so the archive has hundreds of days
+      const MH=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'], ME=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      const DH=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'], DE=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const P=[['פגישת צוות','Team meeting','09:00','10:00'],['כושר','Gym','07:00','08:00'],['שיחת לקוח','Client call','11:00','11:30'],['קניות','Groceries','17:00','18:00'],['עבודה מרוכזת','Focus block','13:00','15:00'],['ארוחת ערב','Dinner','19:30','21:00']];
+      const d=new Date(2025,11,23);
+      for(let i=0;i<300;i++){
+        d.setDate(d.getDate()-1-(i%3===0?1:0));
+        const n=2+(i%4), evs=[];
+        for(let k=0;k<n;k++){ const p=P[(i+k*2)%P.length]; evs.push(AE(p[2],p[3],p[0],p[1],{reminder:k===0,lead:'30m'})); }
+        this.arch.push({dow_he:DH[d.getDay()],dow_en:DE[d.getDay()],day:d.getDate(),yr:d.getFullYear(),mon_he:MH[d.getMonth()],mon_en:ME[d.getMonth()],
+          sumHe:evs.slice(0,3).map(e=>e.he).join(', '),sumEn:evs.slice(0,3).map(e=>e.en).join(', '),count:n,events:evs});
+      }
+    }
     this.AC = {
       indigo:{solid:'bg-indigo-600 hover:bg-indigo-500',text:'text-indigo-600 dark:text-indigo-400',dot:'bg-indigo-500',soft:'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-300 dark:border-indigo-500/40',softText:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400',tag:'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'},
       violet:{solid:'bg-violet-600 hover:bg-violet-500',text:'text-violet-600 dark:text-violet-400',dot:'bg-violet-500',soft:'bg-violet-50 dark:bg-violet-500/10 border-violet-300 dark:border-violet-500/40',softText:'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400',tag:'bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300'},
@@ -476,13 +526,18 @@ class Component extends DCLogic {
       addEvent:he?'הוספת אירוע':'Add event', muteOn:he?'השתקת תזכורות':'Mute alerts', muted:he?'מושתק':'Muted', unmute:he?'ביטול השתקה':'Unmute',
       archiveDay:he?'ארכוב יום':'Archive day', backWeek:he?'חזרה לשבוע':'Back to week',
       openArchive:he?'פתיחת הארכיון':'Open archive',
+      copyFromArchive:he?'העתק מהארכיון':'Copy from archive', byDate:he?'חיפוש לפי תאריך':'Search by date', clearDate:he?'ניקוי תאריך':'Clear date',
+      copyPickHint:he?'בחרו יום מאורכב. כל האירועים שלו יועתקו ליום הנוכחי.':'Pick an archived day. All its events will be copied to the current day.',
+      confirmCopyTitle:he?'לדרוס את היום הנוכחי?':'Overwrite this day?',
+      confirmCopyBody:he?'כל האירועים שיצרתם ביום זה יימחקו ויוחלפו באירועים מהיום המאורכב. אירועי Google של היום יישארו.':'All events you created on this day will be deleted and replaced with the archived day’s events. This day’s Google events remain.',
+      copyOk:he?'העתקה':'Copy', copied:he?'האירועים הועתקו מהארכיון':'Events copied from archive',
       search:he?'חיפוש בארכיון…':'Search archive…', readOnly:he?'קריאה בלבד':'Read only', fromGoogle:'Google',
       email:he?'דוא״ל':'Email', continue:he?'המשך':'Continue', twofaTitle:he?'אימות דו‑שלבי':'Two-factor verification', codeSent:he?'קוד נשלח אל':'Code sent to', verify:he?'אימות':'Verify',
       title:he?'כותרת':'Title', startT:he?'התחלה':'Start', endT:he?'סיום':'End', freq:he?'תדירות':'Repeat', once:he?'חד‑פעמי':'Once', daily:he?'יומי':'Daily', weekly:he?'שבועי':'Weekly',
       reminder:he?'תזכורת':'Reminder', on:he?'פעיל':'On', off:he?'כבוי':'Off', m15:he?'רבע שעה לפני':'15 min before', m30:he?'חצי שעה לפני':'30 min before', h1:he?'שעה לפני':'1 hour before', d1:he?'יום לפני':'1 day before', sameday:he?'שעה מוגדרת':'Specific time', leadAt:he?'התראה בשעה':'Alert at', allDayEvent:he?'אירוע יום שלם':'All-day event',
       desc:he?'תיאור':'Description', note:he?'הערה':'Note', attach:he?'קבצים (תמונה / PDF / Office)':'Files (image / PDF / Office)', chooseFile:he?'בחירת קובץ':'Choose file', save:he?'שמירה':'Save', delete:he?'מחיקה':'Delete', cancel:he?'ביטול':'Cancel',
       editEvent:he?'עריכת אירוע':'Edit event', newEvent:he?'אירוע חדש':'New event', edit:he?'עריכה':'Edit', details:he?'פרטים':'Details',
-      addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום - עד 5 קבצים / 25MB':'Maximum reached - up to 5 files / 25MB',
+      addFiles:he?'הוספת קבצים':'Add files', removeFile:he?'הסרת קובץ':'Remove file', filesMax:he?'הגעת למקסימום — עד 5 קבצים / 25MB':'Maximum reached — up to 5 files / 25MB',
       showMore:he?'הצג עוד':'Show more', showLess:he?'הצג פחות':'Show less',
       attachN:he?'קבצים':'files',
       timeErr:he?'שעת הסיום חייבת להיות אחרי שעת ההתחלה':'End time must be after start time',
@@ -500,9 +555,9 @@ class Component extends DCLogic {
       more:he?'עוד':'More', unmuteDay:he?'ביטול השתקת תזכורות':'Unmute alerts',
       alertsMuted:he?'התראות מושתקות':'Alerts muted', alertsOn:he?'התראות פעילות':'Alerts on',
       language:he?'שפה':'Language', appearance:he?'מראה':'Appearance', light:he?'בהיר':'Light', dark:he?'כהה':'Dark',
-      gcalSync:he?'סנכרון Google Calendar':'Google Calendar sync', reauth:he?'אימות מחדש':'Re-authenticate', gcalNote: he?'אירועים מ‑Google מסומנים ומוצגים לקריאה בלבד - לא ניתן לערוך אותם כאן.':'Events from Google are marked and shown read-only - they can\u2019t be edited here.',
+      gcalSync:he?'סנכרון Google Calendar':'Google Calendar sync', reauth:he?'אימות מחדש':'Re-authenticate', gcalNote: he?'אירועים מ‑Google מסומנים ומוצגים לקריאה בלבד — לא ניתן לערוך אותם כאן.':'Events from Google are marked and shown read-only — they can\u2019t be edited here.',
       notif:he?'התראות':'Notifications', browserN:he?'דפדפן':'Browser', mobileN:he?'נייד':'Mobile',
-      notifNote:he?'ההתראות נשלחות כ‑Push (Firebase). בחרו היכן לקבל אותן - התראות לא יופיעו בתוך האפליקציה עצמה.':'Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear inside the app itself.',
+      notifNote:he?'ההתראות נשלחות כ‑Push (Firebase). בחרו היכן לקבל אותן — התראות לא יופיעו בתוך האפליקציה עצמה.':'Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear inside the app itself.',
       saved:he?'האירוע נשמר':'Event saved', deleted:he?'האירוע נמחק':'Event deleted', signOut:he?'התנתקות':'Sign out',
       dragHint:he?'גררו אירוע כדי לשנות את השעה':'Drag an event to change its time', noArchive:he?'לא נמצאו ימים בארכיון':'No archived days found',
       loadingMore:he?'טוען עוד…':'Loading more…',
@@ -525,7 +580,7 @@ class Component extends DCLogic {
     const btnPrimary = 'inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition disabled:opacity-50 '+ac.solid;
     const btnSecondary = 'inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
     const btnGhost = 'inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
-    const iconBtn = 'h-9 w-9 px-0 justify-center';
+    const iconBtn = 'h-9 w-9 !px-0 !py-0 flex-none justify-center [&>svg]:flex-none';
     const inputCls = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm outline-none focus:border-slate-400 dark:focus:border-slate-500 placeholder:text-slate-400';
     const tagBase = 'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium';
     const tagAccent = tagBase+' '+ac.tag;
@@ -533,10 +588,10 @@ class Component extends DCLogic {
     const tagOutline = tagBase+' border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400';
 
     const frameClass = mobile
-      ? 'w-[390px] max-w-full my-4 self-start rounded-[26px] border border-slate-300 dark:border-slate-700 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 h-[760px] flex flex-col'
+      ? 'w-[390px] max-w-full my-4 self-start rounded-[26px] border border-slate-300 dark:border-slate-700 shadow-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 h-[min(760px,calc(100%-32px))] flex flex-col'
       : 'w-full flex flex-col min-h-full';
-    const stageClass = 'flex-1 min-h-0 overflow-auto flex justify-center '+(mobile?'bg-slate-100 dark:bg-slate-900':'');
-    const weekGridClass = mobile?'grid grid-cols-1 gap-2.5 px-4 pb-5 overflow-auto':'grid gap-3 px-6 pb-6 overflow-auto grid-cols-4';
+    const stageClass = 'flex-1 min-h-0 overflow-auto sy-scroll flex justify-center '+(mobile?'bg-slate-100 dark:bg-slate-900':'');
+    const weekGridClass = mobile?'grid grid-cols-1 gap-2.5 px-4 pb-5 overflow-auto sy-scroll':'grid gap-3 px-6 pb-6 overflow-auto sy-scroll grid-cols-4';
     const backIconStyle = he ? 'transform:scaleX(-1)' : '';
     const fwdIconStyle = he ? '' : 'transform:scaleX(-1)';
 
@@ -574,6 +629,8 @@ class Component extends DCLogic {
       onArchiveMenu:()=>{ this.setState({dayMenu:false}); this.archiveDay(di); },
       onOpenArchive:()=>this.setState({dayMenu:false,screen:'archive',archLimit:12}),
       onClearAllMenu:()=>{ this.setState({dayMenu:false}); this.clearDayEvents(di); },
+      onSettingsMenu:()=>this.setState({dayMenu:false,screen:'settings'}),
+      onCopyMenu:()=>this.setState({dayMenu:false,copyPick:true,copySearch:'',copyDate:'',copyLimit:20}),
       onArchive:()=>this.archiveDay(di),
       onClearAll:()=>{ this.clearDayEvents(di); },
       allDay:dEvs.filter(e=>e.allDay).map(e=>({
@@ -608,12 +665,20 @@ class Component extends DCLogic {
     };
 
     const q=s.search.trim().toLowerCase();
-    const archiveAll=this.state.archAdded.concat(this.arch).filter(a=>!q||(a.dow_he+a.dow_en+a[he?'sumHe':'sumEn']).toLowerCase().includes(q));
+    const allArch=this.state.archAdded.concat(this.arch);
+    const archiveAll=allArch.filter(a=>(!q||(a.dow_he+a.dow_en+a[he?'sumHe':'sumEn']).toLowerCase().includes(q)) && (!s.archDate||this.dkey(a)===s.archDate));
     const archLimit=s.archLimit||12;
     const archiveList=archiveAll.slice(0,archLimit).map(a=>({
       day:a.day, mon:he?a.mon_he:a.mon_en, dow:he?a.dow_he:a.dow_en, yr:a.yr,
       summary:he?a.sumHe:a.sumEn, count:a.count+(he?' אירועים':' events'),
       onOpen:()=>this.setState({archView:a,screen:'archiveDay'}),
+    }));
+    const cq=(s.copySearch||'').trim().toLowerCase(), copyLimit=s.copyLimit||20;
+    const copyAll=allArch.filter(a=>(!cq||(a.dow_he+a.dow_en+a[he?'sumHe':'sumEn']).toLowerCase().includes(cq)) && (!s.copyDate||this.dkey(a)===s.copyDate));
+    const copyList=copyAll.slice(0,copyLimit).map(a=>({
+      day:a.day, mon:he?a.mon_he:a.mon_en, dow:he?a.dow_he:a.dow_en, yr:a.yr,
+      summary:he?a.sumHe:a.sumEn, count:(a.events||[]).length+(he?' אירועים':' events'),
+      onPick:()=>this.copyFromArchive(a),
     }));
 
     const av=s.archView;
@@ -717,6 +782,16 @@ class Component extends DCLogic {
       closeDialog:()=>this.setState({dialogOpen:false,form:null}),
       stop:e=>e.stopPropagation(),
       saveEvent:()=>this.saveForm(), deleteFromForm:()=>this.deleteForm(),
+      copyOpen:!!s.copyPick, copyList, copyEmpty:copyAll.length===0, closeCopy:()=>this.set('copyPick',false),
+      copySearch:s.copySearch||'', onCopySearch:e=>this.setState({copySearch:e.target.value,copyLimit:20}),
+      copyDate:s.copyDate||'', hasCopyDate:!!s.copyDate, onCopyDate:e=>this.setState({copyDate:e.target.value,copyLimit:20}), clearCopyDate:()=>this.setState({copyDate:'',copyLimit:20}),
+      onCopyScroll:e=>{ const el=e.currentTarget; if(el.scrollTop+el.clientHeight>=el.scrollHeight-120 && copyLimit<copyAll.length) this.setState(st=>({copyLimit:(st.copyLimit||20)+20})); },
+      archDate:s.archDate||'', hasArchDate:!!s.archDate, onArchDate:e=>this.setState({archDate:e.target.value,archLimit:12}), clearArchDate:()=>this.setState({archDate:'',archLimit:12}),
+      archHeadCls:'pt-4 pb-2.5 flex items-center border-b border-slate-200 dark:border-slate-800 '+(mobile?'flex-wrap px-4 gap-2.5':'px-6 gap-2.5'),
+      archSearchRowCls: mobile?'basis-full flex items-center gap-2':'flex-1 min-w-0 flex items-center gap-2.5',
+      archDateFullCls: inputCls+' w-auto min-w-[140px]',
+      archClearFullCls: btnGhost+' h-9 justify-center flex-none '+(mobile?'w-7 !px-0':'w-9'),
+      archTitleCls: 'text-xl font-semibold m-0 flex-none',
       detailOpen:s.detail!=null, detail:detailView, closeDetail:()=>this.set('detail',null),
       confirmOpen:!!s.confirm, confirmData:s.confirm||{},
       confirmOk:()=>{ const c=this.state.confirm; if(c&&c.onOk) c.onOk(); },
@@ -750,10 +825,23 @@ class Component extends DCLogic {
     if(!this.state.events.some(e=>e.day===dayIdx)){ this.flash(he?'אין אירועים לארכוב ביום זה':'No events to archive on this day'); return; }
     this.askConfirm({title:t.confirmArchiveTitle, body:t.confirmArchiveBody, label:t.confirm, danger:false, onOk:()=>this.doArchiveDay(dayIdx)});
   }
+  dkey(a){ const M=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; const m=M.indexOf(String(a.mon_en).slice(0,3).toUpperCase())+1; return a.yr+'-'+String(m).padStart(2,'0')+'-'+String(a.day).padStart(2,'0'); }
+  copyFromArchive(a){
+    const t=this.T(), di=this.state.selDay;
+    this.setState({copyPick:false});
+    this.askConfirm({title:t.confirmCopyTitle, body:t.confirmCopyBody, label:t.copyOk, danger:true, onOk:()=>{
+      this.setState(st=>{
+        let id=st.nextId;
+        const copies=(a.events||[]).map(x=>({id:id++,day:di,start:x.allDay?'':x.s,end:x.allDay?'':x.e,titleHe:x.he,titleEn:x.en,allDay:!!x.allDay,gcal:false,freq:x.freq||'once',reminder:!!x.reminder,lead:x.lead||'30m',leadTime:x.leadTime||'08:00',descHe:x.dh||'',descEn:x.de||'',note:x.note||'',files:[]}));
+        return {events:st.events.filter(e=>e.day!==di||e.gcal).concat(copies),nextId:id,confirm:null};
+      });
+      this.flash(t.copied);
+    }});
+  }
   doArchiveDay(dayIdx){
     const he=this.state.lang==='he', w=this.week[dayIdx];
-    const dayEvs=this.state.events.filter(e=>e.day===dayIdx && e.gcal);
-    const aEvents=dayEvs.map(e=>({s:e.start,e:e.end,he:e.titleHe,en:e.titleEn,gcal:true,reminder:e.reminder,lead:e.lead,freq:e.freq,allDay:e.allDay,dh:e.descHe,de:e.descEn}));
+    const dayEvs=this.state.events.filter(e=>e.day===dayIdx);
+    const aEvents=dayEvs.map(e=>({s:e.start,e:e.end,he:e.titleHe,en:e.titleEn,gcal:!!e.gcal,reminder:e.reminder,lead:e.lead,leadTime:e.leadTime,freq:e.freq,allDay:e.allDay,dh:e.descHe,de:e.descEn,note:e.note}));
     const sumHe=dayEvs.map(e=>e.titleHe).slice(0,3).join(', ')||'ללא אירועים';
     const sumEn=dayEvs.map(e=>e.titleEn).slice(0,3).join(', ')||'No events';
     const entry={dow_he:w.dow_he,dow_en:w.dow_en,day:w.date,yr:2026,mon_he:w.mon_he,mon_en:w.mon_en,sumHe,sumEn,count:aEvents.length,events:aEvents};

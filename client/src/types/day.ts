@@ -21,8 +21,18 @@ export interface DayViewData {
   nextUpEventId: string | null;
 }
 
-/** ⋯ menu items. "openArchive" navigates; the rest act on this day's events. */
-export type DayMenuAction = "toggleMute" | "archiveDay" | "clearDay" | "openArchive";
+/**
+ * ⋯ menu items. "openArchive" and "openSettings" navigate to other screens;
+ * "copyFromArchive" opens a picker overlay owned by the Day screen itself;
+ * the rest act on this day's events.
+ */
+export type DayMenuAction =
+  | "toggleMute"
+  | "archiveDay"
+  | "clearDay"
+  | "openArchive"
+  | "copyFromArchive"
+  | "openSettings";
 
 /** Pending destructive action for the generic confirm dialog - archiving has its own flow (useArchiveDayFlow). */
 export type DayConfirmTarget = { kind: "clearDay" } | { kind: "deleteEvent"; eventId: string };
@@ -86,4 +96,5 @@ export interface DayScreenProps {
   onBackToWeek: () => void;
   onNavigateDay: (dayOfWeek: number) => void;
   onOpenArchive: () => void;
+  onOpenSettings: () => void;
 }

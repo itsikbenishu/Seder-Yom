@@ -18,5 +18,10 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Lets `const { omit: _omit, ...rest } = obj` discard a key without a real unused-var -
+      // the established pattern for stripping a field before spreading (see *EventMutation.ts).
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    },
   },
 ])

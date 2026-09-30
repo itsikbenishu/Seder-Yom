@@ -1,12 +1,13 @@
 import type { UIEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Spinner } from "../../ui";
-import type { ArchiveListProps } from "../../../types/archive";
-import { ArchiveRow } from "./ArchiveRow";
+import { ArchiveRow } from "../archive/ArchiveRow";
+import type { CopyFromArchiveListProps } from "../../../types/copyFromArchive";
 
 const REACH_END_THRESHOLD_PX = 160;
 
-export function ArchiveList({ data, onSelect, onReachEnd }: ArchiveListProps) {
+// Mirrors ArchiveList's scroll-to-fetch idiom, reusing ArchiveRow as-is since its contract already fits.
+export function CopyFromArchiveList({ data, onSelect, onReachEnd }: CopyFromArchiveListProps) {
   const { t } = useTranslation();
 
   function handleScroll(event: UIEvent<HTMLDivElement>) {
@@ -22,7 +23,7 @@ export function ArchiveList({ data, onSelect, onReachEnd }: ArchiveListProps) {
   const isEmpty = data.days.length === 0 && !data.isLoadingMore;
 
   return (
-    <div className="sy-scroll flex-1 overflow-y-auto" onScroll={handleScroll}>
+    <div className="sy-scroll min-h-0 flex-1 overflow-y-auto" onScroll={handleScroll}>
       {isEmpty ? (
         <p className="py-12 text-center text-sm text-slate-500 dark:text-slate-400">
           {t("archive.emptyState")}

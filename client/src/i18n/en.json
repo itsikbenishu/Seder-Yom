@@ -29,7 +29,9 @@
       "unmute": "Unmute reminders",
       "archiveDay": "Archive day",
       "clearDay": "Delete all of today's events",
-      "openArchive": "Open the archive"
+      "openArchive": "Open the archive",
+      "copyFromArchive": "Copy from archive",
+      "settings": "Settings"
     },
     "event": {
       "nextUp": "Next up",
@@ -67,7 +69,15 @@
       "clearDayConfirm": "Clear all",
       "deleteEventTitle": "Delete event",
       "deleteEventBody": "This event will be permanently deleted. This can't be undone.",
-      "deleteEventConfirm": "Delete"
+      "deleteEventConfirm": "Delete",
+      "copyFromArchiveTitle": "Overwrite this day?",
+      "copyFromArchiveBody": "This day's local events will be deleted and replaced with copies from the archived day. Google-synced events are not affected. This can't be undone.",
+      "copyFromArchiveConfirm": "Overwrite day"
+    },
+    "copyFromArchive": {
+      "hint": "Pick an archived day to copy its events onto today. Today's local events will be replaced.",
+      "successToast": "Events copied from archive",
+      "errorToast": "Couldn't copy events from archive"
     },
     "addEvent": "+ Add event",
     "addAllDayEvent": "Add all-day event",
@@ -186,6 +196,8 @@
     "backAria": "Back to week",
     "searchPlaceholder": "Search...",
     "searchAria": "Search archive",
+    "dateAria": "Filter archive by date",
+    "clearDateAria": "Clear date filter",
     "countLabel": "{{count}} events",
     "emptyState": "No archived days found",
     "loadingMore": "Loading more…"

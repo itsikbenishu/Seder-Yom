@@ -45,7 +45,7 @@ export function Modal({ open, onClose, title, footer, children, className }: Mod
         aria-labelledby={titleId}
         onClick={stopPropagation}
         className={cn(
-          "flex max-h-[92vh] w-full max-w-lg flex-col rounded-xl bg-white shadow-xl dark:bg-slate-900",
+          "flex max-h-[86vh] w-full max-w-lg flex-col rounded-xl bg-white shadow-xl dark:bg-slate-900",
           className,
         )}
       >

@@ -8,8 +8,11 @@ export interface DropdownMenuItem<T extends string> {
   disabled?: boolean;
 }
 
+/** A menu entry is either a selectable item or a visual divider between items. */
+export type DropdownMenuEntry<T extends string> = DropdownMenuItem<T> | { divider: true };
+
 export interface DropdownMenuProps<T extends string> {
-  items: DropdownMenuItem<T>[];
+  items: DropdownMenuEntry<T>[];
   onSelect: (value: T) => void;
   trigger: ReactNode;
   align?: "start" | "end";
@@ -66,23 +69,31 @@ export function DropdownMenu<T extends string>({
             align === "end" ? "end-0" : "start-0",
           )}
         >
-          {items.map((item) => (
-            <button
-              key={item.value}
-              type="button"
-              role="menuitem"
-              disabled={item.disabled}
-              onClick={() => handleSelect(item.value)}
-              className={cn(
-                "block w-full px-3 py-2 text-start text-sm transition-colors disabled:pointer-events-none disabled:opacity-50",
-                item.danger
-                  ? "text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30"
-                  : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800",
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
+          {items.map((item, index) =>
+            "divider" in item ? (
+              <div
+                key={`divider-${index}`}
+                role="separator"
+                className="my-1 border-t border-slate-200 dark:border-slate-800"
+              />
+            ) : (
+              <button
+                key={item.value}
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                onClick={() => handleSelect(item.value)}
+                className={cn(
+                  "block w-full px-3 py-2 text-start text-sm transition-colors disabled:pointer-events-none disabled:opacity-50",
+                  item.danger
+                    ? "text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                    : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800",
+                )}
+              >
+                {item.label}
+              </button>
+            ),
+          )}
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-# Handoff: SederYom - bilingual day/week event manager
+# Handoff: SederYom — bilingual day/week event manager
 
 ## Overview
 SederYom (סֵדֶר יוֹם, "order of the day") is a bilingual (Hebrew RTL / English LTR) day-and-week
@@ -6,7 +6,7 @@ personal event planner with Google Calendar sync, per-event push reminders, an a
 and full new/edit-event flows. This package documents the design so it can be rebuilt in a real codebase.
 
 ## About the Design Files
-The files in this bundle are **design references created in HTML** - a working prototype that shows the
+The files in this bundle are **design references created in HTML** — a working prototype that shows the
 intended look and behavior. They are **not production code to copy directly**. `SederYom.dc.html` is a
 "Design Component" authored in a proprietary template runtime (`support.js`); the `{{ … }}` holes,
 `<sc-if>`/`<sc-for>` tags and `class Component extends DCLogic` are runtime-specific and will not run in a
@@ -15,7 +15,7 @@ normal app.
 Your task is to **recreate these designs in the target codebase's existing environment** (React, Vue,
 Svelte, SwiftUI, etc.) using its established patterns, component library, i18n and state tooling. If no
 environment exists yet, choose the most appropriate framework and implement there. Treat the HTML as the
-source of truth for layout, spacing, color, copy and interaction - not as code to port line-by-line.
+source of truth for layout, spacing, color, copy and interaction — not as code to port line-by-line.
 
 ## Fidelity
 **High-fidelity.** Final colors, typography, spacing, copy and interactions are all present. Recreate the
@@ -24,18 +24,18 @@ UI pixel-accurately using the codebase's own primitives. All styling is Tailwind
 directly to Tailwind tokens, so a Tailwind-based target can reuse them almost verbatim.
 
 > Note on design systems: the project has two design systems (Classical, Nocturne) *nominally* bound, but
-> by explicit product decision this prototype does **not** use them - it is plain Tailwind with a custom
+> by explicit product decision this prototype does **not** use them — it is plain Tailwind with a custom
 > light/dark theme. Build against the Tailwind classes documented here, not those design systems.
 
 ## App shell / chrome
-A top toolbar (prototype-only harness - **do not ship as-is**) carries four segmented toggles:
+A top toolbar (prototype-only harness — **do not ship as-is**) carries four segmented toggles:
 Desktop/Mobile (viewport preview), עברית/EN (language), Light/Dark (theme). In a real app, language and
 theme belong in Settings (both already exist there); the viewport toggle is purely a preview device and
-should be dropped - responsiveness comes from CSS breakpoints.
+should be dropped — responsiveness comes from CSS breakpoints.
 
 The app renders inside a single full-height flex column: `bg-slate-50 dark:bg-slate-950`,
 `text-slate-800 dark:text-slate-100`, font Inter. Direction is `dir="rtl"` in Hebrew, `dir="ltr"` in
-English - use logical properties (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic.
+English — use logical properties (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start/end`) so mirroring is automatic.
 
 ## Screens / Views
 There are **7 screens**, switched by a single `screen` state value: `login`, `twofa`, `week`, `day`,
@@ -52,7 +52,7 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
 - **Layout**: same centered column. Title, "code sent to {email}" line, one centered code input
   (`text-xl tracking-[0.5em]`, `maxlength=6`, digits only via `replace(/\D/g,'')`), verify button.
 
-### 3. Week (`week`) - home
+### 3. Week (`week`) — home
 - **Purpose**: see the whole week at a glance; open a day.
 - **Header**: kicker + `weekTitle` (`text-2xl font-semibold`) on the start side; Settings and Archive
   icon-buttons on the end side.
@@ -71,9 +71,10 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
   day-of-week in accent + `text-xl font-semibold` date) | next-day chevron › | ⋯ menu button. Chevrons
   mirror in RTL via an inline `transform: scaleX(-1)` style (`backIconStyle`/`fwdIconStyle`).
 - **⋯ menu**: dropdown with Mute/Unmute (toggles day; bell-off icon on the ⋯ button turns amber when
-  muted), Archive day, Clear all events, Open archive. Each destructive item opens a confirm dialog.
+  muted), Open archive, **Copy from archive**, Archive day, Clear all events, a divider, then **Settings**
+  (navigates to the Settings screen). Each destructive item opens a confirm dialog.
 - **Event list**: scrollable. Each event is a bordered row (`rowClass`): time column (start/end,
-  `text-align` follows language), then title (`font-semibold text-[16px]`, always wraps fully -
+  `text-align` follows language), then title (`font-semibold text-[16px]`, always wraps fully —
   `break-words [overflow-wrap:anywhere]`, never clamped), optional "Next up" accent tag, description and
   note (clamped to 2 lines with a "show more"/"show less" toggle **only** when combined length > 80 chars),
   file chips, and metadata (Google-synced badge, reminder lead label). File chips are clickable links
@@ -88,15 +89,23 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
 
 ### 5. Archive (`archive`)
 - **Purpose**: browse past archived days.
-- **Header**: back icon, "Archive" title, search input (`ps-9` with a leading magnifier icon) that filters
-  by day-of-week name and summary text.
-- **List**: **lazy-loaded** - renders 12 records at a time; scrolling within ~160px of the bottom appends
+- **Header**: back icon, "Archive" title, text search (leading magnifier icon; filters by day-of-week name
+  and summary text), and a **date filter** (`<input type="date">`, `min-w-[140px]`) with a ghost × clear
+  button shown only when a date is set. Text and date filters combine (AND). Desktop: all on one row.
+  **Mobile**: back + title on row 1; search (flex-1) + date field on row 2 (`flex-wrap`, search row
+  `basis-full`) — same layout as the Copy-from-archive picker.
+- **List**: **lazy-loaded** — renders 12 records at a time; scrolling within ~160px of the bottom appends
   12 more, with a spinning "Loading more…" indicator while `archiveHasMore`. Page count resets to 12 on
-  every entry into the archive and on every search keystroke. Each record is a clickable row: day-of-week
-  kicker, full date with year, event-count, one-line summary of up to 3 event titles. Empty state:
-  centered "No archived days found".
-- **Data**: archive is live in state (`archAdded` prepended to seed `arch`), not static - archiving a day
+  every entry into the archive, on every search keystroke and on date change. Each record is a clickable
+  row: date block, day-of-week + year, event-count tag (`whitespace-nowrap`), and a summary of up to 3
+  event titles that **wraps** (not truncated). Empty state: centered "No archived days found".
+- **Scale**: designed for hundreds of archived days (the prototype seeds ~300 generated days for testing).
+  In production back this with a server-side paginated/infinite query filtered by date/text.
+- **Data**: archive is live in state (`archAdded` prepended to seed `arch`), not static — archiving a day
   creates a record visible immediately.
+- **Archiving a day** stores **all** of that day's events (local + Google, incl. description, note, reminder
+  time, frequency) in the archive record, then removes only the **local** events from the live day; Google
+  events stay because they come from sync. Files are not archived. Empty days cannot be archived.
 
 ### 6. Archive day (`archiveDay`)
 - **Purpose**: read-only view of one archived day.
@@ -109,8 +118,8 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
   - **Language**: עברית / English.
   - **Appearance**: Light / Dark.
   - **Google Calendar sync**: On / Off segmented control + a "reconnect" secondary button + a note.
-  - **Notifications**: **Browser / Mobile** segmented control (push destination - one, not both). Note text:
-    "Alerts are sent as push notifications (Firebase). Choose where to receive them - no alerts appear
+  - **Notifications**: **Browser / Mobile** segmented control (push destination — one, not both). Note text:
+    "Alerts are sent as push notifications (Firebase). Choose where to receive them — no alerts appear
     inside the app itself." Default: `browser`. (There is deliberately **no** email/SMS channel and **no**
     in-app notification.)
   - **Sign out**: secondary button → confirm dialog.
@@ -122,7 +131,7 @@ There are **7 screens**, switched by a single `screen` state value: `login`, `tw
 - Modal over `bg-slate-900/50 dark:bg-black/60` backdrop; click backdrop to close, click card stops propagation.
 - Card has a flex header (title + ghost close button), a **scrollable body** (`overflow-auto`, custom
   themed thin scrollbar `.sy-scroll`), and a **sticky footer** so the save/cancel buttons stay visible.
-- Fields: Title (span full width), All-day toggle, Start/End time (with `start < end` validation - invalid
+- Fields: Title (span full width), All-day toggle, Start/End time (with `start < end` validation — invalid
   field turns red), Frequency segmented, Reminder On/Off + lead control, Description, Note (textarea),
   Attachments.
 - **All-day vs timed differ**: for a **timed** event the frequency offers once/daily/weekly and the
@@ -142,11 +151,21 @@ Opened from an all-day row's ⓘ button. Centered modal card (`440px`, `max-h-86
 the themed `.sy-scroll`). Header: time/all-day kicker + title. Body: tag row (Google badge, reminder
 lead, repeat frequency), Description section, Note section, and an **Attachments** list where each file
 is a full-width clickable row (icon + name + human size) that opens/downloads it. Footer (local events
-only): Delete (ghost, start-aligned) + Edit (secondary) - both close the popup; Edit opens the event form.
+only): Delete (ghost, start-aligned) + Edit (secondary) — both close the popup; Edit opens the event form.
 Google events show no footer.
 
+### Copy-from-archive picker
+Opened from the Day ⋯ menu. Modal card (`460px`, `max-h-86%`, flex column centered in the viewport).
+Header: title + close. Hint line. Filter row: text search (flex-1) + date field + × clear when set.
+Scrollable list (themed `.sy-scroll`, **lazy-loaded 20 at a time**, resets on open/filter change) of
+archived days: date block, day-of-week · year, one-line summary, event count. Picking a day opens a
+**danger confirm** ("Overwrite this day?"): on confirm, all **local** events of the current day are
+deleted and replaced by copies of every event in the archived day (copies become local, editable events
+even if originally from Google; files are not copied). The current day's Google events remain. Toast:
+"Events copied from archive".
+
 ### Confirm dialog (generic)
-Reused for archive, delete-event, clear-all-events, and sign-out. Title + body explaining the consequence
+Reused for archive, delete-event, clear-all-events, copy-from-archive overwrite, and sign-out. Title + body explaining the consequence
 + Cancel / confirm. Destructive actions render the confirm button in a danger (rose) style. Toast on completion.
 
 ## Interactions & Behavior
@@ -158,30 +177,37 @@ Reused for archive, delete-event, clear-all-events, and sign-out. Title + body e
   (`line-clamp-2`) with a toggle only when combined length > 80.
 - **Mute**: per-day; sets `opacity-70` on the week card and an amber bell-off indicator on the Day ⋯ button.
 - **Archive lazy loading**: `archLimit` starts at 12, grows by 12 on near-bottom scroll; resets on
-  archive-open and on search input.
+  archive-open, search input and date change. Copy picker uses `copyLimit` (20, +20).
+- **Modals** are centered with flex (`items-center justify-center`), capped at 86% of the container
+  height with an internal scroll; the mobile preview frame is capped to the visible height so modals
+  never overflow the bottom.
+- **Scrollbars**: every scrolling region uses the themed thin `.sy-scroll` scrollbar.
 - **Responsive**: week grid 4-up (desktop) vs 1-up (mobile); form grid collapses to single column on mobile.
 
 ## State Management
 Key state fields (from the prototype's `this.state`):
-- `screen` - active view (`login|twofa|week|day|archive|archiveDay|settings`).
-- `lang` - `he|en`; drives `dir` and all copy.
-- `mode` - `light|dark` (theme; toggles `.dark` class).
-- `device` - `desktop|mobile` (**preview-only; drop in production**).
-- `authed` - auth gate.
-- `email`, `code` - login fields.
-- `selDay` - 0–6 index of the open day.
-- `muted` - `{ [dayIndex]: boolean }`.
-- `search` - archive filter string.
-- `gcal` - Google Calendar sync on/off.
-- `notif` - `browser|mobile` push destination.
-- `expanded` - `{ [eventId]: boolean }` for desc/note show-more.
-- `archAdded` - array of archive records created this session (prepended to seed data).
-- `archLimit` - archive lazy-load page size (starts 12).
-- `events` - the event list; each event: `{id, day, start, end, titleHe, titleEn, allDay, gcal, freq,
+- `screen` — active view (`login|twofa|week|day|archive|archiveDay|settings`).
+- `lang` — `he|en`; drives `dir` and all copy.
+- `mode` — `light|dark` (theme; toggles `.dark` class).
+- `device` — `desktop|mobile` (**preview-only; drop in production**).
+- `authed` — auth gate.
+- `email`, `code` — login fields.
+- `selDay` — 0–6 index of the open day.
+- `muted` — `{ [dayIndex]: boolean }`.
+- `search` — archive filter string.
+- `gcal` — Google Calendar sync on/off.
+- `notif` — `browser|mobile` push destination.
+- `expanded` — `{ [eventId]: boolean }` for desc/note show-more.
+- `archAdded` — array of archive records created this session (prepended to seed data).
+- `archLimit` — archive lazy-load page size (starts 12).
+- `archDate` — archive date filter (`YYYY-MM-DD` or empty).
+- `copyPick`, `copySearch`, `copyDate`, `copyLimit` — Copy-from-archive picker state.
+- `detail` — id of the event shown in the all-day detail popup (or null).
+- `events` — the event list; each event: `{id, day, start, end, titleHe, titleEn, allDay, gcal, freq,
   reminder, lead, descHe, descEn, note, files[]}`.
-- `dialogOpen` / `confirm` / `dayMenu` - overlay/menu visibility.
+- `dialogOpen` / `confirm` / `dayMenu` — overlay/menu visibility.
 
-**Data fetching (production)**: replace the seed arrays with API calls - week events, archive
+**Data fetching (production)**: replace the seed arrays with API calls — week events, archive
 (paginated/infinite-query to back the lazy list), Google Calendar sync, and Firebase push registration.
 
 ## Design Tokens
@@ -198,7 +224,7 @@ All values are Tailwind classes; hex values below are the corresponding Tailwind
 - `text`: `text-{c}-600 dark:text-{c}-400` (kickers, "Next up").
 - `soft`: `bg-{c}-50 dark:bg-{c}-500/10 border-{c}-300 dark:border-{c}-500/40` (today card, next-up row).
 - `dot`, `tag`, `softText` variants for chips.
-- Palette hexes - indigo 600 #4f46e5 / violet 600 #7c3aed / emerald 600 #059669 / rose 600 #e11d48.
+- Palette hexes — indigo 600 #4f46e5 / violet 600 #7c3aed / emerald 600 #059669 / rose 600 #e11d48.
 - Danger uses the rose ramp regardless of accent.
 - Muted-day chip: amber (`bg-amber-100 text-amber-700`).
 
@@ -225,16 +251,16 @@ Declared for the prototype; expose as theming config in production:
 - `density`: enum `comfortable|compact` (default `comfortable`).
 
 ## Assets
-- **Icons**: inline hand-authored SVGs (stroke `currentColor`, `stroke-width` ~1.6–1.8) - sun, moon, gear,
+- **Icons**: inline hand-authored SVGs (stroke `currentColor`, `stroke-width` ~1.6–1.8) — sun, moon, gear,
   archive box, chevrons, search, bell/bell-off, close, sign-out, etc. In production substitute your icon
   library (e.g. Lucide/Phosphor) at matching sizes (14–16px in UI, 24px for the app tile).
 - **Fonts**: Inter via Google Fonts.
 - **No raster images** in the design.
 
 ## Files
-- `SederYom.dc.html` - the full design (all 7 screens + overlays, all logic and copy). Read the template
+- `SederYom.dc.html` — the full design (all 7 screens + overlays, all logic and copy). Read the template
   markup for exact structure and the `T()` method for all Hebrew/English strings.
-- `support.js` - the prototype runtime (proprietary; **reference only**, do not ship).
+- `support.js` — the prototype runtime (proprietary; **reference only**, do not ship).
 
 ## Localization
 Every string exists in Hebrew and English inside the `T()` method (keyed getter returning `he ? '…' : '…'`).
@@ -243,5 +269,5 @@ Extract these into your i18n system. Remember RTL: use logical CSS properties an
 
 ## Notifications (production intent)
 Push only, via **Firebase Cloud Messaging**, to **browser or mobile** (user picks one). No email, no SMS,
-and **no in-app notification surface** - the app never shows its own alert UI; it only registers the push
+and **no in-app notification surface** — the app never shows its own alert UI; it only registers the push
 destination and sends reminders through FCM based on each event's reminder lead time.

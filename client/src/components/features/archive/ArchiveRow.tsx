@@ -29,7 +29,7 @@ export function ArchiveRow({ day, onSelect }: ArchiveRowProps) {
         <p className="text-[15px] font-semibold text-slate-900 dark:text-slate-100">
           {formatArchiveDate(day, i18n.language)}
         </p>
-        <p className="mt-0.5 truncate text-sm text-slate-600 dark:text-slate-400">{day.summary}</p>
+        <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-400">{day.summary}</p>
       </div>
       <span className="shrink-0 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">
         {t("archive.countLabel", { count: day.count })}

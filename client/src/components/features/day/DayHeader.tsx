@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Button, DropdownMenu, type DropdownMenuItem } from "../../ui";
+import { Button, DropdownMenu, type DropdownMenuEntry } from "../../ui";
 import type { DayDate, DayHeaderProps, DayMenuAction } from "../../../types/day";
 
 function formatDayDate(date: DayDate, dayName: string, language: string): string {
@@ -38,14 +38,17 @@ export function DayHeader({
   const { t, i18n } = useTranslation();
   const dayNames = t("week.dayNames", { returnObjects: true }) as string[];
 
-  const menuItems: DropdownMenuItem<DayMenuAction>[] = [
+  const menuItems: DropdownMenuEntry<DayMenuAction>[] = [
     {
       value: "toggleMute",
       label: `${isMuted ? "🔕" : "🔔"} ${t(isMuted ? "day.menu.unmute" : "day.menu.mute")}`,
     },
     { value: "openArchive", label: `🗄️ ${t("day.menu.openArchive")}` },
+    { value: "copyFromArchive", label: `📥 ${t("day.menu.copyFromArchive")}` },
     { value: "archiveDay", label: `🗄️ ${t("day.menu.archiveDay")}` },
     { value: "clearDay", label: `🗑️ ${t("day.menu.clearDay")}`, danger: true },
+    { divider: true },
+    { value: "openSettings", label: `⚙️ ${t("day.menu.settings")}` },
   ];
 
   return (
