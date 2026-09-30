@@ -70,6 +70,7 @@
       "deleteEventConfirm": "Delete"
     },
     "addEvent": "+ Add event",
+    "addAllDayEvent": "Add all-day event",
     "allDaySection": "All-day",
     "addAllDayEventAria": "Add all-day event"
   },

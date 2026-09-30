@@ -126,11 +126,11 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
-            size="icon"
+            className="gap-1.5 border border-dashed border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-400"
             onClick={() => requireSession(() => setFormTarget({ kind: "create", dayOfWeek, allDay: true }))}
             aria-label={t("day.addAllDayEventAria")}
           >
-            +
+            + {t("day.addAllDayEvent")}
           </Button>
         </div>
 

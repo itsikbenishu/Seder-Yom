@@ -70,6 +70,7 @@
       "deleteEventConfirm": "מחק"
     },
     "addEvent": "+ הוסף אירוע",
+    "addAllDayEvent": "הוסף אירוע יום שלם",
     "allDaySection": "אירועי יום שלם",
     "addAllDayEventAria": "הוספת אירוע יום שלם"
   },
