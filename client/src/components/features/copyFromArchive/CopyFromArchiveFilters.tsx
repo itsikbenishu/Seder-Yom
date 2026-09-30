@@ -22,8 +22,8 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-full flex-wrap items-center gap-2">
-      <div className="relative basis-full sm:max-w-xs sm:flex-1">
+    <div className="flex w-full items-center gap-2">
+      <div className="relative flex-1 sm:max-w-xs">
         <span
           className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-slate-400"
           aria-hidden="true"
@@ -39,9 +39,9 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <div className="flex w-full items-center gap-1 sm:w-auto">
+      <div className="flex shrink-0 items-center gap-1">
         <Input
-          className="min-w-[140px] flex-1 sm:flex-none"
+          className="min-w-[140px]"
           type="date"
           aria-label={t("archive.dateAria")}
           value={date}
