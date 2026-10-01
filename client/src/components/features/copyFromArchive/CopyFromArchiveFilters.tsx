@@ -23,7 +23,7 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
 
   return (
     <div className="flex w-full items-center gap-2">
-      <div className="relative flex-1 sm:max-w-xs">
+      <div className="relative flex-1">
         <span
           className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-slate-400"
           aria-hidden="true"
