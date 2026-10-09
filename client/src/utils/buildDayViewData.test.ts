@@ -4,17 +4,24 @@ import type { CalendarEvent } from "../types/calendarEvent";
 import { buildDayViewData } from "./buildDayViewData";
 
 function ev(partial: {
+  id?: string;
   dayOfWeek: number;
   start?: string;
   allDay?: boolean;
   mutedUntilArchive?: boolean;
+  reminder?: boolean;
+  reminderTime?: string;
 }): CalendarEvent {
   return {
+    id: partial.id ?? `local_${Math.random()}`,
     dayOfWeek: partial.dayOfWeek,
     start: partial.start ?? "09:00",
     end: partial.start ?? "10:00",
     allDay: partial.allDay ?? false,
     mutedUntilArchive: partial.mutedUntilArchive ?? false,
+    reminder: partial.reminder ?? false,
+    reminderTime: partial.reminderTime,
+    googleCalendarSynced: false,
   } as unknown as CalendarEvent;
 }
 
@@ -76,5 +83,21 @@ describe("buildDayViewData", () => {
     // that would otherwise look "upcoming", but "next up" only makes sense for today.
     const data = buildDayViewData([ev({ dayOfWeek: 2, start: "13:00" })], 2, NOW);
     expect(data.nextUpEventId).toBeNull();
+  });
+
+  it("sorts all-day events: no-reminder first, then reminder-having ascending by reminderTime", () => {
+    const noReminder = ev({ id: "no-reminder", dayOfWeek: 1, allDay: true });
+    const late = ev({ id: "late", dayOfWeek: 1, allDay: true, reminder: true, reminderTime: "18:00" });
+    const early = ev({ id: "early", dayOfWeek: 1, allDay: true, reminder: true, reminderTime: "07:00" });
+    const data = buildDayViewData([late, noReminder, early], 1, NOW);
+    expect(data.allDayEvents.map((e) => e.id)).toEqual(["no-reminder", "early", "late"]);
+  });
+
+  it("treats a Google all-day event as no-reminder, even among reminder-having local events", () => {
+    const withReminder = ev({ id: "local", dayOfWeek: 1, allDay: true, reminder: true, reminderTime: "09:00" });
+    const google = gev({ dayOfWeek: 1, allDay: true });
+    const data = buildDayViewData([withReminder], 1, NOW, [google]);
+    expect(data.allDayEvents[0].id).toBe(google.id);
+    expect(data.allDayEvents[1].id).toBe("local");
   });
 });

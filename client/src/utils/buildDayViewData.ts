@@ -1,7 +1,7 @@
 import { dateForDayOfWeek, dayOfWeekForDate } from "@project/shared";
 import type { GoogleCalendarEvent } from "@project/shared";
 import type { AllDayCalendarEvent, CalendarEvent, TimedCalendarEvent } from "../types/calendarEvent";
-import type { DayAllDayEvent, DayTimedEvent, DayViewData } from "../types/day";
+import { hasAllDayReminder, type DayAllDayEvent, type DayTimedEvent, type DayViewData } from "../types/day";
 
 function toMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
@@ -34,7 +34,13 @@ export function buildDayViewData(
   const timedEvents: DayTimedEvent[] = [...localTimedEvents, ...googleTimedEvents].sort((a, b) =>
     a.start.localeCompare(b.start),
   );
-  const allDayEvents: DayAllDayEvent[] = [...localAllDayEvents, ...googleAllDayEvents];
+  // No-reminder events first (original order), then reminder-having events ascending by reminderTime.
+  const allDayEventsUnsorted: DayAllDayEvent[] = [...localAllDayEvents, ...googleAllDayEvents];
+  const withoutReminder = allDayEventsUnsorted.filter((event) => !hasAllDayReminder(event));
+  const withReminder = allDayEventsUnsorted
+    .filter(hasAllDayReminder)
+    .sort((a, b) => a.reminderTime.localeCompare(b.reminderTime));
+  const allDayEvents: DayAllDayEvent[] = [...withoutReminder, ...withReminder];
 
   const date = dateForDayOfWeek(dayOfWeek);
   const isToday = dayOfWeek === dayOfWeekForDate(now);

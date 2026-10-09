@@ -1,8 +1,16 @@
 import type { GoogleCalendarEvent } from "@project/shared";
-import type { AllDayCalendarEvent, TimedCalendarEvent } from "./calendarEvent";
+import { isGoogleCalendarEvent, type AllDayCalendarEvent, type TimedCalendarEvent } from "./calendarEvent";
 
 export type DayTimedEvent = TimedCalendarEvent | GoogleCalendarEvent;
 export type DayAllDayEvent = AllDayCalendarEvent | GoogleCalendarEvent;
+
+// Google all-day events have no reminder fields at all, and a locally-synced one is excluded the
+// same way timed Google events are - this is the one canonical check for "sortable/draggable by reminder".
+export function hasAllDayReminder(
+  event: DayAllDayEvent,
+): event is AllDayCalendarEvent & { reminder: true; reminderTime: string } {
+  return !isGoogleCalendarEvent(event) && !event.googleCalendarSynced && event.reminder && Boolean(event.reminderTime);
+}
 
 export interface DayDate {
   yr: number;
@@ -62,8 +70,11 @@ export interface EventRowProps {
 }
 
 export interface AllDayEventRowProps {
+  id: string;
   title: string;
   isSynced: boolean;
+  /** true only for local, non-synced events with a reminder - the only ones orderable by reminderTime. */
+  isDraggable: boolean;
   onOpenDetail: () => void;
 }
 
@@ -82,7 +93,7 @@ export interface EventListProps {
   isMuteTogglePending: (eventId: string) => boolean;
   onEditEvent: (eventId: string) => void;
   onDeleteEvent: (eventId: string) => void;
-  onReorder: (eventId: string, newStart: string) => void;
+  onSwap: (firstId: string, firstStart: string, firstEnd: string, secondId: string, secondStart: string, secondEnd: string) => void;
 }
 
 /**

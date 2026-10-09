@@ -35,8 +35,10 @@ export function ArchiveDayScreen({ day, onBackToArchive }: ArchiveDayScreenProps
         {data.allDayEvents.map((event) => (
           <AllDayEventRow
             key={event.id}
+            id={event.id}
             title={event.title}
             isSynced={isGoogleCalendarEvent(event) || event.googleCalendarSynced}
+            isDraggable={false}
             onOpenDetail={() => setOpenAllDayId(event.id)}
           />
         ))}

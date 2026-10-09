@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Button, ConfirmDialog } from "../../ui";
 import { useWeekEvents } from "../../../hooks/useWeekEvents";
 import { useGoogleCalendarWeekEvents } from "../../../hooks/useGoogleCalendarWeekEvents";
@@ -12,9 +14,9 @@ import { useUpdateEventMutation } from "../../../hooks/useUpdateEventMutation";
 import { useDeleteEventMutation } from "../../../hooks/useDeleteEventMutation";
 import { useArchiveDayFlow } from "../../../hooks/useArchiveDayFlow";
 import { useClearDayMutation } from "../../../hooks/useClearDayMutation";
+import { useAllDayReminderDnd } from "../../../hooks/useAllDayReminderDnd";
 import { CopyFromArchivePicker } from "../copyFromArchive/CopyFromArchivePicker";
 import { buildDayViewData } from "../../../utils/buildDayViewData";
-import { computeRescheduledEnd } from "../../../utils/rescheduleEvent";
 import { isGoogleCalendarEvent } from "../../../types/calendarEvent";
 import { EventFormDialog } from "../eventForm";
 import type { EventFormMode } from "../../../types/eventForm";
@@ -22,7 +24,7 @@ import { AllDayEventDetail } from "./AllDayEventDetail";
 import { AllDayEventRow } from "./AllDayEventRow";
 import { DayHeader } from "./DayHeader";
 import { EventList } from "./EventList";
-import type { DayConfirmTarget, DayMenuAction, DayScreenProps } from "../../../types/day";
+import { hasAllDayReminder, type DayConfirmTarget, type DayMenuAction, type DayScreenProps } from "../../../types/day";
 
 function getConfirmDialogContent(target: DayConfirmTarget, t: TFunction) {
   if (target.kind === "clearDay") {
@@ -61,6 +63,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
   const deleteEventMutation = useDeleteEventMutation();
   const archiveDayFlow = useArchiveDayFlow();
   const clearDayMutation = useClearDayMutation();
+  const allDayDnd = useAllDayReminderDnd(data.allDayEvents, handleSwapAllDayReminders);
 
   function handleToggleMuteDay() {
     if (data.isMuted) {
@@ -84,11 +87,27 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
     if (event && !isGoogleCalendarEvent(event)) requireSession(() => setFormTarget({ kind: "edit", event }));
   }
 
-  function handleReorder(eventId: string, newStart: string) {
-    const event = data.timedEvents.find((item) => item.id === eventId);
-    if (!event || isGoogleCalendarEvent(event)) return;
-    const newEnd = computeRescheduledEnd(event.start, event.end, newStart);
-    updateEventMutation.mutate({ id: eventId, input: { start: newStart, end: newEnd }, files: event.files });
+  function handleSwapTimedEvents(
+    firstId: string,
+    firstStart: string,
+    firstEnd: string,
+    secondId: string,
+    secondStart: string,
+    secondEnd: string,
+  ) {
+    const first = data.timedEvents.find((item) => item.id === firstId);
+    const second = data.timedEvents.find((item) => item.id === secondId);
+    if (!first || !second || isGoogleCalendarEvent(first) || isGoogleCalendarEvent(second)) return;
+    updateEventMutation.mutate({ id: firstId, input: { start: firstStart, end: firstEnd }, files: first.files });
+    updateEventMutation.mutate({ id: secondId, input: { start: secondStart, end: secondEnd }, files: second.files });
+  }
+
+  function handleSwapAllDayReminders(firstId: string, firstTime: string, secondId: string, secondTime: string) {
+    const first = data.allDayEvents.find((item) => item.id === firstId);
+    const second = data.allDayEvents.find((item) => item.id === secondId);
+    if (!first || !second || isGoogleCalendarEvent(first) || isGoogleCalendarEvent(second)) return;
+    updateEventMutation.mutate({ id: firstId, input: { reminderTime: firstTime }, files: first.files });
+    updateEventMutation.mutate({ id: secondId, input: { reminderTime: secondTime }, files: second.files });
   }
 
   function handleConfirm() {
@@ -135,14 +154,27 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           </Button>
         </div>
 
-        {data.allDayEvents.map((event) => (
-          <AllDayEventRow
-            key={event.id}
-            title={event.title}
-            isSynced={isGoogleCalendarEvent(event) || event.googleCalendarSynced}
-            onOpenDetail={() => setOpenAllDayId(event.id)}
-          />
-        ))}
+        <DndContext
+          sensors={allDayDnd.sensors}
+          collisionDetection={closestCenter}
+          onDragStart={allDayDnd.onDragStart}
+          onDragEnd={allDayDnd.onDragEnd}
+        >
+          <SortableContext items={allDayDnd.sortableIds} strategy={verticalListSortingStrategy}>
+            <div className="flex flex-col gap-2">
+              {data.allDayEvents.map((event) => (
+                <AllDayEventRow
+                  key={event.id}
+                  id={event.id}
+                  title={event.title}
+                  isSynced={isGoogleCalendarEvent(event) || event.googleCalendarSynced}
+                  isDraggable={hasAllDayReminder(event)}
+                  onOpenDetail={() => setOpenAllDayId(event.id)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
         <EventList
           data={data}
@@ -168,7 +200,7 @@ export function DayScreen({ dayOfWeek, onBackToWeek, onNavigateDay, onOpenArchiv
           isMuteTogglePending={(eventId) => pendingMuteEventIds.has(eventId)}
           onEditEvent={handleEditEvent}
           onDeleteEvent={(eventId) => requireSession(() => setConfirmTarget({ kind: "deleteEvent", eventId }))}
-          onReorder={handleReorder}
+          onSwap={handleSwapTimedEvents}
         />
       </div>
 

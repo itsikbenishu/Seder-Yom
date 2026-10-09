@@ -14,17 +14,19 @@ export function EventList({
   isMuteTogglePending,
   onEditEvent,
   onDeleteEvent,
-  onReorder,
+  onSwap,
 }: EventListProps) {
   const { t } = useTranslation();
-  const { sensors, sortableIds, onDragStart, onDragEnd } = useScheduleDnd(data.timedEvents, onReorder);
+  const { sensors, sortableIds, onDragStart, onDragEnd } = useScheduleDnd(data.timedEvents, onSwap);
 
   return (
     <>
       {sortableIds.length > 0 && (
         <p className="flex items-center gap-1 text-xs text-violet-600 dark:text-violet-400">
           {t("day.event.dragHint")}
-          <span aria-hidden="true">v</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </p>
       )}
 

@@ -65,22 +65,32 @@ async function insertCopiedEvents(tx: DbTransaction, userId: string, dayOfWeek: 
   return copied;
 }
 
-// Publishes reminder jobs for the copies that have one - mirrors events.service.ts's createEvent.
+// Publishes reminder jobs for copies due later this week - mirrors events.service.ts's createEvent, but skips
+// anything whose dayOfWeek already passed this week: computeReminderTime always resolves against the current
+// week, so an unfiltered publish would fire every past-due copy's reminder immediately on copy.
 async function publishReminderJobsFor(userId: string, dayOfWeek: number, copied: CopiedEvent[], correlationId: string): Promise<void> {
-  const withReminders = copied.filter(({ source }) => source.reminder);
+  const now = Date.now();
+  const dueReminders = copied
+    .filter(({ source }) => source.reminder)
+    .map(({ row, source }) => ({
+      row,
+      source,
+      reminderTime: computeReminderTime({
+        dayOfWeek,
+        start: source.start,
+        reminderMode: source.reminderMode ?? "time",
+        reminderTime: source.reminderTime,
+      }),
+    }))
+    .filter(({ reminderTime }) => reminderTime.getTime() > now);
 
   await Promise.all(
-    withReminders.map(({ row, source }) =>
+    dueReminders.map(({ row, source, reminderTime }) =>
       publishReminderJob({
         eventId: row.id,
         userId,
         eventTitle: source.title,
-        reminderTime: computeReminderTime({
-          dayOfWeek,
-          start: source.start,
-          reminderMode: source.reminderMode ?? "time",
-          reminderTime: source.reminderTime,
-        }),
+        reminderTime,
         correlationId,
       }),
     ),

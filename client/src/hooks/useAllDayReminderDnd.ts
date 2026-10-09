@@ -10,28 +10,26 @@ import {
   type SensorOptions,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { isGoogleCalendarEvent, type TimedCalendarEvent } from "../types/calendarEvent";
-import type { DayTimedEvent } from "../types/day";
+import { hasAllDayReminder, type DayAllDayEvent } from "../types/day";
 
-export interface UseScheduleDndResult {
+export interface UseAllDayReminderDndResult {
   sensors: SensorDescriptor<SensorOptions>[];
-  /** id of the event currently being dragged, if any. */
   activeId: string | null;
-  /** ids of the draggable (local, non-gcal) events, in current order - feed to SortableContext. */
+  /** ids of the draggable (local, reminder-having) all-day events, in current order. */
   sortableIds: string[];
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
 }
 
 /**
- * Encapsulates all @dnd-kit state for the Day timed-event list. Dropping a local event onto
- * another row swaps their full start/end pairs directly - no neighbor interpolation, no
- * duration-preservation math; the two events simply exchange times.
+ * Encapsulates all @dnd-kit state for the Day all-day-event list. Dropping a reminder-having
+ * event onto another swaps their reminderTime values directly - the list's own sort (by
+ * reminderTime) resettles both into their correct position after the mutation refetches.
  */
-export function useScheduleDnd(
-  events: DayTimedEvent[],
-  onSwap: (firstId: string, firstStart: string, firstEnd: string, secondId: string, secondStart: string, secondEnd: string) => void,
-): UseScheduleDndResult {
+export function useAllDayReminderDnd(
+  events: DayAllDayEvent[],
+  onSwap: (firstId: string, firstTime: string, secondId: string, secondTime: string) => void,
+): UseAllDayReminderDndResult {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -39,10 +37,7 @@ export function useScheduleDnd(
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  // Google-synced events are never drag sources - only local, non-synced events are sortable.
-  const draggableEvents = events.filter(
-    (event): event is TimedCalendarEvent => !isGoogleCalendarEvent(event) && !event.googleCalendarSynced,
-  );
+  const draggableEvents = events.filter(hasAllDayReminder);
   const sortableIds = draggableEvents.map((event) => event.id);
 
   function onDragStart(event: DragStartEvent) {
@@ -58,7 +53,7 @@ export function useScheduleDnd(
     const target = draggableEvents.find((item) => item.id === over.id);
     if (!dragged || !target) return;
 
-    onSwap(dragged.id, target.start, target.end, target.id, dragged.start, dragged.end);
+    onSwap(dragged.id, target.reminderTime, target.id, dragged.reminderTime);
   }
 
   return { sensors, activeId, sortableIds, onDragStart, onDragEnd };
