@@ -44,8 +44,8 @@ export function ArchiveHeader({ search, onSearchChange, date, onDateChange, onBa
         <GridIcon />
       </Button>
       <h1 className="text-xl font-semibold">{t("archive.title")}</h1>
-      <div className="flex w-full items-center gap-2 sm:w-auto sm:flex-1">
-        <div className="relative flex-1">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-1">
+        <div className="relative min-w-0 flex-1">
           <span
             className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-slate-400"
             aria-hidden="true"
@@ -53,7 +53,7 @@ export function ArchiveHeader({ search, onSearchChange, date, onDateChange, onBa
             🔍
           </span>
           <Input
-            className="ps-9"
+            className="w-full ps-9"
             type="search"
             placeholder={t("archive.searchPlaceholder")}
             aria-label={t("archive.searchAria")}

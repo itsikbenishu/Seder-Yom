@@ -147,15 +147,26 @@ export function EventFormDialog({ mode, onClose, onSaved }: EventFormDialogProps
           )}
 
           {isAllDay ? (
-            <ReminderField
-              allDay
-              reminder={reminder}
-              reminderMode={reminderMode as ReminderMode | undefined}
-              reminderTime={reminderTime}
-              onReminderChange={(value) => setValue("reminder", value)}
-              onReminderModeChange={(value) => setValue("reminderMode", value)}
-              onReminderTimeChange={(value) => setValue("reminderTime", value)}
-            />
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <FrequencyField
+                  allDay
+                  value={frequency as EventFrequency}
+                  onChange={(value) => setValue("frequency", value)}
+                />
+              </div>
+              <div className="flex-1">
+                <ReminderField
+                  allDay
+                  reminder={reminder}
+                  reminderMode={reminderMode as ReminderMode | undefined}
+                  reminderTime={reminderTime}
+                  onReminderChange={(value) => setValue("reminder", value)}
+                  onReminderModeChange={(value) => setValue("reminderMode", value)}
+                  onReminderTimeChange={(value) => setValue("reminderTime", value)}
+                />
+              </div>
+            </div>
           ) : (
             <div className="flex gap-3">
               <div className="flex-1">

@@ -22,8 +22,8 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
   const { t } = useTranslation();
 
   return (
-    <div className="flex w-full items-center gap-2">
-      <div className="relative flex-1">
+    <div className="flex w-full flex-wrap items-center gap-2">
+      <div className="relative min-w-0 flex-1">
         <span
           className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-slate-400"
           aria-hidden="true"
@@ -31,7 +31,7 @@ export function CopyFromArchiveFilters({ search, onSearchChange, date, onDateCha
           🔍
         </span>
         <Input
-          className="ps-9"
+          className="w-full ps-9"
           type="search"
           placeholder={t("archive.searchPlaceholder")}
           aria-label={t("archive.searchAria")}
